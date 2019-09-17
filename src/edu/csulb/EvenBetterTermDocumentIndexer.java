@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class EvenBetterTermDocumentIndexer {
 
 	public static void main(String[] args) {
-		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\iamno\\Desktop\\temp").toAbsolutePath(), ".json");
+		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("").toAbsolutePath(), ".json");
 		Index index = indexCorpus(corpus);
 		// We aren't ready to use a full query parser; for now, we'll only support
 		// single-term queries.
