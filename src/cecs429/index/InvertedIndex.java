@@ -46,9 +46,8 @@ public class InvertedIndex implements Index {
 	}
 
 	public void addTerm(String term, int docID) {
-
-		if (!map.containsKey(term)) {
-			Posting p = new Posting(docID);
+		if (!map.containsKey(term)) { // If map doesn't contain term
+			Posting p = new Posting(docID);	// Add term to map
 			List<Posting> l = new ArrayList<Posting>();
 			l.add(p);
 			map.put(term, l);
@@ -64,5 +63,7 @@ public class InvertedIndex implements Index {
 			}
 		}
 	}
+	
+
 
 }

@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class EvenBetterTermDocumentIndexer {
 
 	public static void main(String[] args) {
-		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\iamno\\Desktop\\temp").toAbsolutePath(), ".json");
+		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
 		Index index = indexCorpus(corpus);
 		// We aren't ready to use a full query parser; for now, we'll only support
 		// single-term queries.
@@ -38,31 +38,21 @@ public class EvenBetterTermDocumentIndexer {
 	
 	private static Index indexCorpus(DocumentCorpus corpus) {
 		BasicTokenProcessor processor = new BasicTokenProcessor();
-		
-		// First, build the vocabulary hash set.
-		
-		
-		// TODO:
-		// Get all the documents in the corpus by calling GetDocuments().
-		
-		// Iterate through the documents, and:
-		// Tokenize the document's content by constructing an EnglishTokenStream around the document's content.
-		// Iterate through the tokens in the document, processing them using a BasicTokenProcessor,
-		//		and adding them to the HashSet vocabulary.
-		
-		// TODO:
-		// Constuct a TermDocumentMatrix once you know the size of the vocabulary.
-		// THEN, do the loop again! But instead of inserting into the HashSet, add terms to the index with addPosting.
-			
-		
+
 		InvertedIndex tdi = new InvertedIndex();
 		
+		// Loops through documents
+
 		for (Document d : corpus.getDocuments()) {
+			// Creates tokens by splitting on whitespace
 			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
 			
+			// Adds term to index along with Document ID
 			for (String token: stream.getTokens()) {
 				tdi.addTerm(processor.processToken(token), d.getId());
+
 			}
+			
 			try {
 				stream.close();
 			} catch (IOException e) {
@@ -70,9 +60,7 @@ public class EvenBetterTermDocumentIndexer {
 				e.printStackTrace();
 			}
 		
-		}
-		
-		
+		}	
 		return tdi;
 	}
 }
