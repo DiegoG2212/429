@@ -18,6 +18,7 @@ public class EvenBetterTermDocumentIndexer {
 
 	public static void main(String[] args) {
 		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+
 		Index index = indexCorpus(corpus);
 		// We aren't ready to use a full query parser; for now, we'll only support
 		// single-term queries.
