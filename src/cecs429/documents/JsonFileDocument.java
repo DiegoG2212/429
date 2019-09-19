@@ -59,9 +59,9 @@ public class JsonFileDocument implements FileDocument {
 	
 	@Override
 	public String getTitle() {
-		return mFilePath.getFileName().toString();
+		//return mFilePath.getFileName().toString();
 		
-		/*Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		try (Reader reader = getContent()) {
 			Article article = gson.fromJson(reader, Article.class);
 			
@@ -69,7 +69,7 @@ public class JsonFileDocument implements FileDocument {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "N/A";*/
+		return "N/A";
 	}
 	
 	public static FileDocument loadJsonFileDocument(Path absolutePath, int documentId) {
