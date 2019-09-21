@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -51,7 +52,10 @@ public class JsonFileDocument implements FileDocument {
 	@Override
 	public Reader getContent() {
 		try {
-			return new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"));
+			//return new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"));
+			Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8")); 
+			Article article = new GsonBuilder().setPrettyPrinting().create().fromJson(reader, Article.class);
+			return new StringReader(article.getBody());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -59,10 +63,11 @@ public class JsonFileDocument implements FileDocument {
 	
 	@Override
 	public String getTitle() {
-		//return mFilePath.getFileName().toString();
+		return mFilePath.getFileName().toString();
 		
+		/*
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (Reader reader = getContent()) {
+		try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"))) {
 			Article article = gson.fromJson(reader, Article.class);
 			
 			return article.getTitle();
@@ -70,6 +75,8 @@ public class JsonFileDocument implements FileDocument {
 			e.printStackTrace();
 		}
 		return "N/A";
+		*/
+		
 	}
 	
 	public static FileDocument loadJsonFileDocument(Path absolutePath, int documentId) {

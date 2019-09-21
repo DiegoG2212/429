@@ -46,16 +46,17 @@ public class PositionalInvertedIndexer {
 		
 		BasicTokenProcessor processor = new BasicTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
-		int x = 0;
+	
 		
 		// Loops through documents
 		for (Document d : corpus.getDocuments()) {
-			x = 0; //Reset counter
+			int x = 0; //Reset counter
 			// Creates tokens by splitting on whitespace
 			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
 			
 			// Adds term to index along with Document ID
 			for (String token: stream.getTokens()) {
+				System.out.println(processor.processToken(token));
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
 				x++;
 			}
