@@ -10,9 +10,7 @@ public class Posting {
 	private int mDocumentId;
 	private ArrayList <Integer> pos;
 	
-	public Posting(int documentId) {
-		
-	}
+
 	
 	public Posting(int documentId, int position) {
 		mDocumentId = documentId;

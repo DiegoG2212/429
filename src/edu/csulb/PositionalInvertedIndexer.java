@@ -8,19 +8,27 @@ import cecs429.index.Posting;
 import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
 import cecs429.text.BasicTokenProcessor;
+import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
+
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Scanner;
 
 
 public class PositionalInvertedIndexer {
 
 	public static void main(String[] args) {
-		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+		DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\diego\\Desktop\\boii").toAbsolutePath(), ".txt");
 		Index index = indexCorpus(corpus);
 
+		List<String> t = index.getVocabulary();
+		
+		for (String i : t) {
+			System.out.println(i);
+		}
 		
 		String query = "";
 		Scanner scan = new Scanner(System.in);
@@ -44,7 +52,7 @@ public class PositionalInvertedIndexer {
 	
 	private static Index indexCorpus(DocumentCorpus corpus) {
 		
-		BasicTokenProcessor processor = new BasicTokenProcessor();
+		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
 	
 		
@@ -56,7 +64,7 @@ public class PositionalInvertedIndexer {
 			
 			// Adds term to index along with Document ID
 			for (String token: stream.getTokens()) {
-				System.out.println(processor.processToken(token));
+				//System.out.println(processor.processToken(token));
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
 				x++;
 			}
