@@ -14,8 +14,9 @@ import cecs429.text.EnglishTokenStream;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
-
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -55,7 +56,13 @@ public class PositionalInvertedIndexer {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		  File file = new File("src/DefaultDirectory.txt"); 
+		  
+		  BufferedReader br = new BufferedReader(new FileReader(file));
+		  String st;
+		  while((st = br.readLine()) != null)
+			  System.out.println(st);
 
 		// GUI
 		SwingUtilities.invokeLater(new Runnable() {
@@ -132,7 +139,7 @@ public class PositionalInvertedIndexer {
 		});
 
 		// GUI End
-		int x = CurrentHolder.getValue();
+
 		List<String> t = CurrentHolder.index.getVocabulary();
 		
 		for (String i : t) {
