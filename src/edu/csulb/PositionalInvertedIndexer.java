@@ -33,15 +33,31 @@ import javax.swing.SwingUtilities;
 
 
 public class PositionalInvertedIndexer {
-	public static void main(String[] args) {
-		DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\diego\\Desktop\\boii").toAbsolutePath(), ".txt");
-		Index index = indexCorpus(corpus);
-		*/
-		
-		// GUI
-		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
-		Index index = indexCorpus(corpus);
 
+	static class CurrentHolder{
+		static int x = 1;
+		static DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+		static //DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
+		Index index = indexCorpus(corpus);
+		public static int getValue() {
+			return x;
+		};
+		public static Index getIndex() {
+			return index;
+		}
+		public static DocumentCorpus getCorpus() {
+			return corpus;
+		}
+		
+		
+		public static void changeCorpus(DocumentCorpus c) {
+			corpus = c;
+		}
+	}
+	
+	public static void main(String[] args) {
+
+		// GUI
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {			
 				// Frame
@@ -58,36 +74,29 @@ public class PositionalInvertedIndexer {
 				JFileChooser j = new JFileChooser();
 				j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				
-
-
-				
 				// Browse Files Action Listener
 				browseFile.addActionListener(new ActionListener() {
-					 
-					
 					public void actionPerformed(ActionEvent e) {
-							int returnVal = j.showOpenDialog(null); // Select File	
-							
-							//corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+							int returnVal = j.showOpenDialog(null); // Select File
+							File file = j.getSelectedFile();
+							String fullPath = file.getAbsolutePath();
+							System.out.println(fullPath);
+							CurrentHolder.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(fullPath).toAbsolutePath(), ".json");
+							CurrentHolder.index = indexCorpus(CurrentHolder.corpus);
 					}				
-				});
-				
-				//File file = j.getSelectedFile();
-				//String fullPath = file.getAbsolutePath();
-				//corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(fullPath).toAbsolutePath(), ".json");
-				
-				
+				});		
+
 				
 				// Search Button Action Listener
 				search.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						String query = textField.getText();
-						query = query.toLowerCase();
+						String query = textField.getText().toLowerCase();
+						//query = query.toLowerCase();
 						
 						int docCount = 0;
-						for (Posting p : index.getPostings(query)) {
-							results.append("Document " + corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
+						for (Posting p : CurrentHolder.index.getPostings(query)) {
+							results.append("Document " + CurrentHolder.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
 							results.append("Positions: " + p.getPos() +"\n");
 							docCount++;
 						}
@@ -123,15 +132,20 @@ public class PositionalInvertedIndexer {
 		});
 
 		// GUI End
-
-		List<String> t = index.getVocabulary();
+		int x = CurrentHolder.getValue();
+		List<String> t = CurrentHolder.index.getVocabulary();
 		
 		for (String i : t) {
 			System.out.println(i);
 		}
-		
 
 		/*
+		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+		//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
+		Index index = indexCorpus(corpus);
+		
+		
+		// Original Prompt
 		String query = "";
 		Scanner scan = new Scanner(System.in);
 		while (!query.equals("quit")) {
@@ -148,11 +162,10 @@ public class PositionalInvertedIndexer {
 			System.out.println();
 		}
 		
-		scan.close();
-		
-		
+		scan.close();	
 		System.out.println("Quitting...");
 		*/
+		
 		
 	}
 

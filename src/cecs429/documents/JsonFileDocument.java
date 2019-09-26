@@ -64,12 +64,10 @@ public class JsonFileDocument implements FileDocument {
 	@Override
 	public String getTitle() {
 		//return mFilePath.getFileName().toString();
-		
-		
+			
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"))) {
-			Article article = gson.fromJson(reader, Article.class);
-			
+			Article article = gson.fromJson(reader, Article.class);	
 			return article.getTitle();
 		} catch (IOException e) {
 			e.printStackTrace();
