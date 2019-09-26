@@ -12,24 +12,147 @@ import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 
 public class PositionalInvertedIndexer {
 
-	public static void main(String[] args) {
-		DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\diego\\Desktop\\boii").toAbsolutePath(), ".txt");
+	static class CurrentHolder{
+		static int x = 1;
+		static DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+		static //DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
 		Index index = indexCorpus(corpus);
+		public static int getValue() {
+			return x;
+		};
+		public static Index getIndex() {
+			return index;
+		}
+		public static DocumentCorpus getCorpus() {
+			return corpus;
+		}
+		
+		
+		public static void changeCorpus(DocumentCorpus c) {
+			corpus = c;
+		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		  File file = new File("src/DefaultDirectory.txt"); 
+		  
+		  BufferedReader br = new BufferedReader(new FileReader(file));
+		  String st;
+		  while((st = br.readLine()) != null)
+			  System.out.println(st);
 
-		List<String> t = index.getVocabulary();
+		// GUI
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {			
+				// Frame
+				JFrame frame = new JFrame("Search Engine");			
+				// Panels
+				JPanel p = new JPanel();
+				// Components
+				JTextField textField = new JTextField(16);
+				JButton search = new JButton ("Search");
+				JButton browseFile = new JButton("Browse Files");
+				JLabel l = new JLabel("Blank");
+				JTextArea results = new JTextArea(15,30);
+				JScrollPane scrollPane = new JScrollPane(results);		
+				JFileChooser j = new JFileChooser();
+				j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				
+				// Browse Files Action Listener
+				browseFile.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+							int returnVal = j.showOpenDialog(null); // Select File
+							File file = j.getSelectedFile();
+							String fullPath = file.getAbsolutePath();
+							System.out.println(fullPath);
+							CurrentHolder.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(fullPath).toAbsolutePath(), ".json");
+							CurrentHolder.index = indexCorpus(CurrentHolder.corpus);
+					}				
+				});		
+
+				
+				// Search Button Action Listener
+				search.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						String query = textField.getText().toLowerCase();
+						//query = query.toLowerCase();
+						
+						int docCount = 0;
+						for (Posting p : CurrentHolder.index.getPostings(query)) {
+							results.append("Document " + CurrentHolder.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
+							results.append("Positions: " + p.getPos() +"\n");
+							docCount++;
+						}
+						results.append("Number of Documents:" + docCount +"\n");
+						results.append("\n");
+						}					
+					
+				});
+				
+				results.setEditable(false);
+	
+				// Panel Add
+				p.add(browseFile);
+				p.add(textField);
+				p.add(search);
+				//p.add(l);
+				p.add(scrollPane);
+								
+				// Frame Add
+				frame.add(p);
+						
+				// Searches when Enter is pressed
+				frame.getRootPane().setDefaultButton(search); 
+				
+				// Size Set
+				frame.setSize(400, 450); 
+				frame.setResizable(false);
+				
+				// Closing window stops program
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setVisible(true);
+			}
+		});
+
+		// GUI End
+
+		List<String> t = CurrentHolder.index.getVocabulary();
 		
 		for (String i : t) {
 			System.out.println(i);
 		}
+
+		/*
+		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+		//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
+		Index index = indexCorpus(corpus);
 		
+		
+		// Original Prompt
 		String query = "";
 		Scanner scan = new Scanner(System.in);
 		while (!query.equals("quit")) {
@@ -45,11 +168,14 @@ public class PositionalInvertedIndexer {
 			System.out.println("Number of Documents:" + docCount);
 			System.out.println();
 		}
-		scan.close();
+		
+		scan.close();	
 		System.out.println("Quitting...");
+		*/
+		
+		
 	}
-	
-	
+
 	private static Index indexCorpus(DocumentCorpus corpus) {
 		
 		BetterTokenProcessor processor = new BetterTokenProcessor();
@@ -64,7 +190,6 @@ public class PositionalInvertedIndexer {
 			
 			// Adds term to index along with Document ID
 			for (String token: stream.getTokens()) {
-				//System.out.println(processor.processToken(token));
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
 				x++;
 			}

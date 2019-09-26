@@ -25,7 +25,9 @@ public class PhraseLiteral implements QueryComponent {
 	 * Constructs a PhraseLiteral given a string with one or more individual terms separated by spaces.
 	 */
 	public PhraseLiteral(String terms) {
-		mTerms.addAll(Arrays.asList(terms.split(" ")));
+
+		mTerms.addAll(Arrays.asList(terms.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").split(" ")));
+
 	}
 	
 	@Override
