@@ -40,23 +40,25 @@ public class PositionalInvertedIndex implements Index {
 		return val;
 	}
 	
-	public void addTerm(String term, int docID, int pos) {
-		if (!map.containsKey(term)) { // If map doesn't contain term
-			Posting p = new Posting(docID, pos);	// Add term to map
-			ArrayList<Posting> l = new ArrayList<Posting>();
-			l.add(p);
-			map.put(term, l);
-		} else {
-			List<Posting> temp = map.get(term);
-
-			if (docID == temp.get(temp.size() - 1).getDocumentId()) {
-				temp.get(temp.size() - 1).addPos(pos);
-				return;
+	public void addTerm(List<String> term, int docID, int pos) {
+		for (String i : term) {
+			if (!map.containsKey(i)) { // If map doesn't contain term
+				Posting p = new Posting(docID, pos);	// Add term to map
+				ArrayList<Posting> l = new ArrayList<Posting>();
+				l.add(p);
+				map.put(i, l);
 			} else {
-				Posting p = new Posting(docID, pos);
-				temp.add(p);
-				map.put(term, new ArrayList<>(temp));
-			}
+				List<Posting> temp = map.get(i);
+	
+				if (docID == temp.get(temp.size() - 1).getDocumentId()) {
+					temp.get(temp.size() - 1).addPos(pos);
+					return;
+				} else {
+					Posting p = new Posting(docID, pos);
+					temp.add(p);
+					map.put(i, new ArrayList<>(temp));
+				}
+			}	
 		}
 	}
 

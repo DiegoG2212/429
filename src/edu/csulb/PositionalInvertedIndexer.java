@@ -8,13 +8,17 @@ import cecs429.index.Posting;
 import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
 import cecs429.text.BasicTokenProcessor;
+import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
+
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.JButton;
@@ -29,13 +33,8 @@ import javax.swing.SwingUtilities;
 
 
 public class PositionalInvertedIndexer {
-	public PositionalInvertedIndexer() {
-		main1();
-	}
-
-	public void main1() {
-		/*
-		DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\JSON Files").toAbsolutePath(), ".json");
+	public static void main(String[] args) {
+		DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\diego\\Desktop\\boii").toAbsolutePath(), ".txt");
 		Index index = indexCorpus(corpus);
 		*/
 		
@@ -59,6 +58,7 @@ public class PositionalInvertedIndexer {
 				JFileChooser j = new JFileChooser();
 				j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				
+
 
 				
 				// Browse Files Action Listener
@@ -123,6 +123,12 @@ public class PositionalInvertedIndexer {
 		});
 
 		// GUI End
+
+		List<String> t = index.getVocabulary();
+		
+		for (String i : t) {
+			System.out.println(i);
+		}
 		
 
 		/*
@@ -149,14 +155,10 @@ public class PositionalInvertedIndexer {
 		*/
 		
 	}
-	public static void main(String[] args) {
-		new PositionalInvertedIndexer();
-	}
-	
-	
+
 	private static Index indexCorpus(DocumentCorpus corpus) {
 		
-		BasicTokenProcessor processor = new BasicTokenProcessor();
+		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
 	
 		
