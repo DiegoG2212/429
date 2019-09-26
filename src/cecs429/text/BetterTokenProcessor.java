@@ -18,8 +18,9 @@ public class BetterTokenProcessor implements TokenProcessor {
 			String b[] = token.split("-");
 			a.add(token.replaceAll("-",""));
 			for (String i : b) {
-				System.out.println(i);
+				if (!(i.isEmpty())){
 				a.add(i.toLowerCase());
+				}
 			}
 		}else { a.add(token.toLowerCase());}
 		return a;
