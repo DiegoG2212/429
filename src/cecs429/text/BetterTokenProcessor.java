@@ -18,7 +18,9 @@ public class BetterTokenProcessor implements TokenProcessor {
 			a.add(token.replaceAll("-",""));
 			for (String i : b) {
 				i = i.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", ""); // this removes any non alphanumeric values at the beginning or end
+
 				i = i.replaceAll("\'+|\"", "");	
+
 				a.add(i.toLowerCase());
 			}
 		}else { 
