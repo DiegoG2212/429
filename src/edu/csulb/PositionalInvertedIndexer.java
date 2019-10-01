@@ -37,19 +37,30 @@ import javax.swing.SwingUtilities;
 
 
 public class PositionalInvertedIndexer {
-
-	static class CurrentHolder{
-		static String directory = ""; // Sets directory to blank
-		static File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
+	String directory = ""; // Sets directory to blank
+	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
+	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
+	//static DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
+	Index index = indexCorpus(corpus);
 	
-		static DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-		//static DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
-		static Index index = indexCorpus(corpus);
+	public PositionalInvertedIndexer() throws Exception {
+		query();
 	}
 	
-	public static void main(String[] args) throws Exception {
+	
+
+	class CurrentHolder{
+		DocumentCorpus getCorpus() {
+			return corpus;
+		}
+		Index getIndex() {
+			return index;
+		}
+	}
+	
+	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
-		  BufferedReader br = new BufferedReader(new FileReader(CurrentHolder.defStore));	  
+		  BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));	  
 		  // Reads text file into String
 		  String st;
 		  while((st = br.readLine()) != null) {
@@ -61,6 +72,7 @@ public class PositionalInvertedIndexer {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {			
 				// Frame
+				
 				JFrame frame = new JFrame("Search Engine");			
 				// Panels
 				JPanel p = new JPanel();
@@ -89,7 +101,7 @@ public class PositionalInvertedIndexer {
 								String fullPath = file.getAbsolutePath();
 								System.out.println(fullPath);
 							    BufferedWriter writer;
-								writer = new BufferedWriter(new FileWriter(CurrentHolder.defStore));
+								writer = new BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
 							    writer.write(fullPath);
 							    writer.close();
 							    updateDirectory(fullPath);
@@ -116,8 +128,8 @@ public class PositionalInvertedIndexer {
 						
 						results.setText(""); // Clear results
 						int docCount = 0;
-						for (Posting p : CurrentHolder.index.getPostings(query)) {
-							results.append("Document: " + CurrentHolder.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
+						for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
+							results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
 							results.append("Positions: " + p.getPos() +"\n");
 							docCount++;
 						}
@@ -160,16 +172,16 @@ public class PositionalInvertedIndexer {
 			}
 		});
 		// GUI End===================================================================================
-		List<String> t = CurrentHolder.index.getVocabulary();
+		List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
 		for (String i : t) {
 			System.out.println(i);
 		}
 		
 	}
 	
-	public static void updateDirectory(String dir) { //Updates changes to corpus and index
-		CurrentHolder.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
-		CurrentHolder.index = indexCorpus(CurrentHolder.corpus);
+	public void updateDirectory(String dir) { //Updates changes to corpus and index
+		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
+		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
 	private static Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
@@ -197,6 +209,14 @@ public class PositionalInvertedIndexer {
 		}	
 		return tdi;
 	}
+	
+	
+	
+	
+	public static void main(String[] args) throws Exception {
+		new PositionalInvertedIndexer();
+	}
+	
 }
 
 	
