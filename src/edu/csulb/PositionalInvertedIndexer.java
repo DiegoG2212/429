@@ -47,17 +47,6 @@ public class PositionalInvertedIndexer {
 		query();
 	}
 	
-	
-
-	class CurrentHolder{
-		DocumentCorpus getCorpus() {
-			return corpus;
-		}
-		Index getIndex() {
-			return index;
-		}
-	}
-	
 	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
 		  BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));	  
@@ -67,18 +56,25 @@ public class PositionalInvertedIndexer {
 			  System.out.println(st);
 			  updateDirectory(st);
 		  }
+		  	/*
+			List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
+			
+			for (String i : t) {
+				System.out.println(i);
+			}
+			*/
 		  
 		// GUI===========================================================================
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {			
 				// Frame
-				
-				JFrame frame = new JFrame("Search Engine");			
+				JFrame frame = new JFrame("Search Engine");
+				//frame.setTitle("woah");
 				// Panels
 				JPanel p = new JPanel();
 				// Components
 				JTextField textField = new JTextField(35);
-				JButton search = new JButton ("Search");
+				JButton search = new JButton ("Enter");
 				JButton browseFile = new JButton("Browse Files");
 				JLabel l = new JLabel("Blank");
 				JTextArea results = new JTextArea(19,55);
@@ -109,12 +105,7 @@ public class PositionalInvertedIndexer {
 							} catch (IOException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
-							}
-
-							
-							
-							
-
+							}			
 					}				
 				});		
 
@@ -124,9 +115,23 @@ public class PositionalInvertedIndexer {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						String query = textField.getText().toLowerCase();
-						//query = query.toLowerCase();
-						
+						//query = query.toLowerCase();					
 						results.setText(""); // Clear results
+						
+						if(textField.getText().equals(":vocab")) {
+							List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
+							
+							int counter = 0;
+							for (String i : t) {
+								results.append(i +"\n");
+								counter++;
+								if(counter >= 1000) //Stops after first 1000 terms
+									break;
+							}
+							results.append("woah \n");
+						}
+						
+						
 						int docCount = 0;
 						for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
 							results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
@@ -172,10 +177,9 @@ public class PositionalInvertedIndexer {
 			}
 		});
 		// GUI End===================================================================================
-		List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
-		for (String i : t) {
-			System.out.println(i);
-		}
+		
+
+		
 		
 	}
 	
@@ -183,7 +187,7 @@ public class PositionalInvertedIndexer {
 		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
-	private static Index indexCorpus(DocumentCorpus corpus) {
+	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
 	
