@@ -158,16 +158,43 @@ public class BooleanQueryParser {
 			lengthOut = nextSpace - startIndex;
 		}
 		
-		// This is a term literal containing a single term.
-		return new Literal(
-		 new StringBounds(startIndex, lengthOut),
-		 new TermLiteral(subquery.substring(startIndex, startIndex + lengthOut)));
+		if (subquery.charAt(startIndex) == '"') {
+			
+			/*
+			TODO:
+			Instead of assuming that we only have single-term literals, modify this method so it will create a PhraseLiteral
+			object if the first non-space character you find is a double-quote ("). In this case, the literal is not ended
+			by the next space character, but by the next double-quote character.
+			 */
+			
+			// Find ending quotation mark
+			
+			int temp = startIndex+1;
+			String holder  = " ";
+			while (subquery.charAt(temp) != '"') {
+				temp++;
+			}
+			// Substring to get all words between quotation marks as a single string
+			holder = subquery.substring(startIndex+1, startIndex + temp);
+			String[] phrase = holder.split(" ");// split that into a list of individual strings
+			List<String> phr = new ArrayList<>();
+			for (String i : phrase) {
+				phr.add(i);
+			}
+			lengthOut = startIndex - temp;
+			return new Literal(
+					new StringBounds(startIndex, lengthOut),// Construct a new Literal object,
+					new PhraseLiteral(phr)); // but the second parameter will be a PhraseLiteral constructed with the list of strings.
+			
+		} else {
 		
-		/*
-		TODO:
-		Instead of assuming that we only have single-term literals, modify this method so it will create a PhraseLiteral
-		object if the first non-space character you find is a double-quote ("). In this case, the literal is not ended
-		by the next space character, but by the next double-quote character.
-		 */
+		// This is a term literal containing a single term.
+			return new Literal(
+			 new StringBounds(startIndex, lengthOut),
+			 new TermLiteral(subquery.substring(startIndex, startIndex + lengthOut)));
+		}
+		
+		
+		
 	}
 }
