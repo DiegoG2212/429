@@ -37,36 +37,44 @@ import javax.swing.SwingUtilities;
 
 
 public class PositionalInvertedIndexer {
-
-	static class CurrentHolder{
-		static String directory = ""; // Sets directory to blank
-		static File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
+	String directory = ""; // Sets directory to blank
+	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
+	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
+	//static DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
+	Index index = indexCorpus(corpus);
 	
-		static DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-		//static DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
-		static Index index = indexCorpus(corpus);
+	public PositionalInvertedIndexer() throws Exception {
+		query();
 	}
 	
-	public static void main(String[] args) throws Exception {
+	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
-		  BufferedReader br = new BufferedReader(new FileReader(CurrentHolder.defStore));	  
+		  BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));	  
 		  // Reads text file into String
 		  String st;
 		  while((st = br.readLine()) != null) {
 			  System.out.println(st);
 			  updateDirectory(st);
 		  }
+		  	/*
+			List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
+			
+			for (String i : t) {
+				System.out.println(i);
+			}
+			*/
 		  
 		// GUI===========================================================================
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {			
 				// Frame
-				JFrame frame = new JFrame("Search Engine");			
+				JFrame frame = new JFrame("Search Engine");
+				//frame.setTitle("woah");
 				// Panels
 				JPanel p = new JPanel();
 				// Components
 				JTextField textField = new JTextField(35);
-				JButton search = new JButton ("Search");
+				JButton search = new JButton ("Enter");
 				JButton browseFile = new JButton("Browse Files");
 				JLabel l = new JLabel("Blank");
 				JTextArea results = new JTextArea(19,55);
@@ -89,7 +97,7 @@ public class PositionalInvertedIndexer {
 								String fullPath = file.getAbsolutePath();
 								System.out.println(fullPath);
 							    BufferedWriter writer;
-								writer = new BufferedWriter(new FileWriter(CurrentHolder.defStore));
+								writer = new BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
 							    writer.write(fullPath);
 							    writer.close();
 							    updateDirectory(fullPath);
@@ -97,12 +105,7 @@ public class PositionalInvertedIndexer {
 							} catch (IOException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
-							}
-
-							
-							
-							
-
+							}			
 					}				
 				});		
 
@@ -112,12 +115,26 @@ public class PositionalInvertedIndexer {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						String query = textField.getText().toLowerCase();
-						//query = query.toLowerCase();
-						
+						//query = query.toLowerCase();					
 						results.setText(""); // Clear results
+						
+						if(textField.getText().equals(":vocab")) {
+							List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
+							
+							int counter = 0;
+							for (String i : t) {
+								results.append(i +"\n");
+								counter++;
+								if(counter >= 1000) //Stops after first 1000 terms
+									break;
+							}
+							results.append("woah \n");
+						}
+						
+						
 						int docCount = 0;
-						for (Posting p : CurrentHolder.index.getPostings(query)) {
-							results.append("Document: " + CurrentHolder.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
+						for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
+							results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
 							results.append("Positions: " + p.getPos() +"\n");
 							docCount++;
 						}
@@ -160,18 +177,17 @@ public class PositionalInvertedIndexer {
 			}
 		});
 		// GUI End===================================================================================
-		List<String> t = CurrentHolder.index.getVocabulary();
-		for (String i : t) {
-			System.out.println(i);
-		}
+		
+
+		
 		
 	}
 	
-	public static void updateDirectory(String dir) { //Updates changes to corpus and index
-		CurrentHolder.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
-		CurrentHolder.index = indexCorpus(CurrentHolder.corpus);
+	public void updateDirectory(String dir) { //Updates changes to corpus and index
+		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
+		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
-	private static Index indexCorpus(DocumentCorpus corpus) {
+	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
 	
@@ -197,6 +213,14 @@ public class PositionalInvertedIndexer {
 		}	
 		return tdi;
 	}
+	
+	
+	
+	
+	public static void main(String[] args) throws Exception {
+		new PositionalInvertedIndexer();
+	}
+	
 }
 
 	
