@@ -3,6 +3,8 @@ package cecs429.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import cecs429.text.BetterTokenProcessor;
+
 /**
  * Parses boolean queries according to the base requirements of the CECS 429 project.
  * Does not handle phrase queries, NOT queries, NEAR queries, or wildcard queries... yet.
@@ -177,9 +179,14 @@ public class BooleanQueryParser {
 			// Substring to get all words between quotation marks as a single string
 			holder = subquery.substring(startIndex+1, startIndex + temp);
 			String[] phrase = holder.split(" ");// split that into a list of individual strings
+			List<String> tem = new ArrayList<>();
 			List<String> phr = new ArrayList<>();
-			for (String i : phrase) {
-				phr.add(i);
+			
+			for (String i : phrase) { // process tokens before going in to the phrase literal. Following golden rule.
+				tem = new BetterTokenProcessor().processToken(i);
+				for(String t : tem) {
+					phr.add(t);
+				}
 			}
 			lengthOut = startIndex - temp;
 			return new Literal(
@@ -189,9 +196,11 @@ public class BooleanQueryParser {
 		} else {
 		
 		// This is a term literal containing a single term.
+			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut)); //process token before 
+																															    // sending to the term literal
 			return new Literal(
 			 new StringBounds(startIndex, lengthOut),
-			 new TermLiteral(subquery.substring(startIndex, startIndex + lengthOut)));
+			 new TermLiteral(tem.get(0)));
 		}
 		
 		
