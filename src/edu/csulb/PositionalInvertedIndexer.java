@@ -45,7 +45,7 @@ public class PositionalInvertedIndexer {
 	String directory = ""; // Sets directory to blank
 	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
 	//DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-	DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get("C:\\Users\\potad\\eclipse-workspace\\Text Files").toAbsolutePath(), ".txt");
+	DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
 	Index index = indexCorpus(corpus);
 	
 	public PositionalInvertedIndexer() throws Exception {
@@ -54,20 +54,14 @@ public class PositionalInvertedIndexer {
 	
 	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
-		  BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));	  
-		  // Reads text file into String
-		  String st;
-		  while((st = br.readLine()) != null) {
-			  System.out.println(st);
-			  updateDirectory(st);
-		  }
-		  	/*
-			List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
-			
-			for (String i : t) {
-				System.out.println(i);
-			}
-			*/
+		BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));
+		// Reads text file into String
+		String st;
+		while ((st = br.readLine()) != null) {
+			System.out.println(st);
+			updateDirectory(st);
+		}
+
 		  
 		// GUI===========================================================================
 		SwingUtilities.invokeLater(new Runnable() {
