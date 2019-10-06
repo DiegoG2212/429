@@ -2,7 +2,7 @@ package cecs429.text;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.tartarus.snowball.ext.englishStemmer;
 public class BetterTokenProcessor implements TokenProcessor {
 
 	@Override
