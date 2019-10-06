@@ -12,6 +12,7 @@ public class TermLiteral implements QueryComponent {
 	private String mTerm;
 	
 	public TermLiteral(String term) {
+		
 		mTerm = term;
 	}
 	

@@ -5,6 +5,8 @@ import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
 import cecs429.index.Index;
 import cecs429.index.Posting;
+import cecs429.query.BooleanQueryParser;
+import cecs429.query.QueryComponent;
 import cecs429.index.InvertedIndex;
 import cecs429.text.BasicTokenProcessor;
 import cecs429.text.EnglishTokenStream;
@@ -27,8 +29,8 @@ public class EvenBetterTermDocumentIndexer {
 		while (!query.equals("quit")) {
 			System.out.println("Enter a term to search: ");
 			query = scan.nextLine();
-			query = query.toLowerCase();
-			for (Posting p : index.getPostings(query)) {
+			QueryComponent q = new BooleanQueryParser().parseQuery(query);
+			for (Posting p : q.getPostings(index)) {
 				System.out.println("Document " + corpus.getDocument(p.getDocumentId()).getTitle());
 			}
 		}
