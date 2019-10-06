@@ -6,6 +6,8 @@ import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
 import cecs429.index.Index;
 import cecs429.index.Posting;
+import cecs429.query.BooleanQueryParser;
+import cecs429.query.QueryComponent;
 import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
 import cecs429.text.BasicTokenProcessor;
@@ -46,6 +48,7 @@ public class PositionalInvertedIndexer {
 	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
 	//DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
 	DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
+
 	Index index = indexCorpus(corpus);
 	
 	public PositionalInvertedIndexer() throws Exception {
@@ -160,7 +163,10 @@ public class PositionalInvertedIndexer {
 						
 						else {
 							int docCount = 0;
-							for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
+							System.out.println("im here");
+							QueryComponent q = new BooleanQueryParser().parseQuery(query);
+							for (Posting p : q.getPostings(index)) {
+								System.out.println("inside q postings");
 								results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
 								results.append("Positions: " + p.getPos() +"\n");
 								docCount++;
@@ -210,8 +216,8 @@ public class PositionalInvertedIndexer {
 	}
 	
 	public void updateDirectory(String dir) { //Updates changes to corpus and index
-		//PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
-		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
+		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
+		//PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
 	
