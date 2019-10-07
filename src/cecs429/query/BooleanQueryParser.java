@@ -41,7 +41,7 @@ public class BooleanQueryParser {
 	 */
 	public QueryComponent parseQuery(String query) {
 		int start = 0;
-		
+
 		// General routine: scan the query to identify a literal, and put that literal into a list.
 		//	Repeat until a + or the end of the query is encountered; build an AND query with each
 		//	of the literals found. Repeat the scan-and-build-AND-query phase for each segment of the
