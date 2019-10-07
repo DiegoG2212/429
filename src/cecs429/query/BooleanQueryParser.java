@@ -157,11 +157,14 @@ public class BooleanQueryParser {
 		if (nextSpace < 0) {
 			// No more literals in this subquery.
 			lengthOut = subLength - startIndex;
+			System.out.println(lengthOut + " " + startIndex);
+
 		}
 		else {
 			lengthOut = nextSpace - startIndex;
+			System.out.println(lengthOut + " " + startIndex);
 		}
-		
+
 		if (subquery.charAt(startIndex) == '"') {
 			
 			/*
@@ -170,31 +173,43 @@ public class BooleanQueryParser {
 			object if the first non-space character you find is a double-quote ("). In this case, the literal is not ended
 			by the next space character, but by the next double-quote character.
 			 */
-			
+
 			// Find ending quotation mark
-			
-			int temp = startIndex+1;
+
+
 			String holder  = " ";
-			while (subquery.charAt(temp) != '"') {
-				temp++;
+			while (subquery.charAt(startIndex) == '"') {
+				startIndex++;
 			}
 			// Substring to get all words between quotation marks as a single string
-			holder = subquery.substring(startIndex+1, startIndex + temp);
+
+			int fallSpace = subquery.indexOf('"', startIndex);
+
+			if (fallSpace < 0){
+				lengthOut = subquery.length() - startIndex;
+			} else {
+				lengthOut = fallSpace -startIndex +1;
+			}
+
+			holder = subquery.substring(startIndex, lengthOut);
+			holder = holder.trim();
+			System.out.println(holder);
 			String[] phrase = holder.split(" ");// split that into a list of individual strings
+			System.out.println(phrase[0] + phrase[1]);
 			List<String> tem = new ArrayList<>();
 			List<String> phr = new ArrayList<>();
-			
+
 			for (String i : phrase) { // process tokens before going in to the phrase literal. Following golden rule.
 				tem = new BetterTokenProcessor().processToken(i);
 				for(String t : tem) {
 					phr.add(t);
 				}
 			}
-			lengthOut = startIndex - temp;
+
+			System.out.println(lengthOut + " " + startIndex + "yoyoyoyoyoy");
 			return new Literal(
-					new StringBounds(startIndex, lengthOut),// Construct a new Literal object,
+					new StringBounds(startIndex , lengthOut),// Construct a new Literal object,
 					new PhraseLiteral(phr)); // but the second parameter will be a PhraseLiteral constructed with the list of strings.
-			
 		} else {
 		
 		// This is a term literal containing a single term.

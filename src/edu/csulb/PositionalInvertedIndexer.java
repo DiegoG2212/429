@@ -8,9 +8,7 @@ import cecs429.index.Index;
 import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
-import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
-import cecs429.text.BasicTokenProcessor;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -25,11 +23,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 // GUI Imports
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
