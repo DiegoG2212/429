@@ -42,30 +42,30 @@ public class OrQuery implements QueryComponent {
 	
 	
 	private List<Posting> orQuery(List<Posting>var1, List<Posting> var2){
-		List <Posting> result = new ArrayList<>(); // result query is the answer 
-		int i = 0;  // pointers that go thru the arrays
+		List <Posting> result = new ArrayList<>(); // Result Query is the answer 
+		int i = 0;  // Pointers that go through the array
 		int j = 0;
 		
-		if ((var1.isEmpty()) && (var2.isEmpty())) { // checking if both of the list are empty so we return an empty list
+		if ((var1.isEmpty()) && (var2.isEmpty())) { // Checking if both of the list are empty so we return an empty list
 			List<Posting> p = Collections.emptyList();
 			return p;
-		}else if (var1.isEmpty()) { // if one of the lists are empty retrun the other one
+		}else if (var1.isEmpty()) { // If one of the lists are empty, return the other one
 			return var2;
 		}else if (var2.isEmpty()) {
 			return var1;
 		}
 		
-		while((i<var1.size()) && (j < var2.size())) { // checking that our pointers are not bigger than the size of the list i am sending
-													  // if we are leave the loop and return the result
+		while((i<var1.size()) && (j < var2.size())) { // Checking if our pointers are not bigger than the size of the list I am sending
+													  // If it is, leave the loop and return the result
 			
-			if (var1.get(i).getDocumentId() == var2.get(j).getDocumentId()) { // if the doc ids of the two posting matches
-																			  // bingo we found the answer and added to our result 
+			if (var1.get(i).getDocumentId() == var2.get(j).getDocumentId()) { // If the Doc IDs of the two postings match
+																			  // Then we found the answer and add it to our result 
 				result.add(var1.get(i));
 				i++;
 				j++;
-			}else if (var1.get(i).getDocumentId() < var2.get(j).getDocumentId()) { // other wise check which one is bigger and increase the opposite pointer 
-				result.add(var1.get(i));
-				i++;															   // that point to the lesser doc ID
+			}else if (var1.get(i).getDocumentId() < var2.get(j).getDocumentId()) {  // Otherwise check which one is bigger and increase the opposite pointer 
+				result.add(var1.get(i));											// that points to the lesser doc ID
+				i++;															   
 			}else {
 				result.add(var2.get(j));
 				j++;
@@ -73,7 +73,7 @@ public class OrQuery implements QueryComponent {
 			
 		}
 		
-		if (i == var1.size()) {   // checking for any left over values in the lsit if there is add them to the result and then return the result
+		if (i == var1.size()) {   // Checking for any left over values in the list. If there is any, add them to the result and then return the result
 			if(j != var2.size()) {
 				while(j < var2.size()) {
 					result.add(var2.get(j));

@@ -46,8 +46,8 @@ import java.awt.event.ActionListener;
 public class PositionalInvertedIndexer {
 	String directory = ""; // Sets directory to blank
 	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
-	//DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-	DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
+	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
+	//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
 
 	Index index = indexCorpus(corpus);
 	
@@ -69,12 +69,11 @@ public class PositionalInvertedIndexer {
 		// GUI===========================================================================
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {			
-				// Frame
+				// Frame ==================
 				JFrame frame = new JFrame("Search Engine");
-				//frame.setTitle("woah");
-				// Panels
+				// Panels =================
 				JPanel p = new JPanel();
-				// Components
+				// Components =============
 				JTextField textField = new JTextField(35);
 				JButton search = new JButton ("Enter");
 				JButton browseFile = new JButton("Browse Files");
@@ -84,31 +83,33 @@ public class PositionalInvertedIndexer {
 				JScrollPane scrollPane = new JScrollPane(results);		
 				JFileChooser j = new JFileChooser();
 				j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				
-				
-				// Fonts
+				// Fonts ==================
 				Font font = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font bold = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font inputFont = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 17);
 				
+				
+				
 				// Browse Files Action Listener; :index Special Query
 				browseFile.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-
 							try {
 								int returnVal = j.showOpenDialog(null); // Select File
 								File file = j.getSelectedFile();
 								String fullPath = file.getAbsolutePath();
 								System.out.println(fullPath);
+								
+								// Stores last chosen directory
 							    BufferedWriter writer;
 								writer = new BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
 							    writer.write(fullPath);
 							    writer.close();
+							    
+							    // Update chosen directory
 							    updateDirectory(fullPath);
 							
 							} catch (IOException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}			
 					}				
@@ -119,9 +120,9 @@ public class PositionalInvertedIndexer {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						englishStemmer stemmer = new englishStemmer();
-						String query = textField.getText().toLowerCase();	
+						String query = textField.getText().toLowerCase();	// Get query, make lower case
 						
-						// Stem Queries
+						// Stem Query
 						stemmer.setCurrent(query);
 						stemmer.stem();
 						query = stemmer.getCurrent();
@@ -166,6 +167,7 @@ public class PositionalInvertedIndexer {
 							System.out.println("im here");
 							QueryComponent q = new BooleanQueryParser().parseQuery(query);
 							for (Posting p : q.getPostings(index)) {
+							//for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
 								System.out.println("inside q postings");
 								results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
 								results.append("Positions: " + p.getPos() +"\n");
