@@ -122,16 +122,21 @@ public class PositionalInvertedIndexer {
 					public void actionPerformed(ActionEvent e) {
 						englishStemmer stemmer = new englishStemmer();
 						String query = textField.getText().toLowerCase();	// Get query, make lower case
+						
+						/*
 						// Stem Query
 						stemmer.setCurrent(query);
 						stemmer.stem();
 						query = stemmer.getCurrent();
 						System.out.println(query);
-						
-						
+						*/
 						
 						// Gets first word in query; splits string after first whitespace
 						String special[] = textField.getText().split(" ", 2);
+						
+						String whole[] = textField.getText().split(" "); //Separate on every whitespace
+						
+						
 						
 						
 						// :vocab Special Query
@@ -153,6 +158,10 @@ public class PositionalInvertedIndexer {
 						else if(special[0].equals(":stem")){
 							try {
 									results.setText(""); // Clear results
+									
+									
+									
+									
 									stemmer.setCurrent(special[1]);
 									if(stemmer.stem()) {
 										results.append(stemmer.getCurrent() + "\n");
@@ -206,29 +215,52 @@ public class PositionalInvertedIndexer {
 								System.out.println("You must search a query first");
 							}
 						}
-						
+
 						else {
-								int docCount = 0;
-								System.out.println("im here");
-								QueryComponent q = new BooleanQueryParser().parseQuery(query);
-								for (Posting p : q.getPostings(index)) {
-								//for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
-									System.out.println("inside q postings");
-									results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
-									results.append("Positions: " + p.getPos() +"\n");
-									docCount++;
+							String combine = "";
+							int counter = 0;
+							// Stemming
+							//System.out.println(whole[1]);
+							for (String s : whole) {
+								if(counter == 0) { //First word
+									stemmer.setCurrent(s);
+									stemmer.stem();
+									
+									combine += stemmer.getCurrent();
+									counter ++;
 								}
-								results.append("Number of Documents:" + docCount +"\n");
-								results.append( "\n");
-								results.append("If you would like to view a document, type :doc <name> \n");
-								results.append("Otherwise, type another search query");
-								lastQuery = query;
-								queryCheck = 1;
+								else {
+									stemmer.setCurrent(s);
+									stemmer.stem();
+									
+									combine += " ";
+									combine += stemmer.getCurrent();
+								}
 							}
-						}			
-					
+							System.out.println(combine);
+
+							int docCount = 0;
+							// System.out.println("im here");
+							QueryComponent q = new BooleanQueryParser().parseQuery(combine);
+							for (Posting p : q.getPostings(index)) {
+								// for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
+								// System.out.println("inside q postings");
+								results.append("Document: " + PositionalInvertedIndexer.this.corpus
+										.getDocument(p.getDocumentId()).getTitle() + "\n");
+								results.append("Positions: " + p.getPos() + "\n");
+								docCount++;
+							}
+							results.append("Number of Documents:" + docCount + "\n");
+							results.append("\n");
+							results.append("If you would like to view a document, type :doc <name> \n");
+							results.append("Otherwise, type another search query");
+							lastQuery = query;
+							queryCheck = 1;
+						}
+					}
+
 				});
-				
+
 				results.setEditable(false);
 				
 				// Panel Add	
