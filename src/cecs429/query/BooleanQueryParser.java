@@ -146,9 +146,11 @@ public class BooleanQueryParser {
 		int lengthOut;
 		
 		// Skip past white space.
+		
 		while (subquery.charAt(startIndex) == ' ') {
 			++startIndex;
 		}
+		
 		
 		// Locate the next space to find the end of this literal.
 		int nextSpace = subquery.indexOf(' ', startIndex);

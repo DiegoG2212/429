@@ -51,6 +51,7 @@ public class JsonFileDocument implements FileDocument {
 	
 	@Override
 	public Reader getContent() {
+		/*
 		try {
 			//return new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"));
 			Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8")); 
@@ -59,8 +60,23 @@ public class JsonFileDocument implements FileDocument {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		*/
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"))) {
+			Article article = gson.fromJson(reader, Article.class);	
+			Reader convert = new StringReader(article.getBody());
+			Reader c = new StringReader("wow");
+			c.read();
+			return convert;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
+	public String printContent() {
+		return "";
+	}
 	@Override
 	public String getTitle() {
 		//return mFilePath.getFileName().toString();
@@ -72,9 +88,7 @@ public class JsonFileDocument implements FileDocument {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "N/A";
-		
-		
+		return "N/A";	
 	}
 	
 	public static FileDocument loadJsonFileDocument(Path absolutePath, int documentId) {
