@@ -8,9 +8,7 @@ import cecs429.index.Index;
 import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
-import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
-import cecs429.text.BasicTokenProcessor;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -22,14 +20,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 // GUI Imports
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -49,8 +44,7 @@ public class PositionalInvertedIndexer {
 	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
 	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
 	//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
-	String lastQuery = ""; // Saves last user query
-	int queryCheck = 0;
+
 	Index index = indexCorpus(corpus);
 	
 	public PositionalInvertedIndexer() throws Exception {
@@ -116,6 +110,7 @@ public class PositionalInvertedIndexer {
 							}			
 					}				
 				});		
+		
 				// Search Button Action Listener
 				search.addActionListener(new ActionListener() {
 					@Override
@@ -131,7 +126,7 @@ public class PositionalInvertedIndexer {
 						System.out.println(query);
 						*/
 						
-						// Gets first word in query; splits string after first whitespace
+						// Gets first word in query
 						String special[] = textField.getText().split(" ", 2);
 						
 						String whole[] = textField.getText().split(" "); //Separate on every whitespace
@@ -141,7 +136,6 @@ public class PositionalInvertedIndexer {
 						
 						// :vocab Special Query
 						if(textField.getText().equals(":vocab")) {
-							results.setText(""); // Clear results
 							List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
 				
 							int counter = 0;
@@ -300,7 +294,7 @@ public class PositionalInvertedIndexer {
 		//PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
-
+	
 	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
