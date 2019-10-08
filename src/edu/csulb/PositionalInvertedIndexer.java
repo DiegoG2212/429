@@ -44,12 +44,14 @@ import java.awt.event.ActionListener;
 
 public class PositionalInvertedIndexer {
 	String directory = ""; // Sets directory to blank
-	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
+	//File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
 	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
 	//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
 	String lastQuery = ""; // Saves last user query
 	int queryCheck = 0;
 	Index index = indexCorpus(corpus);
+	
+	long indexTime = 0;
 	
 	public PositionalInvertedIndexer() throws Exception {
 		query();
@@ -57,13 +59,13 @@ public class PositionalInvertedIndexer {
 	
 	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
-		BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));
+		//BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));
 		// Reads text file into String
-		String st;
-		while ((st = br.readLine()) != null) {
-			System.out.println(st);
-			updateDirectory(st);
-		}
+		//String st;
+		//while ((st = br.readLine()) != null) {
+		//	System.out.println(st);
+		//	updateDirectory(st);	
+		//}
 
 		  
 		// GUI===========================================================================
@@ -96,24 +98,31 @@ public class PositionalInvertedIndexer {
 				// Browse Files Action Listener; :index Special Query
 				browseFile.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-							try {
+							
 								int returnVal = j.showOpenDialog(null); // Select File
 								File file = j.getSelectedFile();
 								String fullPath = file.getAbsolutePath();
 								System.out.println(fullPath);
 								
+								/*
 								// Stores last chosen directory
 							    BufferedWriter writer;
 								writer = new BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
 							    writer.write(fullPath);
 							    writer.close();
-							    
+							    */
+								
 							    // Update chosen directory
 							    updateDirectory(fullPath);
+							    results.setText(""); // Clear previous
+							    results.append("" + indexTime +" milliseconds to index the corpus\n");
 							
-							} catch (IOException e1) {
+							
+							/*
+							catch (IOException e1) {
 								e1.printStackTrace();
-							}			
+							}		
+							*/	
 					}				
 				});		
 				// Search Button Action Listener
@@ -312,7 +321,13 @@ public class PositionalInvertedIndexer {
 	public void updateDirectory(String dir) { //Updates changes to corpus and index
 		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
 		//PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
+		
+		long startTime = System.nanoTime(); // Index Timer
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
+		long endTime = System.nanoTime();
+		
+		PositionalInvertedIndexer.this.indexTime = (endTime - startTime)/1000000;
+		System.out.println(indexTime);
 	}	
 	
 	public String stemThis(String x) { //Updates changes to corpus and index

@@ -65,8 +65,8 @@ public class JsonFileDocument implements FileDocument {
 		try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"))) {
 			Article article = gson.fromJson(reader, Article.class);	
 			Reader convert = new StringReader(article.getBody());
-			Reader c = new StringReader("wow");
-			c.read();
+			//Reader c = new StringReader("wow");
+			//c.read();
 			return convert;
 		} catch (IOException e) {
 			e.printStackTrace();
