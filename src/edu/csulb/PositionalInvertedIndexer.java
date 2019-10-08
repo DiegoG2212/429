@@ -8,9 +8,7 @@ import cecs429.index.Index;
 import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
-import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
-import cecs429.text.BasicTokenProcessor;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -89,9 +87,11 @@ public class PositionalInvertedIndexer {
 				Font font = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font bold = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font inputFont = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
-				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 17);
+				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
 				
-				
+				// Disable horizontal scrolling on Search Results
+				results.setLineWrap(true);
+				results.setWrapStyleWord(true);
 				
 				// Browse Files Action Listener; :index Special Query
 				browseFile.addActionListener(new ActionListener() {
@@ -122,23 +122,13 @@ public class PositionalInvertedIndexer {
 					public void actionPerformed(ActionEvent e) {
 						englishStemmer stemmer = new englishStemmer();
 						String query = textField.getText().toLowerCase();	// Get query, make lower case
-						
-						/*
-						// Stem Query
-						stemmer.setCurrent(query);
-						stemmer.stem();
-						query = stemmer.getCurrent();
-						System.out.println(query);
-						*/
-						
+												
 						// Gets first word in query; splits string after first whitespace
 						String special[] = textField.getText().split(" ", 2);
 						
 						String whole[] = textField.getText().split(" "); //Separate on every whitespace
 						
-						
-						
-						
+							
 						// :vocab Special Query
 						if(textField.getText().equals(":vocab")) {
 							results.setText(""); // Clear results
@@ -159,10 +149,7 @@ public class PositionalInvertedIndexer {
 							try {
 									results.setText(""); // Clear results
 														
-									stemmer.setCurrent(special[1]);
-									if(stemmer.stem()) {
-										results.append(stemmer.getCurrent() + "\n");
-									}
+									results.append(stemThis(special[1]));
 							}
 							catch(ArrayIndexOutOfBoundsException exception) {
 								results.setText("Correct usage: \":stem <token>\" ");
@@ -172,15 +159,14 @@ public class PositionalInvertedIndexer {
 						
 						else if(special[0].equals(":doc")) {
 							if(queryCheck != 0) {
+								results.setText(""); //Clear results
 								String docSearch = special[1].toLowerCase();
-								stemmer.setCurrent(docSearch);
-								stemmer.stem();
-								docSearch = stemmer.getCurrent();
+								docSearch = stemThis(docSearch);
+			
 								for (Posting p : PositionalInvertedIndexer.this.index.getPostings(lastQuery)) {
 									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
-									stemmer.setCurrent(compare);
-									stemmer.stem();
-									compare = stemmer.getCurrent();
+
+									compare = stemThis(compare);
 									if(docSearch.equals(compare)) {
 											results.append("\n");
 											Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getContent();
@@ -194,7 +180,7 @@ public class PositionalInvertedIndexer {
 											}
 										    while (c != -1){
 										        //Converting to character
-										        System.out.print((char)c);
+										        //System.out.print((char)c);
 										        read += Character.toString((char)c);
 										        try {
 													c = b.read();	
@@ -202,9 +188,7 @@ public class PositionalInvertedIndexer {
 													e1.printStackTrace();
 												}
 										    }
-										    results.append(read);
-										
-										System.out.println("mamamia");
+										    results.append(read +"\n");
 									}
 								}		
 							}
@@ -220,18 +204,12 @@ public class PositionalInvertedIndexer {
 							//System.out.println(whole[1]);
 							for (String s : whole) {
 								if(counter == 0) { //First word
-									stemmer.setCurrent(s);
-									stemmer.stem();
-									
-									combine += stemmer.getCurrent();
+									combine += stemThis(s);
 									counter ++;
 								}
 								else {
-									stemmer.setCurrent(s);
-									stemmer.stem();
-									
 									combine += " ";
-									combine += stemmer.getCurrent();
+									combine += stemThis(s);
 								}
 							}
 							System.out.println(combine);
@@ -245,6 +223,7 @@ public class PositionalInvertedIndexer {
 								results.append("Document: " + PositionalInvertedIndexer.this.corpus
 										.getDocument(p.getDocumentId()).getTitle() + "\n");
 								results.append("Positions: " + p.getPos() + "\n");
+								results.append("\n");
 								docCount++;
 							}
 							results.append("Number of Documents:" + docCount + "\n");
@@ -297,6 +276,15 @@ public class PositionalInvertedIndexer {
 		//PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
+	
+	public String stemThis(String x) { //Updates changes to corpus and index
+		englishStemmer stemmer = new englishStemmer();
+		
+		// Stem Query
+		stemmer.setCurrent(x);
+		stemmer.stem();
+		return stemmer.getCurrent();
+	}
 
 	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
