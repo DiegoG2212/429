@@ -308,7 +308,7 @@ public class PositionalInvertedIndexer {
 				frame.setVisible(true); // Visible
 			}
 		});
-		br.close();
+		//br.close();
 		// GUI
 		// End===================================================================================
 	}
