@@ -20,11 +20,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Scanner;
 
 // GUI Imports
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -44,7 +47,8 @@ public class PositionalInvertedIndexer {
 	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
 	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
 	//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
-
+	String lastQuery = ""; // Saves last user query
+	int queryCheck = 0;
 	Index index = indexCorpus(corpus);
 	
 	public PositionalInvertedIndexer() throws Exception {
@@ -83,9 +87,11 @@ public class PositionalInvertedIndexer {
 				Font font = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font bold = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font inputFont = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
-				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 17);
+				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
 				
-				
+				// Disable horizontal scrolling on Search Results
+				results.setLineWrap(true);
+				results.setWrapStyleWord(true);
 				
 				// Browse Files Action Listener; :index Special Query
 				browseFile.addActionListener(new ActionListener() {
@@ -110,28 +116,22 @@ public class PositionalInvertedIndexer {
 							}			
 					}				
 				});		
-		
 				// Search Button Action Listener
 				search.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						englishStemmer stemmer = new englishStemmer();
 						String query = textField.getText().toLowerCase();	// Get query, make lower case
-						
-						// Stem Query
-//						System.out.println(query);
-//						stemmer.setCurrent(query);
-//						stemmer.stem();
-//						query = stemmer.getCurrent();
-//						System.out.println(query);
-						
-						results.setText(""); // Clear results
-						
-						// Gets first word in query
+												
+						// Gets first word in query; splits string after first whitespace
 						String special[] = textField.getText().split(" ", 2);
 						
+						String whole[] = textField.getText().split(" "); //Separate on every whitespace
+						
+							
 						// :vocab Special Query
 						if(textField.getText().equals(":vocab")) {
+							results.setText(""); // Clear results
 							List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
 				
 							int counter = 0;
@@ -147,10 +147,9 @@ public class PositionalInvertedIndexer {
 						// :stem token Special Query
 						else if(special[0].equals(":stem")){
 							try {
-									stemmer.setCurrent(special[1]);
-									if(stemmer.stem()) {
-										results.append(stemmer.getCurrent() + "\n");
-									}
+									results.setText(""); // Clear results
+														
+									results.append(stemThis(special[1]));
 							}
 							catch(ArrayIndexOutOfBoundsException exception) {
 								results.setText("Correct usage: \":stem <token>\" ");
@@ -158,28 +157,124 @@ public class PositionalInvertedIndexer {
 							
 						}
 						
-						
+						else if(special[0].equals(":doc")) {
+							if(queryCheck != 0) {
+								results.setText(""); //Clear results
+								String docSearch = special[1].toLowerCase();
+								docSearch = stemThis(docSearch);
+									
+								QueryComponent q = new BooleanQueryParser().parseQuery(lastQuery);
+								for (Posting p : q.getPostings(index)) {
+									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
+									
+									compare = stemThis(compare);
+									if(docSearch.equals(compare)) {
+											results.append("\n");
+											Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getContent();
+											String read = "";
+											
+										    int c = 0;
+											try {
+												c = b.read();
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
+										    while (c != -1){
+										        //Converting to character
+										        //System.out.print((char)c);
+										        read += Character.toString((char)c);
+										        try {
+													c = b.read();	
+												} catch (IOException e1) {
+													e1.printStackTrace();
+												}
+										    }
+										    results.append(read +"\n");
+									}
+								}
+								
+								
+								
+								
+								
+								
+								/*
+								for (Posting p : PositionalInvertedIndexer.this.index.getPostings(lastQuery)) {
+									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
+
+									compare = stemThis(compare);
+									if(docSearch.equals(compare)) {
+											results.append("\n");
+											Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getContent();
+											String read = "";
+											
+										    int c = 0;
+											try {
+												c = b.read();
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
+										    while (c != -1){
+										        //Converting to character
+										        //System.out.print((char)c);
+										        read += Character.toString((char)c);
+										        try {
+													c = b.read();	
+												} catch (IOException e1) {
+													e1.printStackTrace();
+												}
+										    }
+										    results.append(read +"\n");
+									}
+								}	
+								*/	
+							}
+							else {
+								results.append("You must search a query first \n");
+							}
+						}
+
 						else {
+							results.setText("");
+							String combine = "";
+							int counter = 0;
+							// Stemming
+							//System.out.println(whole[1]);
+							for (String s : whole) {
+								if(counter == 0) { //First word
+									combine += stemThis(s);
+									counter ++;
+								}
+								else {
+									combine += " ";
+									combine += stemThis(s);
+								}
+							}
+							System.out.println(combine);
+
 							int docCount = 0;
-							System.out.println("im here");
-							QueryComponent q = new BooleanQueryParser().parseQuery(query);
+							// System.out.println("im here");
+							QueryComponent q = new BooleanQueryParser().parseQuery(combine);
 							for (Posting p : q.getPostings(index)) {
-							//for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
-//								System.out.println("inside q postings");
-								results.append("Document: " + PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle() +"\n");
-								results.append("Positions: " + p.getPos() +"\n");
+								// for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
+								// System.out.println("inside q postings");
+								results.append("Document: " + PositionalInvertedIndexer.this.corpus
+										.getDocument(p.getDocumentId()).getTitle() + "\n");
+								results.append("Positions: " + p.getPos() + "\n");
+								results.append("\n");
 								docCount++;
 							}
-							results.append("Number of Documents:" + docCount +"\n");
-							results.append( "\n");
-						}	
-						
-						
-						
-						}					
-					
+							results.append("Number of Documents:" + docCount + "\n");
+							results.append("\n");
+							results.append("If you would like to view a document, type :doc <name> \n");
+							results.append("Otherwise, type another search query \n");
+							lastQuery = combine; // Stores last query for :doc usage
+							queryCheck = 1; // Checks that query was searched allowing for :doc usage
+						}
+					}
+
 				});
-				
+
 				results.setEditable(false);
 				
 				// Panel Add	
@@ -220,6 +315,15 @@ public class PositionalInvertedIndexer {
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 	}	
 	
+	public String stemThis(String x) { //Updates changes to corpus and index
+		englishStemmer stemmer = new englishStemmer();
+		
+		// Stem Query
+		stemmer.setCurrent(x);
+		stemmer.stem();
+		return stemmer.getCurrent();
+	}
+
 	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
