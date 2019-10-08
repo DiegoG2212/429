@@ -15,23 +15,23 @@ import com.google.gson.GsonBuilder;
 public class JsonFileDocument implements FileDocument {
 	private int mDocumentId;
 	private Path mFilePath;
-	
+
 	/**
-	 * Constructs a JsonFileDocument with the given document ID representing the file at the given
-	 * absolute file path.
+	 * Constructs a JsonFileDocument with the given document ID representing the
+	 * file at the given absolute file path.
 	 */
 	public JsonFileDocument(int id, Path absoluteFilePath) {
 		mDocumentId = id;
 		mFilePath = absoluteFilePath;
 	}
-	
+
 	// Taken from DirectoryCorpus
 	private static String getFileExtension(Path file) {
 		String fileName = file.getFileName().toString();
 		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		return "." + extension;
 	}
-	
+
 	@Override
 	public Path getFilePath() {
 		try {
@@ -40,57 +40,59 @@ public class JsonFileDocument implements FileDocument {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public int getId() {
 		return mDocumentId;
 	}
-	
+
 	@Override
 	public Reader getContent() {
 		/*
-		try {
-			//return new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"));
-			Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8")); 
-			Article article = new GsonBuilder().setPrettyPrinting().create().fromJson(reader, Article.class);
-			return new StringReader(article.getBody());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		*/
+		 * try { //return new BufferedReader(new InputStreamReader(new
+		 * FileInputStream(mFilePath.toString()),"utf-8")); Reader reader = new
+		 * BufferedReader(new InputStreamReader(new
+		 * FileInputStream(mFilePath.toString()),"utf-8")); Article article = new
+		 * GsonBuilder().setPrettyPrinting().create().fromJson(reader, Article.class);
+		 * return new StringReader(article.getBody()); } catch (IOException e) { throw
+		 * new RuntimeException(e); }
+		 */
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"))) {
-			Article article = gson.fromJson(reader, Article.class);	
+		try (Reader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(mFilePath.toString()), "utf-8"))) {
+			Article article = gson.fromJson(reader, Article.class);
 			Reader convert = new StringReader(article.getBody());
-			//Reader c = new StringReader("wow");
-			//c.read();
+			// Reader c = new StringReader("wow");
+			// c.read();
 			return convert;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public String printContent() {
 		return "";
 	}
+
 	@Override
 	public String getTitle() {
-		//return mFilePath.getFileName().toString();
-			
+		// return mFilePath.getFileName().toString();
+
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath.toString()),"utf-8"))) {
-			Article article = gson.fromJson(reader, Article.class);	
+		try (Reader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(mFilePath.toString()), "utf-8"))) {
+			Article article = gson.fromJson(reader, Article.class);
 			return article.getTitle();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "N/A";	
+		return "N/A";
 	}
-	
+
 	public static FileDocument loadJsonFileDocument(Path absolutePath, int documentId) {
 		return new JsonFileDocument(documentId, absolutePath);
 	}
@@ -101,21 +103,21 @@ class Article {
 	private String title;
 	private String body;
 	private String url;
-	
+
 	public Article(String title, String body, String url) {
 		this.title = title;
 		this.body = body;
 		this.url = url;
 	}
-	
+
 	public String getTitle() {
 		return this.title;
 	}
-	
+
 	public String getBody() {
 		return this.body;
 	}
-	
+
 	public String getURL() {
 		return this.url;
 	}
