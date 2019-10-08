@@ -162,7 +162,43 @@ public class PositionalInvertedIndexer {
 								results.setText(""); //Clear results
 								String docSearch = special[1].toLowerCase();
 								docSearch = stemThis(docSearch);
-			
+									
+								QueryComponent q = new BooleanQueryParser().parseQuery(lastQuery);
+								for (Posting p : q.getPostings(index)) {
+									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
+									
+									compare = stemThis(compare);
+									if(docSearch.equals(compare)) {
+											results.append("\n");
+											Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getContent();
+											String read = "";
+											
+										    int c = 0;
+											try {
+												c = b.read();
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
+										    while (c != -1){
+										        //Converting to character
+										        //System.out.print((char)c);
+										        read += Character.toString((char)c);
+										        try {
+													c = b.read();	
+												} catch (IOException e1) {
+													e1.printStackTrace();
+												}
+										    }
+										    results.append(read +"\n");
+									}
+								}
+								
+								
+								
+								
+								
+								
+								/*
 								for (Posting p : PositionalInvertedIndexer.this.index.getPostings(lastQuery)) {
 									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
 
@@ -190,14 +226,16 @@ public class PositionalInvertedIndexer {
 										    }
 										    results.append(read +"\n");
 									}
-								}		
+								}	
+								*/	
 							}
 							else {
-								System.out.println("You must search a query first");
+								results.append("You must search a query first \n");
 							}
 						}
 
 						else {
+							results.setText("");
 							String combine = "";
 							int counter = 0;
 							// Stemming
@@ -229,9 +267,9 @@ public class PositionalInvertedIndexer {
 							results.append("Number of Documents:" + docCount + "\n");
 							results.append("\n");
 							results.append("If you would like to view a document, type :doc <name> \n");
-							results.append("Otherwise, type another search query");
-							lastQuery = query;
-							queryCheck = 1;
+							results.append("Otherwise, type another search query \n");
+							lastQuery = combine; // Stores last query for :doc usage
+							queryCheck = 1; // Checks that query was searched allowing for :doc usage
 						}
 					}
 
