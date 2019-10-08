@@ -108,21 +108,21 @@ public class BooleanQueryParser {
 		int lengthOut;
 		// Find the start of the next subquery by skipping spaces and + signs.
 		char test = query.charAt(startIndex);
-
+		// part of extended query parser as it needs to read to see if there is a parentesis first other wise split in the +
 		if (test == '('){
 
-			System.out.print("in parentesis\n");
-
+			// the following just grabs what ever is inside the parenthesis with the parenthesis
+			//and sends it as a su query
 			int nextPar = query.indexOf(')', startIndex+1);
-			if (nextPar  < 0 ) {
+			if (nextPar  < 0 ) {// making sure that there is a closing parenthesis
 				lengthOut = query.length() - startIndex;
 			} else {
 				lengthOut = 1 + nextPar - startIndex;
 			}
 
-		}else {
+		}else { // if no parenthesis divide base on space an the plus
 
-			System.out.print("in space phrase amrks\n" );
+
 			while (test == ' ' || test == '+') {
 				test = query.charAt(++startIndex);
 			}
@@ -227,17 +227,17 @@ public class BooleanQueryParser {
 					new PhraseLiteral(phr)); // but the second parameter will be a PhraseLiteral constructed with the list of strings.
 		}else if(subquery.charAt(startIndex) == '('){ // expanded query parser
 
-			String parSub = " ";
-			while (subquery.charAt(startIndex) == '(') {
+			String parSub = " ";	//checking to see if there is a parenthesis
+			while (subquery.charAt(startIndex) == '(') { //if there is get whats inside
 				startIndex++;
 			}
 			// Substring to get all words between the parenthesis as a single string
 
-			int exitPar = subquery.indexOf(')', startIndex);
-			System.out.println(startIndex);
+			int exitPar = subquery.indexOf(')', startIndex); //substring it and send it as a query thru the query
+			System.out.println(startIndex);						  //parser
 			System.out.println(exitPar);
 			System.out.print(subquery);
-			if (exitPar < 0) {
+			if (exitPar < 0) { //amking sure of closing parenthesis
 				lengthOut = subquery.length() - startIndex;
 			} else {
 				lengthOut = exitPar - startIndex + 1;
@@ -245,10 +245,10 @@ public class BooleanQueryParser {
 
 			parSub = subquery.substring(startIndex, lengthOut);
 
-			System.out.println("Paren: "+parSub);
 
 
-			return new Literal(
+
+			return new Literal( // send new literal with parse query as a recursive call
 					new StringBounds(startIndex, lengthOut),
 					this.parseQuery(parSub));
 
