@@ -106,36 +106,53 @@ public class BooleanQueryParser {
 	 */
 	private StringBounds findNextSubquery(String query, int startIndex) {
 		int lengthOut;
-		
 		// Find the start of the next subquery by skipping spaces and + signs.
 		char test = query.charAt(startIndex);
-		while (test == ' ' || test == '+') {
-			test = query.charAt(++startIndex);
-		}
-		
-		// Find the end of the next subquery.
-		int nextPlus = query.indexOf('+', startIndex + 1);
-		
-		if (nextPlus < 0) {
-			// If there is no other + sign, then this is the final subquery in the
-			// query string.
-			lengthOut = query.length() - startIndex;
-		}
-		else {
-			// If there is another + sign, then the length of this subquery goes up
-			// to the next + sign.
-		
-			// Move nextPlus backwards until finding a non-space non-plus character.
-			test = query.charAt(nextPlus);
-			while (test == ' ' || test == '+') {
-				test = query.charAt(--nextPlus);
+
+		if (test == '('){
+
+			System.out.print("in parentesis\n");
+
+			int nextPar = query.indexOf(')', startIndex+1);
+			if (nextPar  < 0 ) {
+				lengthOut = query.length() - startIndex;
+			} else {
+				lengthOut = 1 + nextPar - startIndex;
 			}
-			
-			lengthOut = 1 + nextPlus - startIndex;
+
+		}else {
+
+			System.out.print("in space phrase amrks\n" );
+			while (test == ' ' || test == '+') {
+				test = query.charAt(++startIndex);
+			}
+
+			// Find the end of the next subquery.
+			int nextPlus = query.indexOf('+', startIndex + 1);
+			int nextPar = query.indexOf('(',startIndex+1);
+
+			if ((nextPlus < 0) && (nextPar < 0)) {
+				// If there is no other + sign, then this is the final subquery in the
+				// query string.
+				lengthOut = query.length() - startIndex;
+			}else if ((nextPlus < 0) && (nextPar > 0) ){
+
+				lengthOut = nextPar - startIndex - 1;
+			}else {
+				// If there is another + sign, then the length of this subquery goes up
+				// to the next + sign.
+
+				// Move nextPlus backwards until finding a non-space non-plus character.
+				test = query.charAt(nextPlus);
+				while (test == ' ' || test == '+') {
+					test = query.charAt(--nextPlus);
+				}
+
+				lengthOut = 1 + nextPlus - startIndex;
+			}
 		}
-		
 		// startIndex and lengthOut give the bounds of the subquery.
-		return new StringBounds(startIndex, lengthOut);
+		return new StringBounds(startIndex , lengthOut);
 	}
 	
 	/**
@@ -144,25 +161,24 @@ public class BooleanQueryParser {
 	private Literal findNextLiteral(String subquery, int startIndex) {
 		int subLength = subquery.length();
 		int lengthOut;
-		
+
 		// Skip past white space.
-		
+
 		while (subquery.charAt(startIndex) == ' ') {
 			++startIndex;
 		}
-		
-		
+
+
 		// Locate the next space to find the end of this literal.
 		int nextSpace = subquery.indexOf(' ', startIndex);
 		if (nextSpace < 0) {
 			// No more literals in this subquery.
 			lengthOut = subLength - startIndex;
-			System.out.println(lengthOut + " " + startIndex);
 
-		}
-		else {
+
+		} else {
 			lengthOut = nextSpace - startIndex;
-			System.out.println(lengthOut + " " + startIndex);
+
 		}
 
 		if (subquery.charAt(startIndex) == '"') {
@@ -177,7 +193,7 @@ public class BooleanQueryParser {
 			// Find ending quotation mark
 
 
-			String holder  = " ";
+			String holder = " ";
 			while (subquery.charAt(startIndex) == '"') {
 				startIndex++;
 			}
@@ -185,31 +201,58 @@ public class BooleanQueryParser {
 
 			int fallSpace = subquery.indexOf('"', startIndex);
 
-			if (fallSpace < 0){
+			if (fallSpace < 0) {
 				lengthOut = subquery.length() - startIndex;
 			} else {
-				lengthOut = fallSpace -startIndex +1;
+				lengthOut = fallSpace - startIndex +1;
 			}
 
-			holder = subquery.substring(startIndex, lengthOut);
-			holder = holder.trim();
-			System.out.println(holder);
+			holder = subquery.substring(startIndex , lengthOut);
+
 			String[] phrase = holder.split(" ");// split that into a list of individual strings
-			System.out.println(phrase[0] + phrase[1]);
-			List<String> tem = new ArrayList<>();
+			List<String>  tem = new ArrayList<>();
 			List<String> phr = new ArrayList<>();
 
 			for (String i : phrase) { // process tokens before going in to the phrase literal. Following golden rule.
+				System.out.println(i);
 				tem = new BetterTokenProcessor().processToken(i);
-				for(String t : tem) {
+				for (String t : tem) {
 					phr.add(t);
 				}
 			}
 
-			System.out.println(lengthOut + " " + startIndex + "yoyoyoyoyoy");
+
 			return new Literal(
-					new StringBounds(startIndex , lengthOut),// Construct a new Literal object,
+					new StringBounds(startIndex, lengthOut),// Construct a new Literal object,
 					new PhraseLiteral(phr)); // but the second parameter will be a PhraseLiteral constructed with the list of strings.
+		}else if(subquery.charAt(startIndex) == '('){ // expanded query parser
+
+			String parSub = " ";
+			while (subquery.charAt(startIndex) == '(') {
+				startIndex++;
+			}
+			// Substring to get all words between the parenthesis as a single string
+
+			int exitPar = subquery.indexOf(')', startIndex);
+			System.out.println(startIndex);
+			System.out.println(exitPar);
+			System.out.print(subquery);
+			if (exitPar < 0) {
+				lengthOut = subquery.length() - startIndex;
+			} else {
+				lengthOut = exitPar - startIndex + 1;
+			}
+
+			parSub = subquery.substring(startIndex, lengthOut);
+
+			System.out.println("Paren: "+parSub);
+
+
+			return new Literal(
+					new StringBounds(startIndex, lengthOut),
+					this.parseQuery(parSub));
+
+
 		} else {
 		
 		// This is a term literal containing a single term.
@@ -219,6 +262,7 @@ public class BooleanQueryParser {
 			 new StringBounds(startIndex, lengthOut),
 			 new TermLiteral(tem.get(0)));
 		}
+
 		
 		
 		
