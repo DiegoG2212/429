@@ -327,9 +327,6 @@ public class PositionalInvertedIndexer {
 		System.out.println(indexTime);
 	}	
 	
-	public String stemThis(String x) { //Updates changes to corpus and index
-
-
 	public String stemThis(String x) { // Updates changes to corpus and index
 		englishStemmer stemmer = new englishStemmer();
 
