@@ -4,11 +4,14 @@ package edu.csulb;
 import cecs429.documents.DirectoryCorpus;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
+import cecs429.index.BiwordIndex;
 import cecs429.index.Index;
 import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
+//import cecs429.index.InvertedIndex;
 import cecs429.index.PositionalInvertedIndex;
+//import cecs429.text.BasicTokenProcessor;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -22,15 +25,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Paths;
+//import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 // GUI Imports
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
+//import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+//import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -41,20 +45,21 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class PositionalInvertedIndexer {
 	String directory = ""; // Sets directory to blank
 	File defStore = new File("src/DefaultDirectory.txt"); // Text file storing Default Directory
 	DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-	//DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
+	//DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
 	String lastQuery = ""; // Saves last user query
 	int queryCheck = 0;
+
 	Index index = indexCorpus(corpus);
-	
+	Index bwindex = bwindexCorpus(corpus);
+
 	public PositionalInvertedIndexer() throws Exception {
 		query();
 	}
-	
+
 	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
 		BufferedReader br = new BufferedReader(new FileReader(PositionalInvertedIndexer.this.defStore));
@@ -65,187 +70,176 @@ public class PositionalInvertedIndexer {
 			updateDirectory(st);
 		}
 
-		  
 		// GUI===========================================================================
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {			
+			public void run() {
 				// Frame ==================
 				JFrame frame = new JFrame("Search Engine");
 				// Panels =================
 				JPanel p = new JPanel();
 				// Components =============
 				JTextField textField = new JTextField(35);
-				JButton search = new JButton ("Enter");
+				JButton search = new JButton("Enter");
 				JButton browseFile = new JButton("Browse Files");
-				JLabel l = new JLabel("Blank");
-				JTextArea results = new JTextArea(19,55);
-				//JTextPane results = new JTextPane("text/html", "");
-				JScrollPane scrollPane = new JScrollPane(results);		
+				//JLabel l = new JLabel("Blank");
+				JTextArea results = new JTextArea(19, 55);
+				// JTextPane results = new JTextPane("text/html", "");
+				JScrollPane scrollPane = new JScrollPane(results);
 				JFileChooser j = new JFileChooser();
 				j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				// Fonts ==================
 				Font font = new Font(Font.SANS_SERIF, Font.BOLD, 15);
-				Font bold = new Font(Font.SANS_SERIF, Font.BOLD, 15);
+				//Font bold = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font inputFont = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
 				
 				// Disable horizontal scrolling on Search Results
 				results.setLineWrap(true);
 				results.setWrapStyleWord(true);
-				
+
 				// Browse Files Action Listener; :index Special Query
 				browseFile.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-							try {
-								int returnVal = j.showOpenDialog(null); // Select File
-								File file = j.getSelectedFile();
-								String fullPath = file.getAbsolutePath();
-								System.out.println(fullPath);
-								
-								// Stores last chosen directory
-							    BufferedWriter writer;
-								writer = new BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
-							    writer.write(fullPath);
-							    writer.close();
-							    
-							    // Update chosen directory
-							    updateDirectory(fullPath);
-							
-							} catch (IOException e1) {
-								e1.printStackTrace();
-							}			
-					}				
-				});		
+						try {
+							//int returnVal = j.showOpenDialog(null); // Select File
+							File file = j.getSelectedFile();
+							String fullPath = file.getAbsolutePath();
+							System.out.println(fullPath);
+
+							// Stores last chosen directory
+							BufferedWriter writer;
+							writer = new BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
+							writer.write(fullPath);
+							writer.close();
+
+							// Update chosen directory
+							updateDirectory(fullPath);
+
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+
 				// Search Button Action Listener
 				search.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						englishStemmer stemmer = new englishStemmer();
-						String query = textField.getText().toLowerCase();	// Get query, make lower case
-												
+						//englishStemmer stemmer = new englishStemmer();
+						String query = textField.getText().toLowerCase(); // Get query, make lower case
+						
+						results.setText(""); // Clear results
+
 						// Gets first word in query; splits string after first whitespace
 						String special[] = textField.getText().split(" ", 2);
-						
-						String whole[] = textField.getText().split(" "); //Separate on every whitespace
-						
-							
+
+						String whole[] = textField.getText().split(" "); // Separate on every whitespace
+
 						// :vocab Special Query
-						if(textField.getText().equals(":vocab")) {
+						if (textField.getText().equals(":vocab")) {
 							results.setText(""); // Clear results
 							List<String> t = PositionalInvertedIndexer.this.index.getVocabulary();
-				
+
 							int counter = 0;
 							for (String i : t) {
-								results.append(i +"\n");
+								results.append(i + "\n");
 								counter++;
-								if(counter >= 1000) //Stops after first 1000 terms
+								if (counter >= 1000) // Stops after first 1000 terms
 									break;
 							}
-							results.append("End of Vocabulary \n");	
+							results.append("End of Vocabulary \n");
 						}
-						
-						// :stem token Special Query
-						else if(special[0].equals(":stem")){
-							try {
-									results.setText(""); // Clear results
-														
-									results.append(stemThis(special[1]));
+
+						// :vocab2 Special Biword Query
+						else if (textField.getText().equals(":vocab2")) {
+							results.setText(""); // Clear results
+							List<String> t = PositionalInvertedIndexer.this.bwindex.getVocabulary();
+
+							int counter = 0;
+							for (String i : t) {
+								results.append(i + "\n");
+								counter++;
+								if (counter >= 1000) // Stops after first 1000 terms
+									break;
 							}
-							catch(ArrayIndexOutOfBoundsException exception) {
+							results.append("End of Vocabulary \n");
+						}
+
+						// :stem token Special Query
+						else if (special[0].equals(":stem")) {
+							try {
+								results.setText(""); // Clear results
+								results.append(stemThis(special[1]));
+							} catch (ArrayIndexOutOfBoundsException exception) {
 								results.setText("Correct usage: \":stem <token>\" ");
 							}
-							
 						}
-						
-						else if(special[0].equals(":doc")) {
-							if(queryCheck != 0) {
-								results.setText(""); //Clear results
+
+						else if (special[0].equals(":doc")) {
+							if (queryCheck != 0) {
+								results.setText(""); // Clear results
 								String docSearch = special[1].toLowerCase();
 								docSearch = stemThis(docSearch);
-									
+
 								QueryComponent q = new BooleanQueryParser().parseQuery(lastQuery);
 								for (Posting p : q.getPostings(index)) {
-									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
-									
-									compare = stemThis(compare);
-									if(docSearch.equals(compare)) {
-											results.append("\n");
-											Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getContent();
-											String read = "";
-											
-										    int c = 0;
-											try {
-												c = b.read();
-											} catch (IOException e1) {
-												e1.printStackTrace();
-											}
-										    while (c != -1){
-										        //Converting to character
-										        //System.out.print((char)c);
-										        read += Character.toString((char)c);
-										        try {
-													c = b.read();	
-												} catch (IOException e1) {
-													e1.printStackTrace();
-												}
-										    }
-										    results.append(read +"\n");
-									}
-								}
-								
-								
-								
-								
-								
-								
-								/*
-								for (Posting p : PositionalInvertedIndexer.this.index.getPostings(lastQuery)) {
-									String compare = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle().toLowerCase();
+									String compare = PositionalInvertedIndexer.this.corpus
+											.getDocument(p.getDocumentId()).getTitle().toLowerCase();
 
 									compare = stemThis(compare);
-									if(docSearch.equals(compare)) {
-											results.append("\n");
-											Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getContent();
-											String read = "";
-											
-										    int c = 0;
+									if (docSearch.equals(compare)) {
+										results.append("\n");
+										Reader b = PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId())
+												.getContent();
+										String read = "";
+
+										int c = 0;
+										try {
+											c = b.read();
+										} catch (IOException e1) {
+											e1.printStackTrace();
+										}
+										while (c != -1) {
+											// Converting to character
+											// System.out.print((char)c);
+											read += Character.toString((char) c);
 											try {
 												c = b.read();
 											} catch (IOException e1) {
 												e1.printStackTrace();
 											}
-										    while (c != -1){
-										        //Converting to character
-										        //System.out.print((char)c);
-										        read += Character.toString((char)c);
-										        try {
-													c = b.read();	
-												} catch (IOException e1) {
-													e1.printStackTrace();
-												}
-										    }
-										    results.append(read +"\n");
+										}
+										results.append(read + "\n");
 									}
-								}	
-								*/	
-							}
-							else {
+								}
+							} else {
 								results.append("You must search a query first \n");
 							}
+						}
+
+						else if (special.length == 2) {
+							int docCount = 0;
+							System.out.println("biwording");
+							for (Posting p : PositionalInvertedIndexer.this.bwindex.getPostings(query)) {
+								System.out.println("inside j postings");
+								results.append("Document: " + PositionalInvertedIndexer.this.corpus
+										.getDocument(p.getDocumentId()).getTitle() + "\n");
+								results.append("Positions: " + p.getPos() + "\n");
+								docCount++;
+							}
+							results.append("Number of Documents:" + docCount + "\n");
+							results.append("\n");
 						}
 
 						else {
 							results.setText("");
 							String combine = "";
 							int counter = 0;
-							// Stemming
-							//System.out.println(whole[1]);
 							for (String s : whole) {
-								if(counter == 0) { //First word
+								if (counter == 0) { // First word
 									combine += stemThis(s);
-									counter ++;
-								}
-								else {
+									counter++;
+								} else {
 									combine += " ";
 									combine += stemThis(s);
 								}
@@ -253,7 +247,6 @@ public class PositionalInvertedIndexer {
 							System.out.println(combine);
 
 							int docCount = 0;
-							// System.out.println("im here");
 							QueryComponent q = new BooleanQueryParser().parseQuery(combine);
 							for (Posting p : q.getPostings(index)) {
 								// for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
@@ -271,53 +264,58 @@ public class PositionalInvertedIndexer {
 							lastQuery = combine; // Stores last query for :doc usage
 							queryCheck = 1; // Checks that query was searched allowing for :doc usage
 						}
+
 					}
 
 				});
 
 				results.setEditable(false);
-				
-				// Panel Add	
+
+				// Panel Add
 				p.add(browseFile);
 				p.add(textField);
 				p.add(search);
-				//p.add(l);
+				// p.add(l);
 				p.add(scrollPane);
-								
+
 				// Frame Add
 				frame.add(p);
-						
+
 				// Searches when Enter is pressed
-				frame.getRootPane().setDefaultButton(search); 
-				
+				frame.getRootPane().setDefaultButton(search);
+
 				// Size Set
 				frame.setSize(750, 520);
-				j.setPreferredSize(new Dimension(800,600));
-				
-				
+				j.setPreferredSize(new Dimension(800, 600));
+
 				// Font Set
 				browseFile.setFont(font);
 				search.setFont(font);
 				textField.setFont(inputFont);
 				results.setFont(resultFont);
-				
-				frame.setResizable(false);	// No window resizing
+
+				frame.setResizable(false); // No window resizing
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Closing window stops program; :q Special Query
 				frame.setVisible(true); // Visible
 			}
 		});
-		// GUI End===================================================================================	
+		br.close();
+		// GUI
+		// End===================================================================================
 	}
-	
-	public void updateDirectory(String dir) { //Updates changes to corpus and index
-		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(), ".json");
-		//PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
+
+	public void updateDirectory(String dir) { // Updates changes to corpus and index
+		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),
+				".json");
+		// PositionalInvertedIndexer.this.corpus =
+		// DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
-	}	
-	
-	public String stemThis(String x) { //Updates changes to corpus and index
+		PositionalInvertedIndexer.this.bwindex = bwindexCorpus(PositionalInvertedIndexer.this.corpus);
+	}
+
+	public String stemThis(String x) { // Updates changes to corpus and index
 		englishStemmer stemmer = new englishStemmer();
-		
+
 		// Stem Query
 		stemmer.setCurrent(x);
 		stemmer.stem();
@@ -327,36 +325,69 @@ public class PositionalInvertedIndexer {
 	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		PositionalInvertedIndex tdi = new PositionalInvertedIndex();
-	
+
 		// Loops through documents
 		for (Document d : corpus.getDocuments()) {
-			int x = 0; //Reset counter for positions
+			int x = 0; // Reset counter for positions
 			// Creates tokens by splitting on whitespace
 			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
-			
+
 			// Adds term to index along with Document ID
-			for (String token: stream.getTokens()) {
+			for (String token : stream.getTokens()) {
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
 				x++;
 			}
-			
+
 			try {
 				stream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
-		}	
+
+		}
 		return tdi;
 	}
-	
-	
+
+	private Index bwindexCorpus(DocumentCorpus corpus) {
+		BetterTokenProcessor processor = new BetterTokenProcessor();
+		BiwordIndex bwi = new BiwordIndex();
+
+		// Loops through documents
+		for (Document d : corpus.getDocuments()) {
+			int x = 0; // Reset counter for positions
+
+			// Creates tokens by splitting on whitespace
+			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
+
+			// Adds term to index along with Document ID
+			for (String token : stream.getTokens()) {
+				if (x == 0) {
+					bwi.addT1(processor.processToken(token));
+				} else if (x == 1) {
+					bwi.addT2(processor.processToken(token));
+					bwi.addTerms(d.getId(), x-1);
+				} else {
+					bwi.t1 = bwi.t2;
+					bwi.addT2(processor.processToken(token));
+					bwi.addTerms(d.getId(), x-1);
+				}
+				x++;
+			}
+
+			try {
+				stream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return bwi;
+	}
+
 	public static void main(String[] args) throws Exception {
 		new PositionalInvertedIndexer(); // Calls program
 	}
-	
-}
 
-	
-	
+}
