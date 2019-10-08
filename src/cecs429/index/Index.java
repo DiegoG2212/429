@@ -16,4 +16,10 @@ public interface Index {
 	 * A (sorted) list of all terms in the index vocabulary.
 	 */
 	List<String> getVocabulary();
+	
+	/**
+	 * 
+	 * Adds term into index
+	 */
+	public void addTerm(List<String> term, int docID, int pos);
 }
