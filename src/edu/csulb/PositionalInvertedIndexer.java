@@ -240,7 +240,8 @@ public class PositionalInvertedIndexer {
 
 							int docCount = 0;
 							// System.out.println("im here");
-							QueryComponent q = new BooleanQueryParser().parseQuery(combine);
+							QueryComponent q = new BooleanQueryParser().parseQuery(query);
+
 							for (Posting p : q.getPostings(index)) {
 								// for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
 								// System.out.println("inside q postings");
