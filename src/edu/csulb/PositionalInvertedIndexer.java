@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -328,10 +329,21 @@ public class PositionalInvertedIndexer {
 			int x = 0; // Reset counter for positions
 			// Creates tokens by splitting on whitespace
 			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
-
+			
+			List<String> token2 = new ArrayList<String>();
 			// Adds term to index along with Document ID
 			for (String token : stream.getTokens()) {
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
+				for (String i : processor.processToken(token)) {
+					token2.add(i);
+				}
+				while (token2.size() >= 2) {
+					String temp = token2.get(0) + " " + token2.get(1);
+					List<String> token3 = new ArrayList<String>();
+					token3.add(temp);
+					tdi.addTerm(token3, d.getId(), x);
+					token2.remove(0);
+				}
 				x++;
 			}
 
