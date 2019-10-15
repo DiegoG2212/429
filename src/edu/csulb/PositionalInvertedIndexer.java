@@ -263,31 +263,25 @@ public class PositionalInvertedIndexer {
 
 				});
 
-				results.setEditable(false);
-
+				results.setEditable(false); // Doesn't let user edit results box
 				// Panel Add
 				p.add(browseFile);
 				p.add(textField);
 				p.add(search);
 				// p.add(l);
 				p.add(scrollPane);
-
 				// Frame Add
 				frame.add(p);
-
 				// Searches when Enter is pressed
 				frame.getRootPane().setDefaultButton(search);
-
 				// Size Set
 				frame.setSize(750, 520);
 				j.setPreferredSize(new Dimension(800, 600));
-
 				// Font Set
 				browseFile.setFont(font);
 				search.setFont(font);
 				textField.setFont(inputFont);
 				results.setFont(resultFont);
-
 				frame.setResizable(false); // No window resizing
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Closing window stops program; :q Special Query
 				frame.setVisible(true); // Visible
