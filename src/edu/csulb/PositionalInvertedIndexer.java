@@ -4,6 +4,7 @@ package edu.csulb;
 import cecs429.documents.DirectoryCorpus;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
+import cecs429.index.DiskIndexWriter;
 import cecs429.index.Index;
 import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
@@ -317,6 +318,9 @@ public class PositionalInvertedIndexer {
 	private Index indexCorpus(DocumentCorpus corpus) {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		Index tdi = new PositionalInvertedIndex();
+		DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
+
+		
 
 		// Loops through documents
 		for (Document d : corpus.getDocuments()) {
@@ -349,6 +353,7 @@ public class PositionalInvertedIndexer {
 			}
 
 		}
+		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
 		return tdi;
 	}
 
