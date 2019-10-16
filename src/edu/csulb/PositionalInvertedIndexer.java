@@ -18,6 +18,7 @@ import org.tartarus.snowball.ext.englishStemmer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -115,7 +116,12 @@ public class PositionalInvertedIndexer {
 						 */
 
 						// Update chosen directory
-						updateDirectory(fullPath);
+						try {
+							updateDirectory(fullPath);
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						results.setText(""); // Clear previous
 						results.append("" + indexTime + " milliseconds to index the corpus\n");
 
@@ -292,7 +298,7 @@ public class PositionalInvertedIndexer {
 		// End===================================================================================
 	}
 
-	public void updateDirectory(String dir) { // Updates changes to corpus and index
+	public void updateDirectory(String dir) throws FileNotFoundException { // Updates changes to corpus and index
 		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),
 				".json");
 		// PositionalInvertedIndexer.this.corpus =
@@ -315,7 +321,7 @@ public class PositionalInvertedIndexer {
 		return stemmer.getCurrent();
 	}
 
-	private Index indexCorpus(DocumentCorpus corpus) {
+	private Index indexCorpus(DocumentCorpus corpus) throws FileNotFoundException {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		Index tdi = new PositionalInvertedIndex();
 		DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
@@ -353,7 +359,7 @@ public class PositionalInvertedIndexer {
 			}
 
 		}
-		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
+		//writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
 		return tdi;
 	}
 
