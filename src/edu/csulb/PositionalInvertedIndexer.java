@@ -54,7 +54,7 @@ public class PositionalInvertedIndexer {
 	// ".txt");
 	String lastQuery = ""; // Saves last user query
 	int queryCheck = 0;
-	Index index = indexCorpus(corpus);
+	Index index;
 
 	long indexTime = 0;
 
@@ -108,6 +108,7 @@ public class PositionalInvertedIndexer {
 						File file = j.getSelectedFile();
 						String fullPath = file.getAbsolutePath();
 						System.out.println(fullPath);
+						directory = fullPath;	// Update directory
 
 						/*
 						 * // Stores last chosen directory BufferedWriter writer; writer = new
@@ -118,7 +119,7 @@ public class PositionalInvertedIndexer {
 						// Update chosen directory
 						try {
 							updateDirectory(fullPath);
-						} catch (FileNotFoundException e1) {
+						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
@@ -298,18 +299,16 @@ public class PositionalInvertedIndexer {
 		// End===================================================================================
 	}
 
-	public void updateDirectory(String dir) throws FileNotFoundException { // Updates changes to corpus and index
-		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),
-				".json");
-		// PositionalInvertedIndexer.this.corpus =
-		// DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
+	public void updateDirectory(String dir) throws IOException { // Updates changes to corpus and index
+		PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),".json");
+		// PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 
 		long startTime = System.nanoTime(); // Index Timer
 		PositionalInvertedIndexer.this.index = indexCorpus(PositionalInvertedIndexer.this.corpus);
 		long endTime = System.nanoTime();
 
 		PositionalInvertedIndexer.this.indexTime = (endTime - startTime) / 1000000;
-		System.out.println(indexTime);
+		System.out.println(indexTime + " milliseconds");
 	}
 
 	public String stemThis(String x) { // Updates changes to corpus and index
@@ -321,7 +320,7 @@ public class PositionalInvertedIndexer {
 		return stemmer.getCurrent();
 	}
 
-	private Index indexCorpus(DocumentCorpus corpus) throws FileNotFoundException {
+	private Index indexCorpus(DocumentCorpus corpus) throws IOException {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
 		Index tdi = new PositionalInvertedIndex();
 		DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
@@ -359,7 +358,7 @@ public class PositionalInvertedIndexer {
 			}
 
 		}
-		//writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
+		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
 		return tdi;
 	}
 
