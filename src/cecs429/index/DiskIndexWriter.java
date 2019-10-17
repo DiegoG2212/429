@@ -77,7 +77,7 @@ public class DiskIndexWriter {
 
 	
 	// vocabTable.bin
-	public void writeVocabTable() throws FileNotFoundException{
+	public void writeVocabTable() throws IOException{
 		System.out.println("Writing vocabTable.bin ...");
 		DataOutputStream vtableOut = new DataOutputStream(
 				new BufferedOutputStream(
@@ -87,6 +87,10 @@ public class DiskIndexWriter {
 		
 		
 		
+		
+		
+		
+		vtableOut.close();
 	}
 
 }
