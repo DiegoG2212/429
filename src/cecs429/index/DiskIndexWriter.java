@@ -25,7 +25,7 @@ public class DiskIndexWriter {
 	}
 	
 	// postings.bin
-	public void writePostings() throws IOException {
+	void writePostings() throws IOException {
 		System.out.println("Writing postings.bin ...");
 		DataOutputStream postingsOut = new DataOutputStream(
 				new BufferedOutputStream(
@@ -35,9 +35,9 @@ public class DiskIndexWriter {
 		for (String i : t) {	// Go through vocabulary
 			for (Posting p : index.getPostings(i)) { // Get posting for term
 				postingsOut.writeInt(p.getDocumentId());
-				System.out.println(p.getDocumentId());
+				//System.out.println(p.getDocumentId());
 				for(int x: p.getPos()) {
-					System.out.println(x);
+					//System.out.println(x);
 					postingsOut.writeInt(x);
 				}
 			}	
@@ -55,8 +55,21 @@ public class DiskIndexWriter {
 		
 		List<String> t = index.getVocabulary();	// Get vocab from index
 		
+		int counter = 0;
 		for (String i : t) {	// Go through vocabulary, write to vocab.bin
+			long position = vocabOut.size();
+			
+			System.out.println(position);
+			System.out.println("Vocab: "+ i);
 			vocabOut.writeUTF(i);	// UTF-8 Encoded
+			counter++;
+			if(counter == 10) { // Stops at 10 terms
+				position = vocabOut.size();
+				System.out.println(position);
+				break;
+			}
+			
+			
 		}
 		vocabOut.close();
 	}
@@ -69,6 +82,11 @@ public class DiskIndexWriter {
 		DataOutputStream vtableOut = new DataOutputStream(
 				new BufferedOutputStream(
 				new FileOutputStream(path + "/vocabTable.bin")));
+		
+		
+		
+		
+		
 	}
 
 }
