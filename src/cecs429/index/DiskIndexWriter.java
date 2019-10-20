@@ -98,7 +98,17 @@ public class DiskIndexWriter {
 	
 	// docWeights.bin
 	private void writeDocWeight(Path path, Index index) {
+		// Calculating Doc Weight
+		List<String> t = index.getVocabulary(); // Get vocabulary from index
 		
+		for (String i : t) {// Go through vocabulary
+			int tf = 0; // tf t,d
+			for (Posting p : index.getPostings(i)) { // Get posting for term
+				tf = p.getPos().size();	// td t,d ; Get # of positions
+				double w = 1 + Math.log(tf); //w d,t
+				
+			}	
+		}
 	}
 	
 }
