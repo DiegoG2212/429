@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import edu.csulb.PositionalInvertedIndexer;
 
@@ -97,18 +100,35 @@ public class DiskIndexWriter {
 	}
 	
 	// docWeights.bin
-	private void writeDocWeight(Path path, Index index) {
+	private void writeDocWeight(Path path, Index index) throws IOException {
+		System.out.println("Writing docWeights.bin ...");
+		
+		DataOutputStream docWeightsOut = new DataOutputStream(
+				new BufferedOutputStream(
+						new FileOutputStream(path + "/docWeights.bin")));
+		
 		// Calculating Doc Weight
 		List<String> t = index.getVocabulary(); // Get vocabulary from index
+		HashMap<String, Integer> terms = new HashMap<String, Integer>();
 		
 		for (String i : t) {// Go through vocabulary
-			int tf = 0; // tf t,d
-			for (Posting p : index.getPostings(i)) { // Get posting for term
-				tf = p.getPos().size();	// td t,d ; Get # of positions
-				double w = 1 + Math.log(tf); //w d,t
-				
+			//int tf = 0; // tf t,d
+			for (Posting p : index.getPostings(i)) { // Get postings for term
+				//tf = p.getPos().size();	// td t,d ; Get # of positions
+				//terms.put(i, tf);	// Write into hashmap
 			}	
 		}
+		
+		// The sum of w d,t squared
+		/*
+		double wSquared = 0;
+		for(Map.Entry<String, Integer> entry: terms.entrySet() ) { 
+			wSquared += Math.pow((1 + Math.log( entry.getValue() )),2); //w d,t squared
+		}
+		
+		// Square root the sum of w d,t squared
+		double L = Math.sqrt(wSquared);
+		*/
 	}
 	
 }

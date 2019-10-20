@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -331,6 +332,7 @@ public class DiskPositionalIndexer {
 			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
 			
 			List<String> token2 = new ArrayList<String>();
+			
 			// Adds term to index along with Document ID
 			for (String token : stream.getTokens()) {
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
@@ -346,6 +348,9 @@ public class DiskPositionalIndexer {
 				}
 				x++;
 			}
+			
+			
+			
 
 			try {
 				stream.close();
