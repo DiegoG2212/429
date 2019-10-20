@@ -15,9 +15,6 @@ import edu.csulb.PositionalInvertedIndexer;
 public class DiskIndexWriter {
 
 	public void WriteIndex(Index x, Path y) throws IOException {
-
-		// Sub Methods
-
 		writeVocabTable(y,x);
 	}
 	
@@ -34,23 +31,20 @@ public class DiskIndexWriter {
 		long position = 0;
 		for (String i : t) {// Go through vocabulary
 
-			position = postingsOut.size() - position;
-			docPos.add(position);
-			int docNum = index.getPostings(i).size();
+			position = postingsOut.size() - position; // Get gap
+			docPos.add(position); // Keep track of positions
+			int docNum = index.getPostings(i).size(); // Gets # of docs
 			postingsOut.writeInt(docNum); // Writes # of docs
 			for (Posting p : index.getPostings(i)) { // Get posting for term
-				postingsOut.writeInt((int)position);
-				//System.out.println(p.getDocumentId());
-				int posNum = p.getPos().size();
+				postingsOut.writeInt((int)position); // Write position
+				int posNum = p.getPos().size();	// Get # of positions
 				postingsOut.writeInt(posNum); // Writes # of positions
-				for(int x: p.getPos()) {
-					//System.out.println(x);
-					postingsOut.writeInt(x);
+				for(int x: p.getPos()) {	// For every position
+					postingsOut.writeInt(x);	// Write position
 				}
 			}	
 		}
 		postingsOut.close();
-
 		return docPos;
 	}
 	
@@ -77,9 +71,7 @@ public class DiskIndexWriter {
 
 		return vocabPos;
 	}
-		
 
-	
 	// vocabTable.bin
 	private void writeVocabTable(Path path, Index index) throws IOException{
 		System.out.println("Writing vocabTable.bin ...");
@@ -102,11 +94,11 @@ public class DiskIndexWriter {
 			}
 
 		vtableOut.close();
-		
-		
-		
-		
-		//vtableOut.close();
 	}
-
+	
+	// docWeights.bin
+	private void writeDocWeight(Path path, Index index) {
+		
+	}
+	
 }
