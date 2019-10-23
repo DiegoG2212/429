@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 // GUI Imports
@@ -322,7 +323,7 @@ public class DiskPositionalIndexer {
 
 	private Index indexCorpus(DocumentCorpus corpus) throws IOException {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
-		Index tdi = new DiskPositionalIndex();
+		Index tdi = new PositionalInvertedIndex();
 		DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
 
 		// Loops through documents
@@ -330,12 +331,36 @@ public class DiskPositionalIndexer {
 			int x = 0; // Reset counter for positions
 			// Creates tokens by splitting on whitespace
 			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
-			
 			List<String> token2 = new ArrayList<String>();
+			HashMap<String, Integer> terms = new HashMap<String, Integer>();
 			
+			
+			int termExist = 0;
 			// Adds term to index along with Document ID
-			for (String token : stream.getTokens()) {
+			for (String token : stream.getTokens()) {	// Go through each token
+				// Add processed token
 				tdi.addTerm(processor.processToken(token), d.getId(), x);
+				//System.out.println(processor.processToken(token));
+				
+				
+				// Doc Weight Work ===================================================
+				
+				for(String i: processor.processToken(token)) {
+					// If term exists in HashMap
+				    if(terms.containsKey(i)) {
+				    	int valHold = terms.get(i); // Take value
+				    	valHold++; // Increment counter by 1
+				    	terms.put(i, valHold);
+				    }
+					
+				    else{ // Term doesn't currently exist
+				    	terms.put(i, 1); // Give count of 1		
+				    }
+				}
+			    // ====================================================================
+				
+				
+			    
 				for (String i : processor.processToken(token)) {
 					token2.add(i);
 				}
@@ -344,23 +369,41 @@ public class DiskPositionalIndexer {
 					List<String> token3 = new ArrayList<String>();
 					token3.add(temp);
 					tdi.addTerm(token3, d.getId(), x);
-					token2.remove(0);
+					// Doc Weight Work ===================================================
+					for(String b: token3) {	
+					    if(terms.containsKey(b)) {
+					    	int valHold = terms.get(b); // Take value
+					    	valHold++; // Increment counter by 1
+					    	terms.put(b, valHold);
+					    }
+						
+					    else{ // Term doesn't currently exist
+					    	terms.put(b, 1); // Give count of 1		
+					    }
+					}
+				   
+				    // ====================================================================
+				    token2.remove(0);
 				}
+				
 				x++;
 			}
 			
-			
-			
-
+			writeDisk.addDocWeight(terms); // Add HashMap to list
 			try {
 				stream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-		}
+	
+		}	// End of Documents
+		
+		
+		// Write to Disk
 		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
+		
+		// Return Index
 		return tdi;
 	}
 

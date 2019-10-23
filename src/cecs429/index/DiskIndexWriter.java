@@ -19,6 +19,7 @@ public class DiskIndexWriter {
 
 	public void WriteIndex(Index x, Path y) throws IOException {
 		writeVocabTable(y,x);
+		writeDocWeight(y,x);
 	}
 	
 	// postings.bin
@@ -65,8 +66,8 @@ public class DiskIndexWriter {
 		for (String i : t) {	// Go through vocabulary, write to vocab.bin
 			position =  vocabOut.size();
 			vocabPos.add(position);
-			System.out.println(position);
-			System.out.println("Vocab: "+ i);
+			//System.out.println(position);
+			//System.out.println("Vocab: "+ i);
 			vocabOut.writeUTF(i);	// UTF-8 Encoded
 			
 		}
@@ -99,36 +100,33 @@ public class DiskIndexWriter {
 		vtableOut.close();
 	}
 	
+	// List of HashMap
+	List< HashMap<String, Integer> > holdTerms = new ArrayList< HashMap<String, Integer> >();
 	// docWeights.bin
+	public void addDocWeight(HashMap<String,Integer> terms) throws IOException {
+		holdTerms.add(terms);
+	}
+	
 	private void writeDocWeight(Path path, Index index) throws IOException {
 		System.out.println("Writing docWeights.bin ...");
-		
 		DataOutputStream docWeightsOut = new DataOutputStream(
 				new BufferedOutputStream(
 						new FileOutputStream(path + "/docWeights.bin")));
 		
-		// Calculating Doc Weight
-		List<String> t = index.getVocabulary(); // Get vocabulary from index
-		HashMap<String, Integer> terms = new HashMap<String, Integer>();
-		
-		for (String i : t) {// Go through vocabulary
-			//int tf = 0; // tf t,d
-			for (Posting p : index.getPostings(i)) { // Get postings for term
-				//tf = p.getPos().size();	// td t,d ; Get # of positions
-				//terms.put(i, tf);	// Write into hashmap
-			}	
+		// Iterate List of HashMaps
+		for(HashMap<String, Integer> scan: holdTerms) { // For every Document's HashMap
+			double wSum = 0;
+			for (HashMap.Entry<String, Integer> entry : scan.entrySet()) { // Go through HashMap
+				System.out.println("Key: "+entry.getKey() +", Value: "+entry.getValue());
+				wSum += Math.pow( (1 + Math.log( entry.getValue() )) ,2);
+				System.out.println(wSum);
+			}
+			double Ld = Math.sqrt(wSum);
+			System.out.println("Document Weight: " +Ld);
+			docWeightsOut.writeDouble(Ld);
 		}
 		
-		// The sum of w d,t squared
-		/*
-		double wSquared = 0;
-		for(Map.Entry<String, Integer> entry: terms.entrySet() ) { 
-			wSquared += Math.pow((1 + Math.log( entry.getValue() )),2); //w d,t squared
-		}
-		
-		// Square root the sum of w d,t squared
-		double L = Math.sqrt(wSquared);
-		*/
+		docWeightsOut.close();
 	}
 	
 }
