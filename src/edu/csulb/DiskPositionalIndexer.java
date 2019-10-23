@@ -37,6 +37,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -46,6 +47,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 public class DiskPositionalIndexer {
 	String directory = ""; // Sets directory to blank
@@ -101,6 +103,9 @@ public class DiskPositionalIndexer {
 				results.setLineWrap(true);
 				results.setWrapStyleWord(true);
 
+				
+				
+				
 				// Browse Files Action Listener; :index Special Query
 				browseFile.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -272,7 +277,36 @@ public class DiskPositionalIndexer {
 
 				});
 
+				
+				
+				
+				
 				results.setEditable(false); // Doesn't let user edit results box
+				
+				// Opening Dialog Box to select Mode
+				Object[] options = {"Boolean query mode",
+				                    "Ranked query mode",
+				                    "None"};
+				int n = JOptionPane.showOptionDialog(frame,
+				    "What mode would you like to use?",
+				    "Mode Selection",
+				    JOptionPane.YES_NO_CANCEL_OPTION,
+				    JOptionPane.QUESTION_MESSAGE,
+				    null,
+				    options,
+				    options[2]);
+				// System.out.println(n);
+				if(n == 0) {	//Boolean query mode
+					
+				}
+				else if(n == 1) {	//Ranked query mode
+					
+				}
+				else {
+					// End Program
+					System.exit(-1);
+				}
+				
 				// Panel Add
 				p.add(browseFile);
 				p.add(textField);
@@ -292,7 +326,7 @@ public class DiskPositionalIndexer {
 				textField.setFont(inputFont);
 				results.setFont(resultFont);
 				frame.setResizable(false); // No window resizing
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Closing window stops program; :q Special Query
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Closing window stops program; :q Special Query
 				frame.setVisible(true); // Visible
 			}
 		});

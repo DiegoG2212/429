@@ -119,7 +119,7 @@ public class DiskIndexWriter {
 			for (HashMap.Entry<String, Integer> entry : scan.entrySet()) { // Go through HashMap
 				System.out.println("Key: "+entry.getKey() +", Value: "+entry.getValue());
 				wSum += Math.pow( (1 + Math.log( entry.getValue() )) ,2);
-				System.out.println(wSum);
+				//System.out.println(wSum);
 			}
 			double Ld = Math.sqrt(wSum);
 			System.out.println("Document Weight: " +Ld);
