@@ -4,7 +4,7 @@ package edu.csulb;
 import cecs429.documents.DirectoryCorpus;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
-import cecs429.index.DiskIndexWriter;
+import cecs429.disk.DiskIndexWriter;
 import cecs429.index.DiskPositionalIndex;
 import cecs429.index.Index;
 import cecs429.index.Posting;
