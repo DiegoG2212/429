@@ -4,7 +4,7 @@ package edu.csulb;
 import cecs429.documents.DirectoryCorpus;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
-import cecs429.index.DiskIndexWriter;
+import cecs429.disk.DiskIndexWriter;
 import cecs429.index.DiskPositionalIndex;
 import cecs429.index.Index;
 import cecs429.index.Posting;
@@ -58,6 +58,7 @@ public class DiskPositionalIndexer {
 	String lastQuery = ""; // Saves last user query
 	int queryCheck = 0;
 	Index index;
+	int formulaSelect = 0; // Used to select variant tf-idf formula
 
 	long indexTime = 0;
 
@@ -280,8 +281,7 @@ public class DiskPositionalIndexer {
 				
 				
 				
-				
-				results.setEditable(false); // Doesn't let user edit results box
+
 				
 				// Opening Dialog Box to select Mode
 				Object[] options = {"Boolean query mode",
@@ -296,17 +296,52 @@ public class DiskPositionalIndexer {
 				    options,
 				    options[2]);
 				// System.out.println(n);
-				if(n == 0) {	//Boolean query mode
+				if(n == 0) {	// 0 Boolean query mode
 					
 				}
-				else if(n == 1) {	//Ranked query mode
+				else if(n == 1) {	// 1 Ranked query mode
 					
 				}
-				else {
+				else {	// -1 or 2 Exit
+					// End Program
+					System.exit(-1);
+				}
+				// =========================================
+				
+				// Dialog Box to select variant tf-idf formula
+				Object[] formula = {"Default",
+	                    "tf-idf",
+	                    "Okapi BM25",
+	                    "Wacky"};
+				int w = JOptionPane.showOptionDialog(frame,
+				    "What variant tf-idf formula would you like to use?",
+				    "Mode Selection",
+				    JOptionPane.YES_NO_CANCEL_OPTION,
+				    JOptionPane.QUESTION_MESSAGE,
+				    null,
+				    formula,
+				    formula[2]);
+				//System.out.println(w);
+				if(w == 0) {	// 0 Default
+					
+				}
+				else if(w == 1) {	// 1 tf-idf
+					
+				}
+				else if(w == 2) {	// 2 Okapi BM25
+					
+				}
+				else if(w == 3) {	// 3 Wacky
+					
+				}
+				else {	// -1 Exit
 					// End Program
 					System.exit(-1);
 				}
 				
+				
+				
+				results.setEditable(false); // Doesn't let user edit results box	
 				// Panel Add
 				p.add(browseFile);
 				p.add(textField);
@@ -435,7 +470,7 @@ public class DiskPositionalIndexer {
 		
 		
 		// Write to Disk
-		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
+		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath(), formulaSelect);
 		
 		// Return Index
 		return tdi;

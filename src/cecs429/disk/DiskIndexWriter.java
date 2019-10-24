@@ -1,4 +1,4 @@
-package cecs429.index;
+package cecs429.disk;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -13,13 +13,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import cecs429.index.Index;
+import cecs429.index.Posting;
 import edu.csulb.PositionalInvertedIndexer;
 
 public class DiskIndexWriter {
 
-	public void WriteIndex(Index x, Path y) throws IOException {
+	public void WriteIndex(Index x, Path y, int formula) throws IOException {
 		writeVocabTable(y,x);
-		writeDocWeight(y,x);
+		writeDocWeight(y,x, formula);
 	}
 	
 	// postings.bin
@@ -107,12 +109,13 @@ public class DiskIndexWriter {
 		holdTerms.add(terms);
 	}
 	
-	private void writeDocWeight(Path path, Index index) throws IOException {
+	private void writeDocWeight(Path path, Index index, int formula) throws IOException {
 		System.out.println("Writing docWeights.bin ...");
 		DataOutputStream docWeightsOut = new DataOutputStream(
 				new BufferedOutputStream(
 						new FileOutputStream(path + "/docWeights.bin")));
 		
+		// Default Formula
 		// Iterate List of HashMaps
 		for(HashMap<String, Integer> scan: holdTerms) { // For every Document's HashMap
 			double wSum = 0;
@@ -125,6 +128,8 @@ public class DiskIndexWriter {
 			System.out.println("Document Weight: " +Ld);
 			docWeightsOut.writeDouble(Ld);
 		}
+		// ==========================================================================
+		
 		
 		docWeightsOut.close();
 	}
