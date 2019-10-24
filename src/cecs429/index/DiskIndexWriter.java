@@ -69,7 +69,7 @@ public class DiskIndexWriter {
 			//System.out.println(position);
 			//System.out.println("Vocab: "+ i);
 			vocabOut.writeUTF(i);	// UTF-8 Encoded
-			
+
 		}
 		vocabOut.close();
 

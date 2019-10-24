@@ -3,14 +3,14 @@ package cecs429.index;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import org.mapdb.btree.*;
 public class DiskPositionalIndex implements Index {
 	
 	private HashMap<String, ArrayList<Posting>> map;
 	
 	// Maps docIDs to terms appearing in that doc
 	private HashMap<Integer, HashMap<String, Integer>> docTerms;
-
+	private BTreeMap<String, Posting> T;
 	@Override
 	public List<Posting> getPostings(String term) {
 		// TODO Auto-generated method stub
