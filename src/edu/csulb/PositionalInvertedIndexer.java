@@ -356,7 +356,7 @@ public class PositionalInvertedIndexer {
 			}
 
 		}
-		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
+		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath(),1);
 		return tdi;
 	}
 
