@@ -103,10 +103,14 @@ public class DiskIndexWriter {
 	}
 	
 	// List of HashMap
-	List< HashMap<String, Integer> > holdTerms = new ArrayList< HashMap<String, Integer> >();
+	//List< HashMap<String, Integer> > holdTerms = new ArrayList< HashMap<String, Integer> >();
+
+	List <Double> holdLd = new ArrayList<Double>();
 	// docWeights.bin
-	public void addDocWeight(HashMap<String,Integer> terms) throws IOException {
-		holdTerms.add(terms);
+	//public void addDocWeight(HashMap<String,Integer> terms) throws IOException {
+	public void addDocWeight(double add) throws IOException {
+		//holdTerms.add(terms);
+		holdLd.add(add);
 	}
 	
 	private void writeDocWeight(Path path, Index index, int formula) throws IOException {
@@ -114,7 +118,7 @@ public class DiskIndexWriter {
 		DataOutputStream docWeightsOut = new DataOutputStream(
 				new BufferedOutputStream(
 						new FileOutputStream(path + "/docWeights.bin")));
-		
+		/*
 		// Default Formula
 		// Iterate List of HashMaps
 		for(HashMap<String, Integer> scan: holdTerms) { // For every Document's HashMap
@@ -126,11 +130,17 @@ public class DiskIndexWriter {
 			}
 			double Ld = Math.sqrt(wSum);
 			System.out.println("Document Weight: " +Ld);
-			docWeightsOut.writeDouble(Ld);
+
 		}
 		// ==========================================================================
-		
-		
+		*/
+		for(double scan: holdLd){
+			docWeightsOut.writeDouble(scan);
+		}
+
+
+
+		//docWeightsOut.writeDouble(Ld);
 		docWeightsOut.close();
 	}
 	

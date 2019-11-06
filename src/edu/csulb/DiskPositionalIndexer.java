@@ -457,8 +457,28 @@ public class DiskPositionalIndexer {
 				
 				x++;
 			}
-			
-			writeDisk.addDocWeight(terms); // Add HashMap to list
+
+
+
+
+
+			//writeDisk.addDocWeight(terms); // Add HashMap to list
+
+			// Default Formula
+			double wSum = 0;
+			for (HashMap.Entry<String, Integer> entry : terms.entrySet()) { // Go through HashMap
+				System.out.println("Key: "+entry.getKey() +", Value: "+entry.getValue());
+				wSum += Math.pow( (1 + Math.log( entry.getValue() )) ,2);
+				//System.out.println(wSum);
+			}
+			double Ld = Math.sqrt(wSum);
+			System.out.println("Document Weight: " +Ld);
+			writeDisk.addDocWeight(Ld);
+			// ==========================================================================
+
+
+
+
 			try {
 				stream.close();
 			} catch (IOException e) {
@@ -466,7 +486,7 @@ public class DiskPositionalIndexer {
 				e.printStackTrace();
 			}
 	
-		}	// End of Documents
+		}	// End of Document
 		
 		
 		// Write to Disk

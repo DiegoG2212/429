@@ -1,12 +1,14 @@
 package cecs429.index;
 
+import org.mapdb.BTreeMap;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import org.mapdb.btree.*;
+
 public class DiskPositionalIndex implements Index {
 
 	private BTreeMap<String, ArrayList<Posting>> T;
