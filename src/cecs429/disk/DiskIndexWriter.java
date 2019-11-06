@@ -19,9 +19,9 @@ import edu.csulb.PositionalInvertedIndexer;
 
 public class DiskIndexWriter {
 
-	public void WriteIndex(Index x, Path y, int formula) throws IOException {
+	public void WriteIndex(Index x, Path y) throws IOException {
 		writeVocabTable(y,x);
-		writeDocWeight(y,x, formula);
+		writeDocWeight(y,x);
 	}
 	
 	// postings.bin
@@ -113,7 +113,7 @@ public class DiskIndexWriter {
 		holdLd.add(add);
 	}
 	
-	private void writeDocWeight(Path path, Index index, int formula) throws IOException {
+	private void writeDocWeight(Path path, Index index) throws IOException {
 		System.out.println("Writing docWeights.bin ...");
 		DataOutputStream docWeightsOut = new DataOutputStream(
 				new BufferedOutputStream(

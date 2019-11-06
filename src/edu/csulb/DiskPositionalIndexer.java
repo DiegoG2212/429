@@ -283,7 +283,7 @@ public class DiskPositionalIndexer {
 				
 
 				
-				// Opening Dialog Box to select Mode
+				// Opening Dialog Box to select Mode ===============================================================
 				Object[] options = {"Boolean query mode",
 				                    "Ranked query mode",
 				                    "None"};
@@ -308,12 +308,12 @@ public class DiskPositionalIndexer {
 				}
 				// =========================================
 				
-				// Dialog Box to select variant tf-idf formula
+				// Dialog Box to select variant tf-idf formula ======================================================
 				Object[] formula = {"Default",
 	                    "tf-idf",
 	                    "Okapi BM25",
 	                    "Wacky"};
-				int w = JOptionPane.showOptionDialog(frame,
+				formulaSelect = JOptionPane.showOptionDialog(frame,
 				    "What variant tf-idf formula would you like to use?",
 				    "Mode Selection",
 				    JOptionPane.YES_NO_CANCEL_OPTION,
@@ -322,25 +322,23 @@ public class DiskPositionalIndexer {
 				    formula,
 				    formula[2]);
 				//System.out.println(w);
-				if(w == 0) {	// 0 Default
-					
+				if(formulaSelect == 0) {	// 0 Default
+					System.out.println("Default Formula selected");
 				}
-				else if(w == 1) {	// 1 tf-idf
-					
+				else if(formulaSelect == 1) {	// 1 tf-idf
+					System.out.println("tf-idf Formula selected");
 				}
-				else if(w == 2) {	// 2 Okapi BM25
-					
+				else if(formulaSelect == 2) {	// 2 Okapi BM25
+					System.out.println("Okapi BM25 Formula selected");
 				}
-				else if(w == 3) {	// 3 Wacky
-					
+				else if(formulaSelect == 3) {	// 3 Wacky
+					System.out.println("Wacky Formula selected");
 				}
 				else {	// -1 Exit
 					// End Program
 					System.exit(-1);
 				}
-				
-				
-				
+
 				results.setEditable(false); // Doesn't let user edit results box	
 				// Panel Add
 				p.add(browseFile);
@@ -459,23 +457,30 @@ public class DiskPositionalIndexer {
 			}
 
 
-
-
-
 			//writeDisk.addDocWeight(terms); // Add HashMap to list
-
-			// Default Formula
-			double wSum = 0;
-			for (HashMap.Entry<String, Integer> entry : terms.entrySet()) { // Go through HashMap
-				System.out.println("Key: "+entry.getKey() +", Value: "+entry.getValue());
-				wSum += Math.pow( (1 + Math.log( entry.getValue() )) ,2);
-				//System.out.println(wSum);
+			if(formulaSelect == 0) { // Using Default Formula
+				double wSum = 0;
+				for (HashMap.Entry<String, Integer> entry : terms.entrySet()) { // Go through HashMap
+					System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+					wSum += Math.pow((1 + Math.log(entry.getValue())), 2); // w d,t
+					//System.out.println(wSum);
+				}
+				double Ld = Math.sqrt(wSum); // Square root of sum of squared w d,t
+				System.out.println("Document Weight: " + Ld);
+				writeDisk.addDocWeight(Ld); // Store doc weight
+				// ==========================================================================
 			}
-			double Ld = Math.sqrt(wSum);
-			System.out.println("Document Weight: " +Ld);
-			writeDisk.addDocWeight(Ld);
-			// ==========================================================================
+			if(formulaSelect == 1){	// Using tf-idf Formula
+				System.out.println("Uh oh, stinky");
+				
 
+			}
+			if(formulaSelect == 2){ // Okapi BM25
+				System.out.println("Uh oh, stinky");
+			}
+			if(formulaSelect == 3){ // Wacky
+				System.out.println("Uh oh, wacky");
+			}
 
 
 
@@ -485,12 +490,11 @@ public class DiskPositionalIndexer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
 		}	// End of Document
 		
 		
 		// Write to Disk
-		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath(), formulaSelect);
+		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
 		
 		// Return Index
 		return tdi;
