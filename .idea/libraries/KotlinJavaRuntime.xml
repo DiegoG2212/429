@@ -6,6 +6,8 @@
       <root url="jar://$PROJECT_DIR$/lib/kotlin-test.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/kotlin-stdlib-jdk7.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/kotlin-stdlib-jdk8.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/kotlin-argparser-2.0.7.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/kotlin-stdlib-1.2.41.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
