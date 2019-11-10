@@ -171,13 +171,15 @@ public class BooleanQueryParser {
 			
 			// Find ending quotation mark
 			
-			int temp = startIndex+1;
+			
 			String holder  = " ";
-			while (subquery.charAt(temp) != '"') {
-				temp++;
+			while (subquery.charAt(startIndex) == '"') {
+				startIndex++;
 			}
 			// Substring to get all words between quotation marks as a single string
-			holder = subquery.substring(startIndex+1, startIndex + temp);
+			
+			int fallSpace = subquery.indexOf('"', startIndex);
+			holder = subquery.substring(startIndex, fallSpace-1);
 			String[] phrase = holder.split(" ");// split that into a list of individual strings
 			List<String> tem = new ArrayList<>();
 			List<String> phr = new ArrayList<>();
@@ -188,7 +190,7 @@ public class BooleanQueryParser {
 					phr.add(t);
 				}
 			}
-			lengthOut = startIndex - temp;
+			lengthOut = startIndex - fallSpace;
 			return new Literal(
 					new StringBounds(startIndex, lengthOut),// Construct a new Literal object,
 					new PhraseLiteral(phr)); // but the second parameter will be a PhraseLiteral constructed with the list of strings.
@@ -196,7 +198,7 @@ public class BooleanQueryParser {
 		} else {
 		
 		// This is a term literal containing a single term.
-			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut)); //process token before 
+			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut )); //process token before 
 																															    // sending to the term literal
 			return new Literal(
 			 new StringBounds(startIndex, lengthOut),
