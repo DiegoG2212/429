@@ -4,7 +4,7 @@ package edu.csulb;
 import cecs429.documents.DirectoryCorpus;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
-import cecs429.disk.DiskIndexWriter;
+import cecs429.index.DiskIndexWriter;
 import cecs429.index.DiskPositionalIndex;
 import cecs429.index.Index;
 import cecs429.index.Posting;
@@ -58,7 +58,6 @@ public class DiskPositionalIndexer {
 	String lastQuery = ""; // Saves last user query
 	int queryCheck = 0;
 	Index index;
-	int formulaSelect = 0; // Used to select variant tf-idf formula
 
 	long indexTime = 0;
 
@@ -281,9 +280,10 @@ public class DiskPositionalIndexer {
 				
 				
 				
-
 				
-				// Opening Dialog Box to select Mode ===============================================================
+				results.setEditable(false); // Doesn't let user edit results box
+				
+				// Opening Dialog Box to select Mode
 				Object[] options = {"Boolean query mode",
 				                    "Ranked query mode",
 				                    "None"};
@@ -296,50 +296,17 @@ public class DiskPositionalIndexer {
 				    options,
 				    options[2]);
 				// System.out.println(n);
-				if(n == 0) {	// 0 Boolean query mode
+				if(n == 0) {	//Boolean query mode
 					
 				}
-				else if(n == 1) {	// 1 Ranked query mode
+				else if(n == 1) {	//Ranked query mode
 					
 				}
-				else {	// -1 or 2 Exit
+				else {
 					// End Program
 					System.exit(-1);
 				}
-				// =========================================
 				
-				// Dialog Box to select variant tf-idf formula ======================================================
-				Object[] formula = {"Default",
-	                    "tf-idf",
-	                    "Okapi BM25",
-	                    "Wacky"};
-				formulaSelect = JOptionPane.showOptionDialog(frame,
-				    "What variant tf-idf formula would you like to use?",
-				    "Mode Selection",
-				    JOptionPane.YES_NO_CANCEL_OPTION,
-				    JOptionPane.QUESTION_MESSAGE,
-				    null,
-				    formula,
-				    formula[2]);
-				//System.out.println(w);
-				if(formulaSelect == 0) {	// 0 Default
-					System.out.println("Default Formula selected");
-				}
-				else if(formulaSelect == 1) {	// 1 tf-idf
-					System.out.println("tf-idf Formula selected");
-				}
-				else if(formulaSelect == 2) {	// 2 Okapi BM25
-					System.out.println("Okapi BM25 Formula selected");
-				}
-				else if(formulaSelect == 3) {	// 3 Wacky
-					System.out.println("Wacky Formula selected");
-				}
-				else {	// -1 Exit
-					// End Program
-					System.exit(-1);
-				}
-
-				results.setEditable(false); // Doesn't let user edit results box	
 				// Panel Add
 				p.add(browseFile);
 				p.add(textField);
@@ -455,42 +422,16 @@ public class DiskPositionalIndexer {
 				
 				x++;
 			}
-
-
-			//writeDisk.addDocWeight(terms); // Add HashMap to list
-			if(formulaSelect == 0) { // Using Default Formula
-				double wSum = 0;
-				for (HashMap.Entry<String, Integer> entry : terms.entrySet()) { // Go through HashMap
-					System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-					wSum += Math.pow((1 + Math.log(entry.getValue())), 2); // w d,t
-					//System.out.println(wSum);
-				}
-				double Ld = Math.sqrt(wSum); // Square root of sum of squared w d,t
-				System.out.println("Document Weight: " + Ld);
-				writeDisk.addDocWeight(Ld); // Store doc weight
-				// ==========================================================================
-			}
-			if(formulaSelect == 1){	// Using tf-idf Formula
-				System.out.println("Uh oh, stinky");
-				
-
-			}
-			if(formulaSelect == 2){ // Okapi BM25
-				System.out.println("Uh oh, stinky");
-			}
-			if(formulaSelect == 3){ // Wacky
-				System.out.println("Uh oh, wacky");
-			}
-
-
-
+			
+			writeDisk.addDocWeight(terms); // Add HashMap to list
 			try {
 				stream.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}	// End of Document
+	
+		}	// End of Documents
 		
 		
 		// Write to Disk
