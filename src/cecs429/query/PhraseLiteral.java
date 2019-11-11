@@ -36,9 +36,13 @@ public class PhraseLiteral implements QueryComponent {
 		//return null;
 		
 		List <Posting> result = Collections.emptyList();
+		if (mTerms.size() == 2) {
+			String temp = mTerms.get(0) + " " + mTerms.get(1);
+			return index.getPostings(temp);
+		}
 		
 		if (!(mTerms.isEmpty())) {
-			if (mTerms.size() >=2 ) {
+			if (mTerms.size() > 2 ) {
 				int i = 0;
 				
 				while(i < mTerms.size()) {

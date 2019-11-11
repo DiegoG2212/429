@@ -9,12 +9,11 @@ import java.util.Set;
 public class PositionalInvertedIndex implements Index {
 
 	private HashMap<String, ArrayList<Posting>> map;
-	
-	
+
 	public PositionalInvertedIndex() {
 		map = new HashMap<String, ArrayList<Posting>>();
 	}
-	
+
 	@Override
 	public List<Posting> getPostings(String term) {
 		if (map.containsKey(term)) {
@@ -39,17 +38,17 @@ public class PositionalInvertedIndex implements Index {
 
 		return val;
 	}
-	
+
 	public void addTerm(List<String> term, int docID, int pos) {
 		for (String i : term) {
 			if (!map.containsKey(i)) { // If map doesn't contain term
-				Posting p = new Posting(docID, pos);	// Add term to map
+				Posting p = new Posting(docID, pos); // Add term to map
 				ArrayList<Posting> l = new ArrayList<Posting>();
 				l.add(p);
 				map.put(i, l);
 			} else {
 				List<Posting> temp = map.get(i);
-	
+
 				if (docID == temp.get(temp.size() - 1).getDocumentId()) {
 					temp.get(temp.size() - 1).addPos(pos);
 					return;
@@ -58,7 +57,7 @@ public class PositionalInvertedIndex implements Index {
 					temp.add(p);
 					map.put(i, new ArrayList<>(temp));
 				}
-			}	
+			}
 		}
 	}
 

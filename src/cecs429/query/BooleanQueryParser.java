@@ -41,7 +41,7 @@ public class BooleanQueryParser {
 	 */
 	public QueryComponent parseQuery(String query) {
 		int start = 0;
-		
+
 		// General routine: scan the query to identify a literal, and put that literal into a list.
 		//	Repeat until a + or the end of the query is encountered; build an AND query with each
 		//	of the literals found. Repeat the scan-and-build-AND-query phase for each segment of the
@@ -55,7 +55,8 @@ public class BooleanQueryParser {
 			// Extract the identified subquery into its own string.
 			String subquery = query.substring(nextSubquery.start, nextSubquery.start + nextSubquery.length);
 			int subStart = 0;
-			
+
+
 			// Store all the individual components of this subquery.
 			List<QueryComponent> subqueryLiterals = new ArrayList<>(0);
 
@@ -106,60 +107,81 @@ public class BooleanQueryParser {
 	 */
 	private StringBounds findNextSubquery(String query, int startIndex) {
 		int lengthOut;
-		
+
 		// Find the start of the next subquery by skipping spaces and + signs.
 		char test = query.charAt(startIndex);
 		while (test == ' ' || test == '+') {
 			test = query.charAt(++startIndex);
 		}
-		
+
 		// Find the end of the next subquery.
-		int nextPlus = query.indexOf('+', startIndex + 1);
-		
-		if (nextPlus < 0) {
+		int i =startIndex;
+		while ((test != '+') && (i != query.length())){ // while loop use to find plus outside parenthesis
+
+			if (test == '('){ // if it finds a parenthesis it just send sets i to the final parenthesis
+				i = query.indexOf(')', i + 1);
+				test = query.charAt(i);
+			}else{ // otherwise go to next character add 1 to the iterator i
+				test = query.charAt(i);
+				i++;
+
+			}
+		}
+
+		int nextPlus = i;
+
+		if (nextPlus == query.length()) {
 			// If there is no other + sign, then this is the final subquery in the
 			// query string.
 			lengthOut = query.length() - startIndex;
-		}
-		else {
+		} else {
 			// If there is another + sign, then the length of this subquery goes up
 			// to the next + sign.
-		
+
 			// Move nextPlus backwards until finding a non-space non-plus character.
+
+
 			test = query.charAt(nextPlus);
+
+
 			while (test == ' ' || test == '+') {
 				test = query.charAt(--nextPlus);
 			}
-			
 			lengthOut = 1 + nextPlus - startIndex;
 		}
-		
+
 		// startIndex and lengthOut give the bounds of the subquery.
 		return new StringBounds(startIndex, lengthOut);
 	}
-	
+
 	/**
 	 * Locates and returns the next literal from the given subquery string.
 	 */
 	private Literal findNextLiteral(String subquery, int startIndex) {
 		int subLength = subquery.length();
 		int lengthOut;
-		
+
+
 		// Skip past white space.
+
 		while (subquery.charAt(startIndex) == ' ') {
 			++startIndex;
 		}
-		
+
+
 		// Locate the next space to find the end of this literal.
 		int nextSpace = subquery.indexOf(' ', startIndex);
 		if (nextSpace < 0) {
 			// No more literals in this subquery.
 			lengthOut = subLength - startIndex;
-		}
-		else {
+
+
+		} else {
 			lengthOut = nextSpace - startIndex;
+
 		}
-		
+
+
 		if (subquery.charAt(startIndex) == '"') {
 			
 			/*
@@ -168,42 +190,103 @@ public class BooleanQueryParser {
 			object if the first non-space character you find is a double-quote ("). In this case, the literal is not ended
 			by the next space character, but by the next double-quote character.
 			 */
-			
+
 			// Find ending quotation mark
+
 			
 			
 			String holder  = " ";
+
+
+
+			String holder = " ";
+
 			while (subquery.charAt(startIndex) == '"') {
 				startIndex++;
 			}
 			// Substring to get all words between quotation marks as a single string
+
 			
 			int fallSpace = subquery.indexOf('"', startIndex);
 			holder = subquery.substring(startIndex, fallSpace-1);
+
+
+			int fallSpace = subquery.indexOf('"', startIndex);
+
+			if (fallSpace < 0) {
+				lengthOut = subquery.length() - startIndex;
+			} else {
+				lengthOut = fallSpace - startIndex +1;
+			}
+
+			holder = subquery.substring(startIndex , lengthOut);
+
+
 			String[] phrase = holder.split(" ");// split that into a list of individual strings
-			List<String> tem = new ArrayList<>();
+			List<String>  tem = new ArrayList<>();
 			List<String> phr = new ArrayList<>();
-			
+
 			for (String i : phrase) { // process tokens before going in to the phrase literal. Following golden rule.
+
 				tem = new BetterTokenProcessor().processToken(i);
-				for(String t : tem) {
+				for (String t : tem) {
 					phr.add(t);
 				}
 			}
+
 			lengthOut = startIndex - fallSpace;
+
+
+
+
 			return new Literal(
 					new StringBounds(startIndex, lengthOut),// Construct a new Literal object,
 					new PhraseLiteral(phr)); // but the second parameter will be a PhraseLiteral constructed with the list of strings.
-			
+		}else if(subquery.charAt(startIndex) == '('){ // expanded query parser
+
+			String parSub = " ";	//checking to see if there is a parenthesis
+			while (subquery.charAt(startIndex) == '(') { //if there is get whats inside
+				++startIndex;
+			}
+			// Substring to get all words between the parenthesis as a single string
+
+			int exitPar = subquery.indexOf(')', startIndex); //substring it and send it as a query thru the query
+
+
+			if (exitPar < 0) { //amking sure of closing parenthesis
+				lengthOut = subquery.length() - startIndex;
+
+
+			} else {
+				lengthOut = exitPar - startIndex +1;
+
+			}
+
+			parSub = subquery.substring(startIndex , exitPar); // grabbing up to the closing parenthesis
+
+
+			return new Literal( // send new literal with parse query as a recursive call
+					new StringBounds(startIndex, lengthOut),
+					this.parseQuery(parSub));
+
+
 		} else {
 		
 		// This is a term literal containing a single term.
+
 			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut )); //process token before 
 																															    // sending to the term literal
+
+
+			//process token before sending to the term literal
+			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut));
+			//
+
 			return new Literal(
 			 new StringBounds(startIndex, lengthOut),
 			 new TermLiteral(tem.get(0)));
 		}
+
 		
 		
 		
