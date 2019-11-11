@@ -6,7 +6,7 @@ public class DefaultRank implements RankFormula {
 
     @Override
     public double getWqt(Index i, String term) {
-        return (double)Math.log(1+(i.getVocabulary().size() / i.getPostings(term)));
+        return Math.log(1+((double) i.getVocabulary().size() / ((double) i.getPostings(term).size())));
     }
 
     @Override
