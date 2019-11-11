@@ -198,9 +198,6 @@ public class BooleanQueryParser {
 			String holder  = " ";
 
 
-
-			String holder = " ";
-
 			while (subquery.charAt(startIndex) == '"') {
 				startIndex++;
 			}
@@ -209,9 +206,6 @@ public class BooleanQueryParser {
 			
 			int fallSpace = subquery.indexOf('"', startIndex);
 			holder = subquery.substring(startIndex, fallSpace-1);
-
-
-			int fallSpace = subquery.indexOf('"', startIndex);
 
 			if (fallSpace < 0) {
 				lengthOut = subquery.length() - startIndex;
@@ -278,9 +272,7 @@ public class BooleanQueryParser {
 																															    // sending to the term literal
 
 
-			//process token before sending to the term literal
-			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut));
-			//
+
 
 			return new Literal(
 			 new StringBounds(startIndex, lengthOut),

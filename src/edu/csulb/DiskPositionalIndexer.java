@@ -1,10 +1,11 @@
 package edu.csulb;
 
 // Class Imports
+import cecs429.disk.DiskInvertedIndex;
 import cecs429.documents.DirectoryCorpus;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
-import cecs429.index.DiskIndexWriter;
+import cecs429.disk.DiskIndexWriter;
 import cecs429.index.DiskPositionalIndex;
 import cecs429.index.Index;
 import cecs429.index.Posting;
@@ -357,7 +358,7 @@ public class DiskPositionalIndexer {
 
 	private Index indexCorpus(DocumentCorpus corpus) throws IOException {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
-		Index tdi = new PositionalInvertedIndex();
+		Index tdi = new DiskInvertedIndex(Paths.get(directory +"/index").toAbsolutePath());
 		DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
 
 		// Loops through documents
@@ -423,7 +424,7 @@ public class DiskPositionalIndexer {
 				x++;
 			}
 			
-			writeDisk.addDocWeight(terms); // Add HashMap to list
+			//writeDisk.addDocWeight(terms); // Add HashMap to list
 			try {
 				stream.close();
 			} catch (IOException e) {
@@ -436,7 +437,7 @@ public class DiskPositionalIndexer {
 		
 		// Write to Disk
 		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
-		
+		System.out.println(tdi.getVocabulary());
 		// Return Index
 		return tdi;
 	}

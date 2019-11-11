@@ -14,7 +14,7 @@ public class DefaultRank implements RankFormula {
         for (Posting p : i.getPostings(term)) {
             docs.add(p.getDocumentId());
         }
-        return (double)Math.log(1+(corpusSize / docs.size());
+        return (double)Math.log(1+(corpusSize / docs.size()));
     }
 
     @Override
