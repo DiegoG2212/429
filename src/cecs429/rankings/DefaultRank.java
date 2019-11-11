@@ -1,12 +1,20 @@
 package cecs429.rankings;
 
 import cecs429.index.Index;
+import cecs429.index.Posting;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DefaultRank implements RankFormula {
 
     @Override
-    public double getWqt(Index i, String term) {
-        return (double)Math.log(1+(i.getVocabulary().size() / i.getPostings(term)));
+    public double getWqt(Index i, String term, int corpusSize) {
+        Set<Integer> docs = new HashSet<Integer>();
+        for (Posting p : i.getPostings(term)) {
+            docs.add(p.getDocumentId());
+        }
+        return (double)Math.log(1+(corpusSize / docs.size());
     }
 
     @Override

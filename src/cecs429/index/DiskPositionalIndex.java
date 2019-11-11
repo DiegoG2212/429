@@ -1,26 +1,38 @@
 package cecs429.index;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
 public class DiskPositionalIndex implements Index {
-	
+
 	private HashMap<String, ArrayList<Posting>> map;
-	
+
 	// Maps docIDs to terms appearing in that doc
 	private HashMap<Integer, HashMap<String, Integer>> docTerms;
 
 	@Override
 	public List<Posting> getPostings(String term) {
-		// TODO Auto-generated method stub
-		return null;
+		if (map.containsKey(term)) {
+			return map.get(term);
+		} else {
+			List<Posting> p = Collections.emptyList();
+			return p;
+		}
 	}
 
 	@Override
 	public List<String> getVocabulary() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> vocab = new ArrayList<String>();
+		for (Map.Entry<String, ArrayList<Posting>> entry : map.entrySet()) {
+			vocab.add(entry.getKey());
+		}
+		return vocab;
 	}
 
 	@Override
@@ -44,21 +56,29 @@ public class DiskPositionalIndex implements Index {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	public void addDocTerms(HashMap<String, Integer> terms, int docID) {
-		docTerms.put(docID, terms);	
+		docTerms.put(docID, terms);
 	}
-	
+
 	public HashMap<Integer, HashMap<String, Integer>> getdocTerms(){
 		return docTerms;
 	}
-	
+
 	// Reads docWeights.bin to skip to an appropriate location
 	// to read an 8-byte double for Ld
-	public void readDocWeights() {
-		
+	public void readDocWeights(String binLocation) {
+		try (InputStream in = new FileInputStream(binLocation);) {
+			int byteRead;
+
+			while ((byteRead = in.read()) != -1) {
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
