@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -358,86 +359,92 @@ public class DiskPositionalIndexer {
 
 	private Index indexCorpus(DocumentCorpus corpus) throws IOException {
 		BetterTokenProcessor processor = new BetterTokenProcessor();
-		Index tdi = new DiskInvertedIndex(Paths.get(directory +"/index").toAbsolutePath());
-		DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
+		//Index tdi = new DiskInvertedIndex(Paths.get(directory +"/index").toAbsolutePath());
+		Index tdi = null;
+		if(Files.exists(Paths.get(directory + "/index/vocabTable.bin").toAbsolutePath()) == false) { // If index folder doesn't exist
+			System.out.println("Writing Index to Disk...");
+			tdi = new PositionalInvertedIndex();
+			DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
+			// Loops through documents
+			for (Document d : corpus.getDocuments()) {
+				int x = 0; // Reset counter for positions
+				// Creates tokens by splitting on whitespace
+				EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
+				List<String> token2 = new ArrayList<String>();
+				HashMap<String, Integer> terms = new HashMap<String, Integer>();
 
-		// Loops through documents
-		for (Document d : corpus.getDocuments()) {
-			int x = 0; // Reset counter for positions
-			// Creates tokens by splitting on whitespace
-			EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
-			List<String> token2 = new ArrayList<String>();
-			HashMap<String, Integer> terms = new HashMap<String, Integer>();
-			
-			
-			int termExist = 0;
-			// Adds term to index along with Document ID
-			for (String token : stream.getTokens()) {	// Go through each token
-				// Add processed token
-				tdi.addTerm(processor.processToken(token), d.getId(), x);
-				//System.out.println(processor.processToken(token));
-				
-				
-				// Doc Weight Work ===================================================
-				
-				for(String i: processor.processToken(token)) {
-					// If term exists in HashMap
-				    if(terms.containsKey(i)) {
-				    	int valHold = terms.get(i); // Take value
-				    	valHold++; // Increment counter by 1
-				    	terms.put(i, valHold);
-				    }
-					
-				    else{ // Term doesn't currently exist
-				    	terms.put(i, 1); // Give count of 1		
-				    }
-				}
-			    // ====================================================================
-				
-				
-			    
-				for (String i : processor.processToken(token)) {
-					token2.add(i);
-				}
-				while (token2.size() >= 2) {
-					String temp = token2.get(0) + " " + token2.get(1);
-					List<String> token3 = new ArrayList<String>();
-					token3.add(temp);
-					tdi.addTerm(token3, d.getId(), x);
-					// Doc Weight Work ===================================================
-					for(String b: token3) {	
-					    if(terms.containsKey(b)) {
-					    	int valHold = terms.get(b); // Take value
-					    	valHold++; // Increment counter by 1
-					    	terms.put(b, valHold);
-					    }
-						
-					    else{ // Term doesn't currently exist
-					    	terms.put(b, 1); // Give count of 1		
-					    }
+
+				int termExist = 0;
+				// Adds term to index along with Document ID
+				for (String token : stream.getTokens()) {    // Go through each token
+					// Add processed token
+					tdi.addTerm(processor.processToken(token), d.getId(), x);
+					//System.out.println(processor.processToken(token));
+
+
+					// Doc Weight Work ==================================================
+					for (String i : processor.processToken(token)) {
+						// If term exists in HashMap
+						if (terms.containsKey(i)) {
+							int valHold = terms.get(i); // Take value
+							valHold++; // Increment counter by 1
+							terms.put(i, valHold);
+						} else { // Term doesn't currently exist
+							terms.put(i, 1); // Give count of 1
+						}
 					}
-				   
-				    // ====================================================================
-				    token2.remove(0);
+					// ====================================================================
+
+
+					for (String i : processor.processToken(token)) {
+						token2.add(i);
+					}
+					while (token2.size() >= 2) {
+						String temp = token2.get(0) + " " + token2.get(1);
+						List<String> token3 = new ArrayList<String>();
+						token3.add(temp);
+						tdi.addTerm(token3, d.getId(), x);
+						// Doc Weight Work ===================================================
+						for (String b : token3) {
+							if (terms.containsKey(b)) {
+								int valHold = terms.get(b); // Take value
+								valHold++; // Increment counter by 1
+								terms.put(b, valHold);
+							} else { // Term doesn't currently exist
+								terms.put(b, 1); // Give count of 1
+							}
+						}
+						// ====================================================================
+						token2.remove(0);
+					}
+
+					x++;
 				}
-				
-				x++;
-			}
-			
-			//writeDisk.addDocWeight(terms); // Add HashMap to list
-			try {
-				stream.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	
-		}	// End of Documents
-		
-		
-		// Write to Disk
-		writeDisk.WriteIndex(tdi, Paths.get(directory +"/index").toAbsolutePath());
-		System.out.println(tdi.getVocabulary());
+
+				//writeDisk.addDocWeight(terms); // Add HashMap to list
+				try {
+					stream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}    // End of Documents
+
+
+			// Write to Disk
+			writeDisk.WriteIndex(tdi, Paths.get(directory + "/index").toAbsolutePath());
+		}
+
+		else{ // Already on disk
+			System.out.println("Index on Disk");
+			tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
+		}
+
+
+		//System.out.println(tdi.getVocabulary());
+
+
 		// Return Index
 		return tdi;
 	}

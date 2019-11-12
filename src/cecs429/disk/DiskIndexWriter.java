@@ -1,10 +1,6 @@
 package cecs429.disk;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,8 +16,9 @@ import edu.csulb.PositionalInvertedIndexer;
 public class DiskIndexWriter {
 
 	public void WriteIndex(Index x, Path y) throws IOException {
-		writeVocabTable(y,x);
-		writeDocWeight(y,x);
+			writeVocabTable(y, x);
+			writeDocWeight(y, x);
+
 	}
 	
 	// postings.bin
@@ -81,9 +78,9 @@ public class DiskIndexWriter {
 	// vocabTable.bin
 	private void writeVocabTable(Path path, Index index) throws IOException{
 		System.out.println("Writing vocabTable.bin ...");
-
-		List<Long> docPos = writePostings(path, index);
 		List<Long> vocabPos = writeVocab(path, index);
+		List<Long> docPos = writePostings(path, index);
+
 
 		DataOutputStream vtableOut = new DataOutputStream(
 				new BufferedOutputStream(

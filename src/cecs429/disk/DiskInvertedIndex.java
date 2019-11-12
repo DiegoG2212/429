@@ -21,20 +21,26 @@ public class DiskInvertedIndex implements Index {
 
     // Opens a disk inverted index that was constructed in the given path.
     public DiskInvertedIndex(Path path) {
-        try {
+
+        //try {
 
             mPath = path.toString();
             System.out.println(mPath);
-            mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
-            mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
-            mVocabTable = readVocabTable(path.toString());
+
             //mFileNames = readFileNames(path);
-        }
+        //}
+        /*
         catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
         }
+       */
     }
 
+    public void start() throws IOException{
+        mVocabList = new RandomAccessFile(new File(mPath.toString(), "vocab.bin"), "r");
+        mPostings = new RandomAccessFile(new File(mPath.toString(), "postings.bin"), "r");
+        mVocabTable = readVocabTable(mPath.toString());
+    }
 
 
     // Locates the byte position of the postings for the given term.
@@ -83,7 +89,6 @@ public class DiskInvertedIndex implements Index {
     // Reads the file vocabTable.bin into memory.
     private static long[] readVocabTable(String indexName) {
         try {
-
             System.out.println(indexName);
             long[] vocabTable;
 
@@ -134,7 +139,6 @@ public class DiskInvertedIndex implements Index {
 
 
     public List<String> getVocabulary() {
-
         try {
 
             List<String> res = new ArrayList<>();
@@ -168,7 +172,6 @@ public class DiskInvertedIndex implements Index {
         }catch(IOException ex){
             System.out.println(ex.toString());
         }
-
         return null;
     }
 
