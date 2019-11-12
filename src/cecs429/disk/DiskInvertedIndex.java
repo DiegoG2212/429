@@ -1,11 +1,9 @@
 package cecs429.disk;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import cecs429.index.Index;
 import cecs429.index.Posting;
@@ -25,7 +23,7 @@ public class DiskInvertedIndex implements Index {
             mPath = path.toString();
             mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
             mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
-            mVocabTable = readVocabTable(path.toString());
+            mVocabTable = readVocabTable(mPath);
             //mFileNames = readFileNames(path);
         }
         catch (FileNotFoundException ex) {
@@ -91,21 +89,39 @@ public class DiskInvertedIndex implements Index {
                     new File(indexName, "vocabTable.bin"),
                     "r");
 
+ /*
+            DataInputStream tableFile = new DataInputStream(
+                    new BufferedInputStream(
+                            new FileInputStream(indexName + "/vocabTable.bin")));
+
+  */
+
 
             byte[] byteBuffer = new byte[4];
             tableFile.read(byteBuffer, 0, byteBuffer.length);
 
             int tableIndex = 0;
-            vocabTable = new long[ByteBuffer.wrap(byteBuffer).getInt() * 2];
+            //System.out.println(ByteBuffer.wrap(byteBuffer).getInt());
+            vocabTable = new long[(int) tableFile.length() / 16 * 2];
             byteBuffer = new byte[8];
 
             System.out.println(vocabTable.length);
+            System.out.println(byteBuffer.length);
             System.out.println(tableFile.read(byteBuffer, 0, byteBuffer.length));
+
             while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) { // while we keep reading 4 bytes
+                System.out.println("hi");
                 vocabTable[tableIndex] = ByteBuffer.wrap(byteBuffer).getLong();
                 tableIndex++;
             }
             tableFile.close();
+            //System.out.println(vocabTable);
+            /*
+            for(long s: vocabTable){
+                System.out.println(s);
+            }
+
+             */
             return vocabTable;
         }
         catch (FileNotFoundException ex) {
@@ -168,8 +184,6 @@ public class DiskInvertedIndex implements Index {
         return null;
     }
 
-    public void addTerm(List<String> term, int docID, int pos){
-
-    }
+    public void addTerm(List<String> term, int docID, int pos){ }
 
 }

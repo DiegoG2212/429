@@ -87,6 +87,7 @@ public class DiskIndexWriter {
 						new FileOutputStream(path + "/vocabTable.bin")));
 
 
+
 		for (int i = 0; i <docPos.size(); i++){
 
 			long vPos = vocabPos.get(i);
