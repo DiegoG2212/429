@@ -2,7 +2,9 @@ package cecs429.rankings;
 
 import cecs429.index.Index;
 
-class OkapiRank implements RankFormula {
+public class OkapiRank implements RankFormula {
+    public OkapiRank() {}
+
     @Override
     public double getWqt(Index i, String term) {
         return 0;
