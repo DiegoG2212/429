@@ -83,7 +83,8 @@ public class DiskPositionalIndexer {
 			public void run() {
 				// Frame ==================
 				JFrame frame = new JFrame("Search Engine");
-				// Panels =================
+				// Panels =================+
+
 				JPanel p = new JPanel();
 				// Components =============
 				JTextField textField = new JTextField(35);
