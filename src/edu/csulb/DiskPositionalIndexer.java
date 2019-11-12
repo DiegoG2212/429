@@ -444,7 +444,7 @@ public class DiskPositionalIndexer {
 
 		//System.out.println(tdi.getVocabulary());
 
-
+		System.out.println(tdi.getVocabulary());
 		// Return Index
 		return tdi;
 	}

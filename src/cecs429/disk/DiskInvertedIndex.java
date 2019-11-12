@@ -21,25 +21,20 @@ public class DiskInvertedIndex implements Index {
 
     // Opens a disk inverted index that was constructed in the given path.
     public DiskInvertedIndex(Path path) {
-
-        //try {
-
+        try {
             mPath = path.toString();
-            System.out.println(mPath);
-
+            mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
+            mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
+            mVocabTable = readVocabTable(path.toString());
             //mFileNames = readFileNames(path);
-        //}
-        /*
+        }
         catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
         }
-       */
     }
 
     public void start() throws IOException{
-        mVocabList = new RandomAccessFile(new File(mPath.toString(), "vocab.bin"), "r");
-        mPostings = new RandomAccessFile(new File(mPath.toString(), "postings.bin"), "r");
-        mVocabTable = readVocabTable(mPath.toString());
+
     }
 
 
@@ -107,8 +102,6 @@ public class DiskInvertedIndex implements Index {
             System.out.println(vocabTable.length);
             System.out.println(tableFile.read(byteBuffer, 0, byteBuffer.length));
             while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) { // while we keep reading 4 bytes
-
-
                 vocabTable[tableIndex] = ByteBuffer.wrap(byteBuffer).getLong();
                 tableIndex++;
             }

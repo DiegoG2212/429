@@ -1,4 +1,4 @@
-package cecs429.query;i
+package cecs429.query;
 
 import cecs429.index.Index;
 import cecs429.rankings.*;
@@ -16,35 +16,38 @@ public class RankQuery {
     }
 
     public RankQuery(DefaultRank d, int corpusSize) {
-        rf = d;
+        //rf = d;
         this.corpusSize = corpusSize;
     }
 
     public RankQuery(tfidfRank t, int corpusSize) {
-        rf = t;
+        //rf = t;
         this.corpusSize = corpusSize;
     }
 
     public RankQuery(OkapiRank o, int corpusSize) {
-        rf = o;
+        //rf = o;
         this.corpusSize = corpusSize;
     }
 
     public RankQuery(WackyRank w, int corpusSize) {
-        rf = w;
+        //rf = w;
         this.corpusSize = corpusSize;
     }
 
     public double getWqt(Index i, String term, int corpusSize) {
-        return this.rf.getWqt(i, term, corpusSize);
+        //return this.rf.getWqt(i, term, corpusSize);
+        return 0;
     }
 
     public double getWdt() {
-        return this.rf.getWdt();
+        //return this.rf.getWdt();
+        return 0;
     }
 
     public double getLd() {
-        return this.rf.getLd();
+        //return this.rf.getLd();
+        return 0;
     }
 
     public void getCorpusSize() {
