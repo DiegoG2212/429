@@ -1,7 +1,8 @@
-package cecs429.query;
+/* package cecs429.query;
 
 import cecs429.index.Index;
 import cecs429.rankings.*;
+
 
 import java.io.File;
 
@@ -62,3 +63,4 @@ public class RankQuery {
         return false;
     }
 }
+*/
