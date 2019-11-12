@@ -1,66 +1,79 @@
-/* package cecs429.query;
+package cecs429.query;
 
 import cecs429.index.Index;
+import cecs429.index.Posting;
 import cecs429.rankings.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
-import java.io.File;
-
-public class RankQuery {
+public class RankQuery /*implements QueryComponent*/ {
 
     private int corpusSize;
     private RankFormula rf;
+    private List<String> query;
+    private Path path;
 
-    public RankQuery(int corpusSize) {
-        this.rf = new DefaultRank();
+    public RankQuery(RankFormula rf, List<String> query, int corpusSize, Path path) {
+        this.rf = rf;
+        this.query = query;
         this.corpusSize = corpusSize;
+        this.path = path;
     }
 
-    public RankQuery(DefaultRank d, int corpusSize) {
-        //rf = d;
-        this.corpusSize = corpusSize;
-    }
+    /* @Override */
+    public List<Double> getPostings(Index index) {
 
-    public RankQuery(tfidfRank t, int corpusSize) {
-        //rf = t;
-        this.corpusSize = corpusSize;
-    }
+        List<Double> Ads = Collections.emptyList();
 
-    public RankQuery(OkapiRank o, int corpusSize) {
-        //rf = o;
-        this.corpusSize = corpusSize;
-    }
+        for (String s : query) {
+            double Wqt = rf.getWqt(index, s, corpusSize);
 
-    public RankQuery(WackyRank w, int corpusSize) {
-        //rf = w;
-        this.corpusSize = corpusSize;
-    }
+            List<Integer> doc = Collections.emptyList();
+            for (Posting p : index.getPostings(s)) {
+                doc.add(p.getDocumentId());
+            }
 
-    public double getWqt(Index i, String term, int corpusSize) {
-        //return this.rf.getWqt(i, term, corpusSize);
-        return 0;
-    }
+            for (Posting p : index.getPostings(s)) {
+                for (int i : doc) {
+                    // Accumulator
+                    double Ad = 0;
+                    // Calculate Wdt
+                    double Wdt = rf.getWdt(index, s, i);
+                    // Increeasing Ad by Wqt * Wdt
+                    Ad += Wqt * Wdt;
 
-    public double getWdt() {
-        //return this.rf.getWdt();
-        return 0;
-    }
+                    // If non-zero, divide by Ld
+                    if (Ad != 0) {
+                        try {
+                            Ad /= rf.getLd(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-    public double getLd() {
-        //return this.rf.getLd();
-        return 0;
-    }
-
-    public void getCorpusSize() {
-
-    }
-
-    public boolean accept(File pathname) {
-        String suffix = ".rbc";
-        if( pathname.getName().toLowerCase().endsWith(suffix) ) {
-            return true;
+                    Ads.add(Ad);
+                }
+            }
+//            // Accumulator
+//            double Ad = 0;
+//            for (Posting p : index.getPostings(s)) {
+//                // Calculating Wdt
+//                double Wdt = rf.getWdt(index, s, p.getDocumentId());
+//                // Increasing accumulator
+//                Ad += Wqt * Wdt;
+//            }
+//            if (Ad != 0) {
+//                try {
+//                    Ad /= rf.getLd(path);
+//                    Ads.add(Ad);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
         }
-        return false;
+        return Ads;
     }
 }
-*/
