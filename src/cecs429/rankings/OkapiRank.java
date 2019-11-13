@@ -11,12 +11,12 @@ public class OkapiRank implements RankFormula {
     }
 
     @Override
-    public double getWdt(int x) {
+    public double getWdt() {
         return 0;
     }
 
     @Override
     public double getLd() {
-        return 0;
+        return 1;
     }
 }
