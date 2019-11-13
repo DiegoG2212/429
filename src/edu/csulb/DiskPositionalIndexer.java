@@ -13,6 +13,10 @@ import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
 //import cecs429.rankings.*;
+import cecs429.rankings.DefaultRank;
+import cecs429.rankings.OkapiRank;
+import cecs429.rankings.RankCalculator;
+import cecs429.rankings.tfidfRank;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -291,24 +295,26 @@ public class DiskPositionalIndexer {
 					System.exit(-1);
 				}
 
-				// Opening Dialog Box to select Mode
-				Object[] options2 = {"Default",	// 0
-						"tf-idf",				// 1
-						"OkapiBM25",			// 2
-						"Wacky"};				// 3
-				formulaSelect = JOptionPane.showOptionDialog(frame,
-						"What formula would you like to use?",
-						"Formula Selection",
-						JOptionPane.YES_NO_CANCEL_OPTION,
-						JOptionPane.QUESTION_MESSAGE,
-						null,
-						options2,
-						options2[3]);
-				// System.out.println(n);
-				if(formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) { }
-				else {
-					// End Program
-					System.exit(-1);
+				if(modeSelect == 1) {
+					// Opening Dialog Box to select Mode
+					Object[] options2 = {"Default",    // 0
+							"tf-idf",                // 1
+							"OkapiBM25",            // 2
+							"Wacky"};                // 3
+					formulaSelect = JOptionPane.showOptionDialog(frame,
+							"What formula would you like to use?",
+							"Formula Selection",
+							JOptionPane.YES_NO_CANCEL_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options2,
+							options2[3]);
+					// System.out.println(n);
+					if (formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) {
+					} else {
+						// End Program
+						System.exit(-1);
+					}
 				}
 
 				// Panel Add
