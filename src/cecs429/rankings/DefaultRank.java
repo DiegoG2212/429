@@ -30,14 +30,11 @@ public class DefaultRank implements RankFormula {
 
     @Override
     public double getLd(Path path) throws IOException {
-        DataInputStream docWeight = new DataInputStream(
-                new BufferedInputStream(
-                        new FileInputStream(path + "/docWeights.bin")));
 
 
 
         docWeight.close();
 
-        return
+        return 0;
     }
 }

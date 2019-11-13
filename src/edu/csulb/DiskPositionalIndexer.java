@@ -60,6 +60,8 @@ public class DiskPositionalIndexer {
 	String lastQuery = ""; // Saves last user query
 	int queryCheck = 0;
 	Index index;
+	int formulaSelect = 0;
+	int modeSelect = 0;
 
 	long indexTime = 0;
 
@@ -285,12 +287,13 @@ public class DiskPositionalIndexer {
 				
 				
 				results.setEditable(false); // Doesn't let user edit results box
-				
+
+				// DIALOG BOXES ====================================================
 				// Opening Dialog Box to select Mode
 				Object[] options = {"Boolean query mode",
 				                    "Ranked query mode",
-				                    "None"};
-				int n = JOptionPane.showOptionDialog(frame,
+				                    "Exit"};
+				modeSelect = JOptionPane.showOptionDialog(frame,
 				    "What mode would you like to use?",
 				    "Mode Selection",
 				    JOptionPane.YES_NO_CANCEL_OPTION,
@@ -299,12 +302,27 @@ public class DiskPositionalIndexer {
 				    options,
 				    options[2]);
 				// System.out.println(n);
-				if(n == 0) {	//Boolean query mode
-					
+				if(modeSelect == 0 || modeSelect == 1) { }
+				else {
+					// End Program
+					System.exit(-1);
 				}
-				else if(n == 1) {	//Ranked query mode
-					
-				}
+
+				// Opening Dialog Box to select Mode
+				Object[] options2 = {"Default",	// 0
+						"tf-idf",				// 1
+						"OkapiBM25",			// 2
+						"Wacky"};				// 3
+				formulaSelect = JOptionPane.showOptionDialog(frame,
+						"What formula would you like to use?",
+						"Formula Selection",
+						JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						options,
+						options[3]);
+				// System.out.println(n);
+				if(formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) { }
 				else {
 					// End Program
 					System.exit(-1);
