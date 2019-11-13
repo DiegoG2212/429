@@ -12,9 +12,7 @@ import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
-import cecs429.rankings.DefaultRank;
-import cecs429.rankings.RankCalculator;
-import cecs429.rankings.RankFormula;
+import cecs429.rankings.*;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -455,17 +453,17 @@ public class DiskPositionalIndexer {
 
 
 
-                if(formulaSelect == 0){
+                if(formulaSelect == 0){ // Default
                 	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
 				}
-                if(formulaSelect == 1){
-
+                if(formulaSelect == 1){ // tf-idf
+					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank()));
 				}
-                if(formulaSelect == 2){
-
+                if(formulaSelect == 2){ // OkapiBM25
+					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
 				}
-                if(formulaSelect == 3){
-
+                if(formulaSelect == 3){ // Wacky
+					writeDisk.addDocWeight(rankSelect.calculateLd(new WackyRank()));
 				}
 
 
