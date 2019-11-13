@@ -7,6 +7,9 @@ import java.util.HashMap;
 public class tfidfRank implements RankFormula {
     HashMap<String,Integer> terms = new HashMap<String,Integer>();
     int tftd = 0;
+    public tfidfRank(){
+
+    }
 
     public tfidfRank(HashMap<String,Integer> x){
        terms = x;
@@ -15,11 +18,6 @@ public class tfidfRank implements RankFormula {
     public double getWqt() {
 
         return 0;
-    }
-
-    @Override
-    public double getWdt() {
-        return tftd;
     }
 
     @Override

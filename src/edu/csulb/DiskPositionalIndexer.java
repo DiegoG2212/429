@@ -13,6 +13,7 @@ import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
 //import cecs429.rankings.*;
+import cecs429.query.RankedQueryParser;
 import cecs429.rankings.DefaultRank;
 import cecs429.rankings.OkapiRank;
 import cecs429.rankings.RankCalculator;
@@ -241,12 +242,12 @@ public class DiskPositionalIndexer {
 							System.out.println(combine);
 
 							int docCount = 0;
-							QueryComponent q = new BooleanQueryParser().parseQuery(query);
+							QueryComponent q = new BooleanQueryParser().parseQuery(query); // Default
 							if(modeSelect == 0){
 								q = new BooleanQueryParser().parseQuery(query);
 							}
 							if(modeSelect == 1){
-								//q= new RankedQueryParser().parseQuery(query);
+								q= new RankedQueryParser().parseQuery(query, corpus, formulaSelect);
 							}
 
 							for (Posting p : q.getPostings(index)) {
@@ -439,9 +440,6 @@ public class DiskPositionalIndexer {
                     x++;
                 }
 
-
-
-
                 if(formulaSelect == 0){ // Default
                 	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
 				}
@@ -475,12 +473,14 @@ public class DiskPositionalIndexer {
                 dAveTFtd.add(tftdsum);
 
                 //writeDisk.addDocWeight(terms); // Add HashMap to list
+
+                 */
                 try {
                     stream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                 */
+
 
             }    // End of Documents
 

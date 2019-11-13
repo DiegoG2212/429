@@ -18,10 +18,18 @@ public class DefaultRank implements RankFormula {
         terms = x;
     }
 
+    int corpusSize = 0;
+    int documentFreq = 0;
+    public DefaultRank(int corpSize, int docFreq){
+        corpusSize = corpSize;
+        documentFreq = docFreq;
+    }
+
     @Override
     public double getWqt() {
         //return Math.log(1 + (double)(corpusSize / i.getPostings(term).size()));
-        return 0;
+        double calc1 = corpusSize/ documentFreq;
+        return Math.log(1 + calc1);
     }
 
     @Override
