@@ -166,8 +166,20 @@ public class DiskIndexWriter {
 		docWeightsOut.close();
 	}
 
+	private void writeAverageDocLength(Path path, List<Double> docLengths) throws IOException {
+		DataOutputStream aveLength = new DataOutputStream(
+				new BufferedOutputStream(
+						new FileOutputStream(path + "/avgLength.bin")));
+		double avg = 0;
 
+		for (double d : docLengths) {
+			avg += d;
+		}
 
+		avg /= docLengths.size();
+		aveLength.writeDouble(avg);
 
+		aveLength.close();
+	}
 
 }
