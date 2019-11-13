@@ -1,13 +1,13 @@
 package cecs429.disk;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import cecs429.index.Index;
 import cecs429.index.Posting;
@@ -16,9 +16,8 @@ import edu.csulb.PositionalInvertedIndexer;
 public class DiskIndexWriter {
 
 	public void WriteIndex(Index x, Path y) throws IOException {
-			writeVocabTable(y, x);
-			writeDocWeight(y, x);
-
+		writeVocabTable(y,x);
+		writeDocWeights(y,x);
 	}
 	
 	// postings.bin
@@ -32,18 +31,14 @@ public class DiskIndexWriter {
 		
 		List<String> t = index.getVocabulary();
 		long position = 0;
-
 		for (String i : t) {// Go through vocabulary
-			int lastDocId = 0;
-			position = postingsOut.size(); // postion of the number of docs
+
+			position = postingsOut.size() - position; // Get gap
 			docPos.add(position); // Keep track of positions
-			int numDocs = index.getPostings(i).size(); // Gets # of docs
-			postingsOut.writeInt(numDocs); // Writes # of docs
+			int docNum = index.getPostings(i).size(); // Gets # of docs
+			postingsOut.writeInt(docNum); // Writes # of docs
 			for (Posting p : index.getPostings(i)) { // Get posting for term
-				//postingsOut.writeInt((int)position); // Write position
-				int docID = p.getDocumentId() - lastDocId; // getting gaps for doc id
-				lastDocId = p.getDocumentId(); // saving previous doc id
-				postingsOut.writeInt(docID); // writing the doc id
+				postingsOut.writeInt((int)position); // Write position
 				int posNum = p.getPos().size();	// Get # of positions
 				postingsOut.writeInt(posNum); // Writes # of positions
 				for(int x: p.getPos()) {	// For every position
@@ -71,8 +66,8 @@ public class DiskIndexWriter {
 			vocabPos.add(position);
 			//System.out.println(position);
 			//System.out.println("Vocab: "+ i);
-            byte[] sbytes = i.getBytes("UTF-8");
-            vocabOut.write(sbytes);
+			vocabOut.writeUTF(i);	// UTF-8 Encoded
+			
 		}
 		vocabOut.close();
 
@@ -82,14 +77,13 @@ public class DiskIndexWriter {
 	// vocabTable.bin
 	private void writeVocabTable(Path path, Index index) throws IOException{
 		System.out.println("Writing vocabTable.bin ...");
-		List<Long> vocabPos = writeVocab(path, index);
-		List<Long> docPos = writePostings(path, index);
 
+		List<Long> docPos = writePostings(path, index);
+		List<Long> vocabPos = writeVocab(path, index);
 
 		DataOutputStream vtableOut = new DataOutputStream(
 				new BufferedOutputStream(
 						new FileOutputStream(path + "/vocabTable.bin")));
-
 
 
 		for (int i = 0; i <docPos.size(); i++){
@@ -107,40 +101,64 @@ public class DiskIndexWriter {
 	// List of HashMap
 	//List< HashMap<String, Integer> > holdTerms = new ArrayList< HashMap<String, Integer> >();
 
-	List <Double> holdLd = new ArrayList<Double>();
+	// docWeights
+	List<Double> holdLd = Collections.emptyList();
+	// docLength
+	List<Double> holdDocLengths = Collections.emptyList();
+	// byteSize
+	List<Double> holdByteSizes = Collections.emptyList();
+	//aveTFtd
+	List<Double> holdAvgTFtds = Collections.emptyList();
 	// docWeights.bin
 	//public void addDocWeight(HashMap<String,Integer> terms) throws IOException {
 	public void addDocWeight(double add) throws IOException {
-		//holdTerms.add(terms);
 		holdLd.add(add);
 	}
-	
-	private void writeDocWeight(Path path, Index index) throws IOException {
+
+	public void addDocLength(double add) throws IOException {
+		holdDocLengths.add(add);
+	}
+
+	public void addByteSize(double add) throws IOException {
+		holdByteSizes.add(add);
+	}
+
+	public void addAvgTFs(double add) throws IOException {
+		holdAvgTFtds.add(add);
+	}
+
+	public List<Double> getDocWeights() {
+		return this.holdLd;
+	}
+
+	public List<Double> getDocLengths() {
+		return this.holdDocLengths;
+	}
+
+	public List<Double> getByteSizes() {
+		return this.holdByteSizes;
+	}
+
+	public List<Double> getAvgTFs() {
+		return this.holdAvgTFtds;
+	}
+
+	private void writeDocWeights(Path path, Index index) throws IOException {
 		System.out.println("Writing docWeights.bin ...");
 		DataOutputStream docWeightsOut = new DataOutputStream(
 				new BufferedOutputStream(
 						new FileOutputStream(path + "/docWeights.bin")));
-		/*
-		// Default Formula
-		// Iterate List of HashMaps
-		for(HashMap<String, Integer> scan: holdTerms) { // For every Document's HashMap
-			double wSum = 0;
-			for (HashMap.Entry<String, Integer> entry : scan.entrySet()) { // Go through HashMap
-				System.out.println("Key: "+entry.getKey() +", Value: "+entry.getValue());
-				wSum += Math.pow( (1 + Math.log( entry.getValue() )) ,2);
-				//System.out.println(wSum);
-			}
-			double Ld = Math.sqrt(wSum);
-			System.out.println("Document Weight: " +Ld);
 
+		List<Double> Lds = getDocWeights();
+		List<Double> docLengths = getDocLengths();
+		List<Double> byteSizes = getByteSizes();
+		List<Double> avgTFs = getAvgTFs();
+
+		for (int i = 0; i < holdLd.size(); i++) {
+			double Ld = Lds.get(i);
+
+			docWeightsOut.writeDouble(Ld);
 		}
-		// ==========================================================================
-		*/
-		for(double scan: holdLd){
-			docWeightsOut.writeDouble(scan);
-		}
-
-
 
 		//docWeightsOut.writeDouble(Ld);
 		docWeightsOut.close();
