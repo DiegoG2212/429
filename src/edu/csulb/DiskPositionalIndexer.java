@@ -13,6 +13,11 @@ import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
 //import cecs429.rankings.*;
+import cecs429.query.RankedQueryParser;
+import cecs429.rankings.DefaultRank;
+import cecs429.rankings.OkapiRank;
+import cecs429.rankings.RankCalculator;
+import cecs429.rankings.tfidfRank;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -60,8 +65,8 @@ public class DiskPositionalIndexer {
 	//For showing how long it took to index
     long indexTime = 0;
 
-	//Ranking formula
-    //RankCalculator rankSelect;
+	//Ranking formula selection
+    RankCalculator rankSelect;
 
 	public DiskPositionalIndexer() throws Exception {
 		query();
@@ -69,6 +74,7 @@ public class DiskPositionalIndexer {
 
 	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
+		// Disabled for now :(
 		// BufferedReader br = new BufferedReader(new
 		// FileReader(PositionalInvertedIndexer.this.defStore));
 		// Reads text file into String
@@ -83,10 +89,9 @@ public class DiskPositionalIndexer {
 			public void run() {
 				// Frame ==================
 				JFrame frame = new JFrame("Search Engine");
-				// Panels =================+
-
+				// Panels ======================================
 				JPanel p = new JPanel();
-				// Components =============
+				// Components ========================================
 				JTextField textField = new JTextField(35);
 				JButton search = new JButton("Enter");
 				JButton browseFile = new JButton("Browse Files");
@@ -96,16 +101,15 @@ public class DiskPositionalIndexer {
 				JScrollPane scrollPane = new JScrollPane(results);
 				JFileChooser j = new JFileChooser();
 				j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				// Fonts ==================
+				// Fonts =====================================================
 				Font font = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font bold = new Font(Font.SANS_SERIF, Font.BOLD, 15);
 				Font inputFont = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 				Font resultFont = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
-
 				// Disable horizontal scrolling on Search Results
 				results.setLineWrap(true);
 				results.setWrapStyleWord(true);
-
+				// END OF FORMATTING ====================================================================
 
 
 
@@ -129,7 +133,6 @@ public class DiskPositionalIndexer {
 						try {
 							updateDirectory(fullPath);
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 						results.setText(""); // Clear previous
@@ -216,24 +219,6 @@ public class DiskPositionalIndexer {
 										results.append(read + "\n");
 									}
 								}
-
-								/*
-								 * for (Posting p : PositionalInvertedIndexer.this.index.getPostings(lastQuery))
-								 * { String compare =
-								 * PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).getTitle
-								 * ().toLowerCase();
-								 *
-								 * compare = stemThis(compare); if(docSearch.equals(compare)) {
-								 * results.append("\n"); Reader b =
-								 * PositionalInvertedIndexer.this.corpus.getDocument(p.getDocumentId()).
-								 * getContent(); String read = "";
-								 *
-								 * int c = 0; try { c = b.read(); } catch (IOException e1) {
-								 * e1.printStackTrace(); } while (c != -1){ //Converting to character
-								 * //System.out.print((char)c); read += Character.toString((char)c); try { c =
-								 * b.read(); } catch (IOException e1) { e1.printStackTrace(); } }
-								 * results.append(read +"\n"); } }
-								 */
 							} else {
 								results.append("You must search a query first \n");
 							}
@@ -257,12 +242,15 @@ public class DiskPositionalIndexer {
 							System.out.println(combine);
 
 							int docCount = 0;
-							// System.out.println("im here");
-							QueryComponent q = new BooleanQueryParser().parseQuery(query);
+							QueryComponent q = new BooleanQueryParser().parseQuery(query); // Default
+							if(modeSelect == 0){
+								q = new BooleanQueryParser().parseQuery(query);
+							}
+							if(modeSelect == 1){
+								q= new RankedQueryParser().parseQuery(query, corpus, formulaSelect);
+							}
 
 							for (Posting p : q.getPostings(index)) {
-								// for (Posting p : PositionalInvertedIndexer.this.index.getPostings(query)) {
-								// System.out.println("inside q postings");
 								results.append("Document: " + DiskPositionalIndexer.this.corpus
 										.getDocument(p.getDocumentId()).getTitle() + "\n");
 								if(modeSelect == 0) {
@@ -308,6 +296,7 @@ public class DiskPositionalIndexer {
 					System.exit(-1);
 				}
 
+<<<<<<< HEAD
 				// Opening Dialog Box to select Mode
 				Object[] options2 = {"Default",	// 0
 						"tf-idf",				// 1
@@ -319,13 +308,35 @@ public class DiskPositionalIndexer {
 						JOptionPane.YES_NO_CANCEL_OPTION,
 						JOptionPane.QUESTION_MESSAGE,
 						null,
-						options,
-						options[3]);
+						options2,
+						options2[3]);
 				// System.out.println(n);
 				if(formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) { }
 				else {
 					// End Program
 					System.exit(-1);
+=======
+				if(modeSelect == 1) {
+					// Opening Dialog Box to select Mode
+					Object[] options2 = {"Default",    // 0
+							"tf-idf",                // 1
+							"OkapiBM25",            // 2
+							"Wacky"};                // 3
+					formulaSelect = JOptionPane.showOptionDialog(frame,
+							"What formula would you like to use?",
+							"Formula Selection",
+							JOptionPane.YES_NO_CANCEL_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options2,
+							options2[3]);
+					// System.out.println(n);
+					if (formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) {
+					} else {
+						// End Program
+						System.exit(-1);
+					}
+>>>>>>> f4198b343b068328156a4cf8344a6543400da62a
 				}
 
 				// Panel Add
@@ -450,21 +461,15 @@ public class DiskPositionalIndexer {
                     x++;
                 }
 
-
-
-
-//                if(formulaSelect == 0){ // Default
-//                	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
-//				}
-//                if(formulaSelect == 1){ // tf-idf
-//					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank()));
-//				}
-//                if(formulaSelect == 2){ // OkapiBM25
-//					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
-//				}
-//                if(formulaSelect == 3){ // Wacky
-//					writeDisk.addDocWeight(rankSelect.calculateLd(new WackyRank()));
-//				}
+                if(formulaSelect == 0){ // Default
+                	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
+				}
+                if(formulaSelect == 1){ // tf-idf
+					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank(terms)));
+				}
+                if(formulaSelect == 2){ // OkapiBM25
+					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
+				}
 
 
 
@@ -489,17 +494,26 @@ public class DiskPositionalIndexer {
                 dAveTFtd.add(tftdsum);
 
                 //writeDisk.addDocWeight(terms); // Add HashMap to list
+
+                 */
                 try {
                     stream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                 */
+
 
             }    // End of Documents
 
-			//List to get the byte size of each doc
-			List<Long> dBytes = getByteSizes();
+			if(formulaSelect == 3){ // Wacky
+				//List to get the byte size of each doc
+				System.out.print("Wacky byteSize Test: ");
+				List<Long> dBytes = getByteSizes();
+				for(Long s: dBytes){
+					double byteGet = (double) s;
+					writeDisk.addDocWeight(Math.sqrt(byteGet));
+				}
+			}
 
             // Write to Disk
             writeDisk.WriteIndex(tdi, Paths.get(directory + "/index").toAbsolutePath());
@@ -511,8 +525,11 @@ public class DiskPositionalIndexer {
             System.out.println("Index on Disk");
             tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
         }
-        //System.out.println(tdi.getVocabulary().toString());
-
+        List<Posting> p = tdi.getPostings("sea");
+		for (Posting i : p){
+			System.out.println("DocId: " + i.getDocumentId());
+			System.out.println("Positions" + i.getPos().toString());
+		}
         // Return Index
         return tdi;
     }

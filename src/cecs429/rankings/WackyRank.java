@@ -8,11 +8,19 @@ public class WackyRank implements RankFormula {
         return 0;
     }
 
-    @Override
+<<<<<<< HEAD
+
     public double getWdt(int x) {
+=======
+    @Override
+    public double getWdt() {
+>>>>>>> f4198b343b068328156a4cf8344a6543400da62a
         return 0;
     }
 
+    public double getWdt(){
+        return 0;
+    }
     @Override
     public double getLd() {
         return 0;

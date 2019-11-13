@@ -83,7 +83,7 @@ public class DiskInvertedIndex implements Index {
     // Reads the file vocabTable.bin into memory.
     private static long[] readVocabTable(String indexName) {
         try {
-            System.out.println(indexName);
+
             long[] vocabTable;
 
             RandomAccessFile tableFile = new RandomAccessFile(
@@ -145,14 +145,16 @@ public class DiskInvertedIndex implements Index {
         try {
 
             long position = binarySearchVocabulary(term);
-            byte[] buffer = new byte[8]; // making  bytes
+            System.out.println(position);
+
+            byte[] buffer = new byte[4]; // making  bytes
 
             if (position < 0) {
                 return Collections.emptyList();
             } else {
                 mPostings.seek(position);
 
-                mPostings.read(buffer, 0,8 ); //reading from first location of the term to end of the term
+                mPostings.read(buffer, 0,4 ); //reading from first location of the term to end of the term
                 int numberOfDocs = ByteBuffer.wrap(buffer).getInt();
 
                 //position = position + 4; // to go to the next number
@@ -254,6 +256,9 @@ public class DiskInvertedIndex implements Index {
         return null;
     }
 
-    public void addTerm(List<String> term, int docID, int pos){ }
+    public void addTerm(List<String> term, int docID, int pos){
+        // never adding a single term to disk so we just use this to query
+
+    }
 
 }

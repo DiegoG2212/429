@@ -16,6 +16,7 @@ public class OrQuery implements QueryComponent {
 	private List<QueryComponent> mComponents;
 	
 	public OrQuery(List<QueryComponent> components) {
+
 		mComponents = components;
 	}
 	
