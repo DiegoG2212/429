@@ -6,17 +6,17 @@ public class OkapiRank implements RankFormula {
     public OkapiRank() {}
 
     @Override
-    public double getWqt(Index i, String term) {
+    public double getWqt() {
         return 0;
     }
 
     @Override
-    public double getWdt(Index i, String term, int docID) {
+    public double getWdt(int x) {
         return 0;
     }
 
     @Override
-    public double getLd(int docID) {
+    public double getLd() {
         return 0;
     }
 }

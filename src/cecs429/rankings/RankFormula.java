@@ -7,10 +7,10 @@ import java.nio.file.Path;
 
 public interface RankFormula {
 
-    double getWqt(Index i, String term, int corpusSize);
+    double getWqt();
 
-    double getWdt(Index i, String term, int docID);
+    double getWdt();
 
-    double getLd(Path path) throws IOException;
+    double getLd();
 
 }
