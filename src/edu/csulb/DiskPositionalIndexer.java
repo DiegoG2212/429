@@ -445,7 +445,10 @@ public class DiskPositionalIndexer {
 
 		//System.out.println(tdi.getVocabulary());
 
-		System.out.println(tdi.getVocabulary().toString());
+		for (Posting p : tdi.getPostings("youth")){
+			System.out.println("DocId: " + p.getDocumentId());
+			System.out.println(p.getPos());
+		}
 		// Return Index
 		return tdi;
 	}

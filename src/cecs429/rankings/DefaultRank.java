@@ -38,6 +38,6 @@ public class DefaultRank implements RankFormula {
 
         docWeight.close();
 
-        return
+        return 0;
     }
 }

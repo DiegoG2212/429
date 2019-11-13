@@ -11,6 +11,7 @@ import java.util.List;
 
 public class DiskPositionalIndex implements Index {
 
+
 	private HashMap<String, ArrayList<Posting>> map;
 
 	// Maps docIDs to terms appearing in that doc

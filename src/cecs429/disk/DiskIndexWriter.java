@@ -32,14 +32,18 @@ public class DiskIndexWriter {
 		
 		List<String> t = index.getVocabulary();
 		long position = 0;
-		for (String i : t) {// Go through vocabulary
 
-			position = postingsOut.size() - position; // Get gap
+		for (String i : t) {// Go through vocabulary
+			int lastDocId = 0;
+			position = postingsOut.size(); // postion of the number of docs
 			docPos.add(position); // Keep track of positions
-			int docNum = index.getPostings(i).size(); // Gets # of docs
-			postingsOut.writeInt(docNum); // Writes # of docs
+			int numDocs = index.getPostings(i).size(); // Gets # of docs
+			postingsOut.writeInt(numDocs); // Writes # of docs
 			for (Posting p : index.getPostings(i)) { // Get posting for term
-				postingsOut.writeInt((int)position); // Write position
+				//postingsOut.writeInt((int)position); // Write position
+				int docID = p.getDocumentId() - lastDocId; // getting gaps for doc id
+				lastDocId = p.getDocumentId(); // saving previous doc id
+				postingsOut.writeInt(docID); // writing the doc id
 				int posNum = p.getPos().size();	// Get # of positions
 				postingsOut.writeInt(posNum); // Writes # of positions
 				for(int x: p.getPos()) {	// For every position
@@ -67,8 +71,8 @@ public class DiskIndexWriter {
 			vocabPos.add(position);
 			//System.out.println(position);
 			//System.out.println("Vocab: "+ i);
-			vocabOut.writeUTF(i);	// UTF-8 Encoded
-			
+            byte[] sbytes = i.getBytes("UTF-8");
+            vocabOut.write(sbytes);
 		}
 		vocabOut.close();
 
