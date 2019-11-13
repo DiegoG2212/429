@@ -10,30 +10,23 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class DefaultRank implements RankFormula {
-    public DefaultRank(){}
+    public DefaultRank(){
 
-    @Override
-    public double getWqt(Index i, String term, int corpusSize) {
-        return Math.log(1 + (double)(corpusSize / i.getPostings(term).size()));
     }
 
     @Override
-    public double getWdt(Index i, String term, int docID) {
-        int freq = 0;
-        for (Posting p : i.getPostings(term)) {
-            if (p.getDocumentId() == docID) {
-                freq++;
-            }
-        }
-        return 1 + Math.log(freq);
+    public double getWqt() {
+        //return Math.log(1 + (double)(corpusSize / i.getPostings(term).size()));
+        return 0;
     }
 
     @Override
-    public double getLd(Path path) throws IOException {
+    public double getWdt() {
+        return 0;
+    }
 
-
-
-        docWeight.close();
+    @Override
+    public double getLd(){
 
         return 0;
     }

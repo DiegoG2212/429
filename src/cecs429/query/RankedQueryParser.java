@@ -18,12 +18,15 @@ public class RankedQueryParser {
             terms.add(result[i]);
         }
 
-        List<Double> top10 = new RankQuery(rf, terms, corpusSize, path).getPostings(index);
+        //List<Double> top10 = new RankQuery(rf, terms, corpusSize, path).getPostings(index);
 
         System.out.println("Top 10 docs: ");
+        /*
         for (double d : top10) {
             System.out.println(d);
         }
+
+         */
     }
 
 }
