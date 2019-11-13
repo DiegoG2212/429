@@ -12,7 +12,7 @@ import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
-import cecs429.rankings.*;
+//import cecs429.rankings.*;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
@@ -61,7 +61,7 @@ public class DiskPositionalIndexer {
     long indexTime = 0;
 
 	//Ranking formula
-    RankCalculator rankSelect;
+    //RankCalculator rankSelect;
 
 	public DiskPositionalIndexer() throws Exception {
 		query();
@@ -453,18 +453,18 @@ public class DiskPositionalIndexer {
 
 
 
-                if(formulaSelect == 0){ // Default
-                	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
-				}
-                if(formulaSelect == 1){ // tf-idf
-					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank()));
-				}
-                if(formulaSelect == 2){ // OkapiBM25
-					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
-				}
-                if(formulaSelect == 3){ // Wacky
-					writeDisk.addDocWeight(rankSelect.calculateLd(new WackyRank()));
-				}
+//                if(formulaSelect == 0){ // Default
+//                	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
+//				}
+//                if(formulaSelect == 1){ // tf-idf
+//					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank()));
+//				}
+//                if(formulaSelect == 2){ // OkapiBM25
+//					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
+//				}
+//                if(formulaSelect == 3){ // Wacky
+//					writeDisk.addDocWeight(rankSelect.calculateLd(new WackyRank()));
+//				}
 
 
 
