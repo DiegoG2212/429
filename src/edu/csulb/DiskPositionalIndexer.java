@@ -12,7 +12,7 @@ import cecs429.index.Posting;
 import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
-import cecs429.rankings.*;
+//import cecs429.rankings.*;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;

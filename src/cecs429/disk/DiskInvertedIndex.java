@@ -59,7 +59,7 @@ public class DiskInvertedIndex implements Index {
 
                 byte[] buffer = new byte[termLength];
                 mVocabList.read(buffer, 0, termLength);
-                String fileTerm = new String(buffer, "ASCII");
+                String fileTerm = new String(buffer, "UTF-8");
 
                 int compareValue = term.compareTo(fileTerm);
                 if (compareValue == 0) {
@@ -99,7 +99,7 @@ public class DiskInvertedIndex implements Index {
 
 
             byte[] byteBuffer = new byte[4];
-            tableFile.read(byteBuffer, 0, byteBuffer.length);
+          //  tableFile.read(byteBuffer, 0, byteBuffer.length);
 
             int tableIndex = 0;
             //System.out.println(ByteBuffer.wrap(byteBuffer).getInt());
@@ -143,49 +143,54 @@ public class DiskInvertedIndex implements Index {
         List<Posting> res = new ArrayList<>();
 
         try {
-            List<Posting> posting = new ArrayList<>();
+
             long position = binarySearchVocabulary(term);
+            byte[] buffer = new byte[8]; // making  bytes
 
             if (position < 0) {
                 return Collections.emptyList();
             } else {
                 mPostings.seek(position);
-                byte[] buffer = new byte[4]; // making  bytes
-                mPostings.read(buffer, 0,4 ); //reading from first location of the term to end of the term
+
+                mPostings.read(buffer, 0,8 ); //reading from first location of the term to end of the term
                 int numberOfDocs = ByteBuffer.wrap(buffer).getInt();
 
-                position = position + 4; // to go to the next number
+                //position = position + 4; // to go to the next number
 
                 int i =0;
+                int lastDocId = 0;
                 while (i < numberOfDocs){
-                    mPostings.seek(position);
+                    //mPostings.seek(position);
                     byte[] buffer2 = new byte[4]; // making  bytes
                     mPostings.read(buffer2, 0,4 ); //reading from first location of the term to end of the term
-                    int DocId  = ByteBuffer.wrap(buffer2).getInt();
-
-                    position += 4;
-                    mPostings.seek(position);
+                    int DocId  = ByteBuffer.wrap(buffer2).getInt() + lastDocId;
+                    lastDocId = DocId;
+                    
+                    //position += 4;
+                    //mPostings.seek(position);
                     mPostings.read(buffer2, 0,4 );
-                    int termPostions = ByteBuffer.wrap(buffer2).getInt(); // getting number of positions of that term
+                    int termFreq = ByteBuffer.wrap(buffer2).getInt(); // getting number of positions of that term
 
-                    position += 4;
-                    mPostings.seek(position);
+                  //  position += 4;
+                    //mPostings.seek(position);
                     mPostings.read(buffer2, 0,4 );
                     int termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
 
                     Posting p = new Posting(DocId, termPos); // creates the posting so
                                                              // i just add the locations in the for loop
-                    for(int j = 0; j < termPostions - 1; j++){
+                    for(int j = 0; j < termFreq - 1; j++){
+                        mPostings.read(buffer2, 0,4 );
+                        termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
 
                         p.addPos(termPos); // otherwise is just add the location on to it
 
-                        position += 4;// goes to the next location
+                        //position += 4;// goes to the next location
 
 
                     }
-                    posting.add(p); // adds posting to the list
+                    res.add(p); // adds posting to the list
                     i++; // adds 1  to i;
-                    position += 4; // makes it go to the next doc id.
+                    //position += 4; // makes it go to the next doc id.
                 }
 
             }
@@ -209,17 +214,17 @@ public class DiskInvertedIndex implements Index {
             long locHolder = 0;
 
             int i = 0;
-            while (i <= getTermCount() - 1){
+            while (i <= mVocabTable.length - 1){
 
                 long termLength = 0;
                 locHolder = mVocabTable[i * 2];
 
-                if (((2*i)+1) == (getTermCount() - 1)) { // we at the last term then read to EOF
-                    int nextNum = (2*i) + 2;
+                if (((2*i)+1) == (mVocabTable.length - 1)) { // we at the last term then read to EOF
+                    int nextNum = mVocabTable.length - 1;
                     System.out.println(mVocabList.length());
                     termLength = mVocabTable[nextNum] - locHolder; // i is at the last term
 
-                    i = getTermCount() ;
+                    i = mVocabTable.length ;
                 }else{                                // we are not at the last term read until the next term
                     int nextNum = (2*i) + 2;
                     termLength  =  mVocabTable[nextNum] -  locHolder;
@@ -233,7 +238,7 @@ public class DiskInvertedIndex implements Index {
 
                 byte[] buffer = new byte[(int) termLength]; // making  bytes
                 mVocabList.read(buffer, 0,(int) termLength ); //reading from first location of the term to end of the term
-                String fileTerm = new String(buffer, "ASCII"); // encoding bytes read to string
+                String fileTerm = new String(buffer, "UTF-8"); // encoding bytes read to string
                 System.out.println(fileTerm);
                 res.add(fileTerm); // adding the word in our corpus to the list so we can return it
 

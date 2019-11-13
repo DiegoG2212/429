@@ -23,6 +23,11 @@ public class tfidfRank implements RankFormula {
     }
 
     @Override
+    public double getWdt() {
+        return 0;
+    }
+
+    @Override
     public double getLd() {
         double wSum = 0;
         for (HashMap.Entry<String, Integer> entry : terms.entrySet()) { // Go through HashMap
