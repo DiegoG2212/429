@@ -3,27 +3,41 @@ package cecs429.rankings;
 import cecs429.index.Index;
 import cecs429.index.Posting;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class DefaultRank implements RankFormula {
+    public DefaultRank(){}
 
     @Override
     public double getWqt(Index i, String term, int corpusSize) {
-        Set<Integer> docs = new HashSet<Integer>();
-        for (Posting p : i.getPostings(term)) {
-            docs.add(p.getDocumentId());
-        }
-        return (double)Math.log(1+(corpusSize / docs.size()));
+        return Math.log(1 + (double)(corpusSize / i.getPostings(term).size()));
     }
 
     @Override
     public double getWdt(Index i, String term, int docID) {
-        return 0;
+        int freq = 0;
+        for (Posting p : i.getPostings(term)) {
+            if (p.getDocumentId() == docID) {
+                freq++;
+            }
+        }
+        return 1 + Math.log(freq);
     }
 
     @Override
-    public double getLd(int docID) {
-        return 0;
+    public double getLd(Path path) throws IOException {
+        DataInputStream docWeight = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(path + "/docWeights.bin")));
+
+
+
+        docWeight.close();
+
+        return
     }
 }
