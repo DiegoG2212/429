@@ -13,6 +13,7 @@ import cecs429.query.BooleanQueryParser;
 import cecs429.query.QueryComponent;
 import cecs429.index.PositionalInvertedIndex;
 import cecs429.rankings.DefaultRank;
+import cecs429.rankings.RankCalculator;
 import cecs429.rankings.RankFormula;
 import cecs429.text.BetterTokenProcessor;
 import cecs429.text.EnglishTokenStream;
@@ -58,12 +59,11 @@ public class DiskPositionalIndexer {
 	int formulaSelect = 0;
 	//For selecting between Ranked or Boolean query
 	int modeSelect = 0;
-
 	//For showing how long it took to index
     long indexTime = 0;
 
 	//Ranking formula
-    RankFormula rf;
+    RankCalculator rankSelect;
 
 	public DiskPositionalIndexer() throws Exception {
 		query();
@@ -267,7 +267,9 @@ public class DiskPositionalIndexer {
 								// System.out.println("inside q postings");
 								results.append("Document: " + DiskPositionalIndexer.this.corpus
 										.getDocument(p.getDocumentId()).getTitle() + "\n");
-								results.append("Positions: " + p.getPos() + "\n");
+								if(modeSelect == 0) {
+									results.append("Positions: " + p.getPos() + "\n");
+								}
 								results.append("\n");
 								docCount++;
 							}
@@ -414,10 +416,7 @@ public class DiskPositionalIndexer {
                     // Add processed token
                     tdi.addTerm(processor.processToken(token), d.getId(), x);
                     //System.out.println(processor.processToken(token));
-
-
                     // Doc Weight Work ===================================================
-
                     for (String i : processor.processToken(token)) {
                         // If term exists in HashMap
                         if (terms.containsKey(i)) {
@@ -429,8 +428,6 @@ public class DiskPositionalIndexer {
                         }
                     }
                     // ====================================================================
-
-
                     for (String i : processor.processToken(token)) {
                         token2.add(i);
                     }
@@ -452,9 +449,28 @@ public class DiskPositionalIndexer {
                         // ====================================================================
                         token2.remove(0);
                     }
-
                     x++;
                 }
+
+
+
+
+                if(formulaSelect == 0){
+                	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
+				}
+                if(formulaSelect == 1){
+
+				}
+                if(formulaSelect == 2){
+
+				}
+                if(formulaSelect == 3){
+
+				}
+
+
+
+                /*
                 // Get the Wdts for the doc and add it into the list
 				for (Map.Entry<String, Integer> entry : terms.entrySet()) {
 					Wdts.add(this.getWdt(entry.getValue()));
@@ -480,6 +496,7 @@ public class DiskPositionalIndexer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                 */
 
             }    // End of Documents
 
@@ -491,16 +508,20 @@ public class DiskPositionalIndexer {
 
             // Return Index
             return tdi;
-        } else { // Already on disk
+        }
+        else { // Already on disk
             System.out.println("Index on Disk");
             tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
         }
-        //System.out.println(tdi.getVocabulary());
+        //System.out.println(tdi.getVocabulary().toString());
 
-        System.out.println(tdi.getVocabulary().toString());
         // Return Index
         return tdi;
     }
+
+
+
+
 
     public List<Long> getByteSizes() {
         List<Long> result = new ArrayList<Long>();

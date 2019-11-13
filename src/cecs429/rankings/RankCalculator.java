@@ -2,16 +2,16 @@ package cecs429.rankings;
 
 public class RankCalculator {
 
-    public void calculateWqt(RankFormula strategy){
-        strategy.getWqt();
+    public double calculateWqt(RankFormula strategy){
+        return strategy.getWqt();
     }
 
-    public void calculateWdt(RankFormula strategy){
-        strategy.getWdt();
+    public double calculateWdt(RankFormula strategy){
+        return strategy.getWdt();
     }
 
-    public void calculateLd(RankFormula strategy){
-        strategy.getLd();
+    public double calculateLd(RankFormula strategy){
+        return strategy.getLd();
     }
 
 }

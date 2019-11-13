@@ -9,7 +9,7 @@ public class WackyRank implements RankFormula {
     }
 
     @Override
-    public double getWdt() {
+    public double getWdt(int x) {
         return 0;
     }
 
