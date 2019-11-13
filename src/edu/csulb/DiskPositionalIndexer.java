@@ -53,16 +53,21 @@ public class DiskPositionalIndexer {
     DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
     String lastQuery = ""; // Saves last user query
     int queryCheck = 0;
-    Index index;
+	Index index;
+	//For selecting the type of ranking query
+	int formulaSelect = 0;
+	//For selecting between Ranked or Boolean query
+	int modeSelect = 0;
 
+	//For showing how long it took to index
     long indexTime = 0;
 
+	//Ranking formula
     RankFormula rf;
-    //
 
-    public DiskPositionalIndexer() throws Exception {
-        query();
-    }
+	public DiskPositionalIndexer() throws Exception {
+		query();
+	}
 
 	public void query() throws Exception {
 		// Load Default Directory (Last selected folder)
@@ -283,25 +288,41 @@ public class DiskPositionalIndexer {
 
 				results.setEditable(false); // Doesn't let user edit results box
 
+				// DIALOG BOXES ====================================================
 				// Opening Dialog Box to select Mode
 				Object[] options = {"Boolean query mode",
-						"Ranked query mode",
-						"None"};
-				int n = JOptionPane.showOptionDialog(frame,
-						"What mode would you like to use?",
-						"Mode Selection",
+				                    "Ranked query mode",
+				                    "Exit"};
+				modeSelect = JOptionPane.showOptionDialog(frame,
+				    "What mode would you like to use?",
+				    "Mode Selection",
+				    JOptionPane.YES_NO_CANCEL_OPTION,
+				    JOptionPane.QUESTION_MESSAGE,
+				    null,
+				    options,
+				    options[2]);
+				// System.out.println(n);
+				if(modeSelect == 0 || modeSelect == 1) { }
+				else {
+					// End Program
+					System.exit(-1);
+				}
+
+				// Opening Dialog Box to select Mode
+				Object[] options2 = {"Default",	// 0
+						"tf-idf",				// 1
+						"OkapiBM25",			// 2
+						"Wacky"};				// 3
+				formulaSelect = JOptionPane.showOptionDialog(frame,
+						"What formula would you like to use?",
+						"Formula Selection",
 						JOptionPane.YES_NO_CANCEL_OPTION,
 						JOptionPane.QUESTION_MESSAGE,
 						null,
 						options,
-						options[2]);
+						options[3]);
 				// System.out.println(n);
-				if(n == 0) {	//Boolean query mode
-
-				}
-				else if(n == 1) {	//Ranked query mode
-
-				}
+				if(formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) { }
 				else {
 					// End Program
 					System.exit(-1);
