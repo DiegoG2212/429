@@ -53,8 +53,8 @@ public class DiskPositionalIndexer {
     String directory = ""; // Sets directory to blank
     // File defStore = new File("src/DefaultDirectory.txt"); // Text file storing
     // Default Directory
-    // DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-    DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
+    DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
+    //DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
     String lastQuery = ""; // Saves last user query
     int queryCheck = 0;
 	Index index;
@@ -364,8 +364,8 @@ public class DiskPositionalIndexer {
 
     //
     public void updateDirectory(String dir) throws IOException { // Updates changes to corpus and index
-        // PositionalInvertedIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),".json");
-        DiskPositionalIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
+        corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),".json");
+        //DiskPositionalIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 
         long startTime = System.nanoTime(); // Index Timer
         DiskPositionalIndexer.this.index = indexCorpus(DiskPositionalIndexer.this.corpus);
