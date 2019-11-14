@@ -68,6 +68,9 @@ public class DiskPositionalIndexer {
     //Ranking formula selection
     RankCalculator rankSelect;
 
+    // Token Counter use
+    HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
+
     public DiskPositionalIndexer() throws Exception {
         query();
     }
@@ -242,7 +245,7 @@ public class DiskPositionalIndexer {
                                 q = new BooleanQueryParser().parseQuery(query);
                             }
                             if (modeSelect == 1) {
-                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect);
+                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount);
                             }
 
                             for (Posting p : q.getPostings(index)) {
@@ -431,6 +434,9 @@ public class DiskPositionalIndexer {
                     }
                     x++;
                 }
+
+                // Save token count
+                tCount.put(d.getId(), terms.size());
 
                 if (formulaSelect == 0) { // Default
                     writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
