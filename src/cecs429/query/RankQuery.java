@@ -22,11 +22,13 @@ public class RankQuery implements QueryComponent{
     RankCalculator rankC;
     int formulaSelect = 0;
     DocumentCorpus corpus;
+    HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
 
-    public RankQuery(String[] r, DocumentCorpus c, int formSel) {
+    public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount) {
         corpusSize = c.getCorpusSize();
         formulaSelect = formSel;
         corpus = c;
+        tCount = tokCount;
     }
 
     /* @Override */
@@ -41,24 +43,37 @@ public class RankQuery implements QueryComponent{
                 dft ++;
             }
             double wqt = 0;
-            if(formulaSelect == 0) { // Default
+            if(formulaSelect == 0) { // Default -
                 wqt = rankC.calculateWqt(new DefaultRank(corpusSize, dft));
             }
-            if(formulaSelect == 1) { // tf-idf
-                wqt = rankC.calculateWqt(new tfidfRank());
+            if(formulaSelect == 1) { // tf-idf -
+                wqt = rankC.calculateWqt(new tfidfRank(corpusSize, dft));
             }
             if(formulaSelect == 2) { // OkapiBM25
-                wqt = rankC.calculateWqt(new OkapiRank());
+                wqt = rankC.calculateWqt(new OkapiRank(corpusSize, dft));
             }
             if(formulaSelect == 3) { // Wacky
-                wqt = rankC.calculateWqt(new WackyRank());
+                wqt = rankC.calculateWqt(new WackyRank(corpusSize, dft));
             }
 
             // For each document d in t's posting list
             for (Posting p : index.getPostings(s)) {
-                        // Calculate wdt (Default)
+                        // Calculate wdt
                         int tftd = p.getPos().size();
-                        double wdt = 1 + Math.log(tftd);
+                        double wdt = 0;
+
+                        if(formulaSelect == 0) { // Default
+                            wdt = rankC.calculateWdt(new DefaultRank(tftd));
+                        }
+                        if(formulaSelect == 1) { // tf-idf
+                            wdt = rankC.calculateWdt(new tfidfRank(tftd));
+                        }
+                        if(formulaSelect == 2) { // OkapiBM25 ????
+                           wdt = rankC.calculateWdt(new OkapiRank(tftd, tCount.get(p.getDocumentId()), tCount, corpusSize));
+                        }
+                        if(formulaSelect == 3) { // Wacky ????
+                            //wdt = rankC.calculateWdt(new WackyRank(tftd,  ) );
+                        }
 
                         // If accumulator exists for document
                         if(acc.containsKey(p.getDocumentId()) ){

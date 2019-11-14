@@ -6,13 +6,14 @@ import cecs429.index.Posting;
 import cecs429.rankings.RankFormula;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class RankedQueryParser {
     /**
      * Given a boolean query, parses and returns a tree of QueryComponents representing the query.
      */
-    public QueryComponent parseQuery(String query, DocumentCorpus c, int formulaSelect) {
+    public QueryComponent parseQuery(String query, DocumentCorpus c, int formulaSelect, HashMap<Integer,Integer> tCount) {
         String[] result = query.split("\\s+");
 
         //List<Double> top10 = new RankQuery(rf, terms, corpusSize, path).getPostings(index);
@@ -24,7 +25,7 @@ public class RankedQueryParser {
         }
 
          */
-        return new RankQuery(result, c, formulaSelect);
+        return new RankQuery(result, c, formulaSelect, tCount);
     }
 
 }

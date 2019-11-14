@@ -68,6 +68,9 @@ public class DiskPositionalIndexer {
 	//Ranking formula selection
     RankCalculator rankSelect;
 
+    // Token Counter use
+	HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
+
 	public DiskPositionalIndexer() throws Exception {
 		query();
 	}
@@ -247,7 +250,7 @@ public class DiskPositionalIndexer {
 								q = new BooleanQueryParser().parseQuery(query);
 							}
 							if(modeSelect == 1){
-								q= new RankedQueryParser().parseQuery(query, corpus, formulaSelect);
+								q= new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount);
 							}
 
 							for (Posting p : q.getPostings(index)) {
@@ -394,13 +397,8 @@ public class DiskPositionalIndexer {
 				// List of Wdts to calculate the Ld of each doc
 				List<Double> Wdts = Collections.emptyList();
 
-                // Count number of tokens for each doc
-                int tokenCount = 0;
-
                 // Adds term to index along with Document ID
                 for (String token : stream.getTokens()) {    // Go through each token
-                    // Increment token counter each time
-                    tokenCount++;
                     // Add processed token
                     tdi.addTerm(processor.processToken(token), d.getId(), x);
                     //System.out.println(processor.processToken(token));
@@ -440,6 +438,10 @@ public class DiskPositionalIndexer {
                     x++;
                 }
 
+                // Save token count
+				tCount.put(d.getId(), terms.size());
+
+				// Calculate Ld
                 if(formulaSelect == 0){ // Default
                 	writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
 				}
@@ -452,29 +454,7 @@ public class DiskPositionalIndexer {
 
 
 
-                /*
-                // Get the Wdts for the doc and add it into the list
-				for (Map.Entry<String, Integer> entry : terms.entrySet()) {
-					Wdts.add(this.getWdt(entry.getValue()));
-				}
-				double Ldcalc = 0;
-				for (double dub : Wdts) {
-					Ldcalc += Math.pow(dub, 2);
-				}
-				docWeights.add(Math.sqrt(Ldcalc));
 
-				//Add doc lengths into list
-                docLengths.add((double)tokenCount);
-                double tftdsum = 0;
-                for (Map.Entry<String, Integer> entry : terms.entrySet()) {
-                    tftdsum += (double) entry.getValue();
-                }
-                tftdsum /= terms.size();
-                dAveTFtd.add(tftdsum);
-
-                //writeDisk.addDocWeight(terms); // Add HashMap to list
-
-                 */
                 try {
                     stream.close();
                 } catch (IOException e) {
@@ -486,7 +466,7 @@ public class DiskPositionalIndexer {
 
 			if(formulaSelect == 3){ // Wacky
 				//List to get the byte size of each doc
-				System.out.print("Wacky byteSize Test: ");
+				//System.out.print("Wacky byteSize Test: ");
 				List<Long> dBytes = getByteSizes();
 				for(Long s: dBytes){
 					double byteGet = (double) s;
@@ -509,9 +489,6 @@ public class DiskPositionalIndexer {
         // Return Index
         return tdi;
     }
-
-
-
 
 
     public List<Long> getByteSizes() {

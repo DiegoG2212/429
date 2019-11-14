@@ -11,18 +11,30 @@ public class tfidfRank implements RankFormula {
 
     }
 
+    int corpusSize = 0;
+    int documentFreq = 0;
+    public tfidfRank(int cSize, int docFreq){
+        corpusSize = cSize;
+        documentFreq = docFreq;
+    }
+
     public tfidfRank(HashMap<String,Integer> x){
        terms = x;
     }
+
+    public tfidfRank(int t){
+        tftd = t;
+    }
+
     @Override
     public double getWqt() {
-
-        return 0;
+        double calc1 = corpusSize/documentFreq;
+        return Math.log(calc1);
     }
 
     @Override
     public double getWdt() {
-        return 0;
+        return tftd;
     }
 
     @Override

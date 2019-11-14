@@ -18,6 +18,10 @@ public class DefaultRank implements RankFormula {
         terms = x;
     }
 
+    public DefaultRank(int t){
+        tftd = t;
+    }
+
     int corpusSize = 0;
     int documentFreq = 0;
     public DefaultRank(int corpSize, int docFreq){
