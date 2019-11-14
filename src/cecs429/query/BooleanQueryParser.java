@@ -227,7 +227,7 @@ public class BooleanQueryParser {
 				}
 			}
 
-			lengthOut = startIndex - fallSpace;
+			//lengthOut = startIndex - fallSpace;
 
 
 

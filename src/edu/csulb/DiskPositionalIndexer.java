@@ -241,7 +241,7 @@ public class DiskPositionalIndexer {
                                 }
                             }
                             System.out.println(combine);
-                            System.out.println("HELP");
+                            //System.out.println("HELP");
 
                             int docCount = 0;
                             if (modeSelect == 0) {
@@ -400,6 +400,7 @@ public class DiskPositionalIndexer {
 
             // Loops through documents
             for (Document d : corpus.getDocuments()) {
+                System.out.println("At Document: " +d.getId());
                 int x = 0; // Reset counter for positions
                 // Creates tokens by splitting on whitespace
                 EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
