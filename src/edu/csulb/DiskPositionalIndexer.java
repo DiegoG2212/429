@@ -497,10 +497,12 @@ public class DiskPositionalIndexer {
 
             // Return Index
             return tdi;
-        } else { // Already on disk
-            System.out.println("Index on Disk");
-            tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
         }
+        // Switches to DiskInvertedIndex after building/ already existed
+        System.out.println("Index on Disk");
+        tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
+
+        /*
         List <Posting> p = tdi.getPostings("sea");
         List <Posting> z = ((DiskInvertedIndex) tdi).getPositionalPostings("sea");
         for (Posting i : p){
@@ -514,6 +516,7 @@ public class DiskPositionalIndexer {
             System.out.println(i.getDocumentId());
 
         }
+         */
 
 
         // Return Index
