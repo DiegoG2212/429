@@ -30,7 +30,40 @@ public class PhraseLiteral implements QueryComponent {
 		mTerms.addAll(Arrays.asList(terms.replaceAll("^[^a-zA-Z0-9\\s]+|[^a-zA-Z0-9\\s]+$", "").split(" ")));
 
 	}
-	
+
+	public List<Posting> getPostings(Index index) {
+		//return null;
+
+		List <Posting> result = Collections.emptyList();
+		if (mTerms.size() == 2) {
+			String temp = mTerms.get(0) + " " + mTerms.get(1);
+			return index.getPostings(temp);
+		}
+
+		if (!(mTerms.isEmpty())) {
+			if (mTerms.size() > 2 ) {
+				int i = 0;
+
+				while(i < mTerms.size()) {
+					if (i < 2) {
+
+						result = andPos(index.getPositionalPostings(mTerms.get(i)), index.getPositionalPostings(mTerms.get(i+1)));
+						i = i + 2;
+					}else {
+						result = andPos(result, index.getPositionalPostings(mTerms.get(i)));
+						i++;
+					}
+				}
+
+
+			}else { result = index.getPositionalPostings(mTerms.get(0));}
+
+		}
+		return result;
+		// TODO: program this method. Retrieve the postings for the individual terms in the phrase,
+		// and positional merge them together.
+	}
+	/*
 	@Override
 	public List<Posting> getPostings(Index index) {
 		//return null;
@@ -64,7 +97,7 @@ public class PhraseLiteral implements QueryComponent {
 		// TODO: program this method. Retrieve the postings for the individual terms in the phrase,
 		// and positional merge them together.
 	}
-	
+	*/
 	
 	private List<Posting> andPos(List<Posting>var1, List<Posting>var2){
 		List <Posting> result = new ArrayList<>(); // result query is the answer 

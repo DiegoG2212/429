@@ -34,9 +34,6 @@ public class DiskInvertedIndex implements Index {
         }
     }
 
-    public void start() throws IOException{
-
-    }
 
 
     // Locates the byte position of the postings for the given term.

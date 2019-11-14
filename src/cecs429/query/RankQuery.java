@@ -120,12 +120,15 @@ public class RankQuery implements QueryComponent{
 
         // For the Top 10 results
         int count = 1;
+        /*
         for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
             Posting newP = new Posting(entry.getKey(),entry.getValue()); // Create new posting with DocID
             result.add(newP);
             System.out.println("At: " +count);
             count++;
         }
+
+         */
 
 
         return result;

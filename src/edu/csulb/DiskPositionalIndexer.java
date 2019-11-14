@@ -244,19 +244,29 @@ public class DiskPositionalIndexer {
                             System.out.println("HELP");
 
                             int docCount = 0;
-                            QueryComponent q = new BooleanQueryParser().parseQuery(query); // Default
                             if (modeSelect == 0) {
                                 System.out.println("Boolean Parse");
-                                q = new BooleanQueryParser().parseQuery(query);
                             }
+                            QueryComponent q = new BooleanQueryParser().parseQuery(query); // Default
+
                             if (modeSelect == 1) {
                                 System.out.println("Ranked Retrieval Parse");
                                 q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount, aveTCount);
                             }
 
+
+                            /*
+                            for(Posting p: index.getPostings(query)){
+                                results.append("Document: " +corpus.getDocument(p.getDocumentId())+ "\n");
+                            }
+
+                             */
+
+
                             for (Posting p : q.getPostings(index)) {
-                                results.append("Document: " + DiskPositionalIndexer.this.corpus
-                                        .getDocument(p.getDocumentId()).getTitle() + "\n");
+
+                                results.append("Document: " +corpus.getDocument(p.getDocumentId()).getTitle()+ "\n");
+
                                 if(modeSelect == 1){
                                     results.append("Accumulator: " +p.getAccumulator());
                                 }
@@ -267,6 +277,8 @@ public class DiskPositionalIndexer {
                                 results.append("\n");
                                 docCount++;
                             }
+
+
                             results.append("Number of Documents:" + docCount + "\n");
                             results.append("\n");
                             results.append("If you would like to view a document, type :doc <name> \n");
@@ -457,7 +469,7 @@ public class DiskPositionalIndexer {
                 aveTCount.put(d.getId(), aveCalc);
 
 
-                // Calculate Ld
+                // Calculate Ld ========================================================
                 if (formulaSelect == 0) { // Default
                     double h = rankSelect.calculateLd(new DefaultRank(terms));
                     writeDisk.addDocWeight(h);
@@ -470,30 +482,6 @@ public class DiskPositionalIndexer {
                 }
 
 
-
-                /*
-                // Get the Wdts for the doc and add it into the list
-				for (Map.Entry<String, Integer> entry : terms.entrySet()) {
-					Wdts.add(this.getWdt(entry.getValue()));
-				}
-				double Ldcalc = 0;
-				for (double dub : Wdts) {
-					Ldcalc += Math.pow(dub, 2);
-				}
-				docWeights.add(Math.sqrt(Ldcalc));
-
-				//Add doc lengths into list
-                docLengths.add((double)tokenCount);
-                double tftdsum = 0;
-                for (Map.Entry<String, Integer> entry : terms.entrySet()) {
-                    tftdsum += (double) entry.getValue();
-                }
-                tftdsum /= terms.size();
-                dAveTFtd.add(tftdsum);
-
-                //writeDisk.addDocWeight(terms); // Add HashMap to list
-
-                 */
                 try {
                     stream.close();
                 } catch (IOException e) {
@@ -517,28 +505,11 @@ public class DiskPositionalIndexer {
             writeDisk.WriteIndex(tdi, Paths.get(directory + "/index").toAbsolutePath());
 
             // Return Index
-            return tdi;
+            //return tdi;
         }
         // Switches to DiskInvertedIndex after building/ already existed
         System.out.println("Index on Disk");
         tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
-
-        /*
-        List <Posting> p = tdi.getPostings("sea");
-        List <Posting> z = ((DiskInvertedIndex) tdi).getPositionalPostings("sea");
-        for (Posting i : p){
-            System.out.println(i.getDocumentId());
-
-        }
-
-        System.out.println("Positional============================");
-
-        for (Posting i : z){
-            System.out.println(i.getDocumentId());
-
-        }
-         */
-
 
         // Return Index
         return tdi;

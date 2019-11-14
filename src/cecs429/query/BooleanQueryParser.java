@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cecs429.text.BetterTokenProcessor;
-
 /**
  * Parses boolean queries according to the base requirements of the CECS 429 project.
  * Does not handle phrase queries, NOT queries, NEAR queries, or wildcard queries... yet.
@@ -16,26 +15,26 @@ public class BooleanQueryParser {
 	private static class StringBounds {
 		int start;
 		int length;
-		
+
 		StringBounds(int start, int length) {
 			this.start = start;
 			this.length = length;
 		}
 	}
-	
+
 	/**
 	 * Encapsulates a QueryComponent and the StringBounds that led to its parsing.
 	 */
 	private static class Literal {
 		StringBounds bounds;
 		QueryComponent literalComponent;
-		
+
 		Literal(StringBounds bounds, QueryComponent literalComponent) {
 			this.bounds = bounds;
 			this.literalComponent = literalComponent;
 		}
 	}
-	
+
 	/**
 	 * Given a boolean query, parses and returns a tree of QueryComponents representing the query.
 	 */
@@ -47,7 +46,7 @@ public class BooleanQueryParser {
 		//	of the literals found. Repeat the scan-and-build-AND-query phase for each segment of the
 		// query separated by + signs. In the end, build a single OR query that composes all of the built
 		// AND subqueries.
-		
+
 		List<QueryComponent> allSubqueries = new ArrayList<>();
 		do {
 			// Identify the next subquery: a portion of the query up to the next + sign.
@@ -63,19 +62,19 @@ public class BooleanQueryParser {
 			do {
 				// Extract the next literal from the subquery.
 				Literal lit = findNextLiteral(subquery, subStart);
-				
+
 				// Add the literal component to the conjunctive list.
 				subqueryLiterals.add(lit.literalComponent);
-				
+
 				// Set the next index to start searching for a literal.
 				subStart = lit.bounds.start + lit.bounds.length;
-				
+
 			} while (subStart < subquery.length());
-			
+
 			// After processing all literals, we are left with a conjunctive list
 			// of query components, and must fold that list into the final disjunctive list
 			// of components.
-			
+
 			// If there was only one literal in the subquery, we don't need to AND it with anything --
 			// its component can go straight into the list.
 			if (subqueryLiterals.size() == 1) {
@@ -87,7 +86,7 @@ public class BooleanQueryParser {
 			}
 			start = nextSubquery.start + nextSubquery.length;
 		} while (start < query.length());
-		
+
 		// After processing all subqueries, we either have a single component or multiple components
 		// that must be combined with an OrQuery.
 		if (allSubqueries.size() == 1) {
@@ -100,7 +99,7 @@ public class BooleanQueryParser {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Locates the start index and length of the next subquery in the given query string,
 	 * starting at the given index.
@@ -193,8 +192,8 @@ public class BooleanQueryParser {
 
 			// Find ending quotation mark
 
-			
-			
+
+
 			String holder  = " ";
 
 
@@ -203,7 +202,7 @@ public class BooleanQueryParser {
 			}
 			// Substring to get all words between quotation marks as a single string
 
-			
+
 			int fallSpace = subquery.indexOf('"', startIndex);
 			holder = subquery.substring(startIndex, fallSpace-1);
 
@@ -265,22 +264,22 @@ public class BooleanQueryParser {
 
 
 		} else {
-		
-		// This is a term literal containing a single term.
+
+			// This is a term literal containing a single term.
 
 			List<String> tem = new BetterTokenProcessor().processToken(subquery.substring(startIndex, startIndex + lengthOut )); //process token before 
-																															    // sending to the term literal
+			// sending to the term literal
 
 
 
 
 			return new Literal(
-			 new StringBounds(startIndex, lengthOut),
-			 new TermLiteral(tem.get(0)));
+					new StringBounds(startIndex, lengthOut),
+					new TermLiteral(tem.get(0)));
 		}
 
-		
-		
-		
+
+
+
 	}
 }
