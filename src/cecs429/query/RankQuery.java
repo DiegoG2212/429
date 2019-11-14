@@ -23,12 +23,14 @@ public class RankQuery implements QueryComponent{
     int formulaSelect = 0;
     DocumentCorpus corpus;
     HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
+    HashMap<Integer, Double> ave = new HashMap<Integer, Double>();
 
-    public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount) {
+    public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
         corpusSize = c.getCorpusSize();
         formulaSelect = formSel;
         corpus = c;
         tCount = tokCount;
+        ave = a;
     }
 
     /* @Override */
@@ -68,11 +70,11 @@ public class RankQuery implements QueryComponent{
                         if(formulaSelect == 1) { // tf-idf
                             wdt = rankC.calculateWdt(new tfidfRank(tftd));
                         }
-                        if(formulaSelect == 2) { // OkapiBM25 ????
+                        if(formulaSelect == 2) { // OkapiBM25
                            wdt = rankC.calculateWdt(new OkapiRank(tftd, tCount.get(p.getDocumentId()), tCount, corpusSize));
                         }
-                        if(formulaSelect == 3) { // Wacky ????
-                            //wdt = rankC.calculateWdt(new WackyRank(tftd,  ) );
+                        if(formulaSelect == 3) { // Wacky
+                            wdt = rankC.calculateWdt(new WackyRank(tftd, ave.get(p.getDocumentId()) ) );
                         }
 
                         // If accumulator exists for document

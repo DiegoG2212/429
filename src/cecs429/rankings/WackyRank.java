@@ -13,6 +13,14 @@ public class WackyRank implements RankFormula {
         docFreq = d;
     }
 
+    int tftd = 0;
+    double ave = 0;
+    public WackyRank(int t, double a){
+        tftd = t;
+        ave = a;
+    }
+
+
     @Override
     public double getWqt() {
         double calc = (corpusSize - docFreq)/(docFreq);
@@ -21,7 +29,8 @@ public class WackyRank implements RankFormula {
 
     @Override
     public double getWdt() {
-        return 0;
+        double calc = (1 + Math.log(tftd))/(1 + Math.log(ave));
+        return calc;
     }
 
     @Override

@@ -71,6 +71,9 @@ public class DiskPositionalIndexer {
     // Token Counter use
     HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
 
+    // Average Token Counter use
+    HashMap<Integer, Double> aveTCount = new HashMap<Integer, Double>();
+
     public DiskPositionalIndexer() throws Exception {
         query();
     }
@@ -245,7 +248,7 @@ public class DiskPositionalIndexer {
                                 q = new BooleanQueryParser().parseQuery(query);
                             }
                             if (modeSelect == 1) {
-                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount);
+                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount, aveTCount);
                             }
 
                             for (Posting p : q.getPostings(index)) {
@@ -435,9 +438,19 @@ public class DiskPositionalIndexer {
                     x++;
                 }
 
-                // Save token count
+                // Save Token Count
                 tCount.put(d.getId(), terms.size());
 
+                // Save Average Token Count
+                double atSum = 0;
+                for (double s: terms.values()){
+                    atSum += s;
+                }
+                double aveCalc = atSum / terms.size();
+                aveTCount.put(d.getId(), aveCalc);
+
+
+                // Calculate Ld
                 if (formulaSelect == 0) { // Default
                     writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
                 }
