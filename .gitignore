@@ -13,3 +13,4 @@
 .idea/compiler.xml
 4299.iml
 *.xml
+/out/
