@@ -57,22 +57,22 @@ public class DiskPositionalIndexer {
     DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
     String lastQuery = ""; // Saves last user query
     int queryCheck = 0;
-    Index index;
-    //For selecting the type of ranking query
-    int formulaSelect = 0;
-    //For selecting between Ranked or Boolean query
-    int modeSelect = 0;
-    //For showing how long it took to index
+	Index index;
+	//For selecting the type of ranking query
+	int formulaSelect = 0;
+	//For selecting between Ranked or Boolean query
+	int modeSelect = 0;
+	//For showing how long it took to index
     long indexTime = 0;
 
-    //Ranking formula selection
+	//Ranking formula selection
     RankCalculator rankSelect = new RankCalculator();
 
     // Token Counter use
-    HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
+    HashMap<Integer, Integer> tFrequency = new HashMap<Integer, Integer>();
 
     // Average Token Counter use
-    HashMap<Integer, Double> aveTCount = new HashMap<Integer, Double>();
+    HashMap<Integer, Double> aveTFrequency = new HashMap<Integer, Double>();
 
     public DiskPositionalIndexer() throws Exception {
         query();
@@ -251,7 +251,7 @@ public class DiskPositionalIndexer {
 
                             if (modeSelect == 1) {
                                 System.out.println("Ranked Retrieval Parse");
-                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount, aveTCount);
+                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tFrequency, aveTFrequency);
                             }
 
 
@@ -313,54 +313,54 @@ public class DiskPositionalIndexer {
                     System.exit(-1);
                 }
 
-                if (modeSelect == 1) {
-                    // Opening Dialog Box to select Mode
-                    Object[] options2 = {"Default",    // 0
-                            "tf-idf",                // 1
-                            "OkapiBM25",            // 2
-                            "Wacky"};                // 3
-                    formulaSelect = JOptionPane.showOptionDialog(frame,
-                            "What formula would you like to use?",
-                            "Formula Selection",
-                            JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            options2,
-                            options2[3]);
-                    // System.out.println(n);
-                    if (formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) {
-                    } else {
-                        // End Program
-                        System.exit(-1);
-                    }
-                }
+				if (modeSelect == 1) {
+					// Opening Dialog Box to select Mode
+					Object[] options2 = {"Default",    // 0
+							"tf-idf",                // 1
+							"OkapiBM25",            // 2
+							"Wacky"};                // 3
+					formulaSelect = JOptionPane.showOptionDialog(frame,
+							"What formula would you like to use?",
+							"Formula Selection",
+							JOptionPane.YES_NO_CANCEL_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options2,
+							options2[3]);
+					// System.out.println(n);
+					if (formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) {
+					} else {
+						// End Program
+						System.exit(-1);
+					}
+				}
 
-                // Panel Add
-                p.add(browseFile);
-                p.add(textField);
-                p.add(search);
-                // p.add(l);
-                p.add(scrollPane);
-                // Frame Add
-                frame.add(p);
-                // Searches when Enter is pressed
-                frame.getRootPane().setDefaultButton(search);
-                // Size Set
-                frame.setSize(750, 520);
-                j.setPreferredSize(new Dimension(800, 600));
-                // Font Set
-                browseFile.setFont(font);
-                search.setFont(font);
-                textField.setFont(inputFont);
-                results.setFont(resultFont);
-                frame.setResizable(false); // No window resizing
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Closing window stops program; :q Special Query
-                frame.setVisible(true); // Visible
-            }
-        });
-        // GUI
-        // End===================================================================================
-    }
+				// Panel Add
+				p.add(browseFile);
+				p.add(textField);
+				p.add(search);
+				// p.add(l);
+				p.add(scrollPane);
+				// Frame Add
+				frame.add(p);
+				// Searches when Enter is pressed
+				frame.getRootPane().setDefaultButton(search);
+				// Size Set
+				frame.setSize(750, 520);
+				j.setPreferredSize(new Dimension(800, 600));
+				// Font Set
+				browseFile.setFont(font);
+				search.setFont(font);
+				textField.setFont(inputFont);
+				results.setFont(resultFont);
+				frame.setResizable(false); // No window resizing
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Closing window stops program; :q Special Query
+				frame.setVisible(true); // Visible
+			}
+		});
+		// GUI
+		// End===================================================================================
+	}
 
     //
     public void updateDirectory(String dir) throws IOException { // Updates changes to corpus and index
@@ -392,11 +392,11 @@ public class DiskPositionalIndexer {
             tdi = new PositionalInvertedIndex();
             DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
 
-            // Lists for calculating each individual document's weightings
-            List<Double> docWeights = Collections.emptyList(); //Ld of each doc in Default & tfidf
-            List<Double> docLengths = Collections.emptyList();
-            // List to get the average for term frequency of each term in the doc
-            List<Double> dAveTFtd = Collections.emptyList();
+			// Lists for calculating each individual document's weightings
+			List<Double> docWeights = Collections.emptyList(); //Ld of each doc in Default & tfidf
+			List<Double> docLengths = Collections.emptyList();
+			// List to get the average for term frequency of each term in the doc
+			List<Double> dAveTFtd = Collections.emptyList();
 
             // Loops through documents
             for (Document d : corpus.getDocuments()) {
@@ -408,16 +408,16 @@ public class DiskPositionalIndexer {
                 //Hashmap to keep track of the frequency of each term in the doc
                 HashMap<String, Integer> terms = new HashMap<String, Integer>();
 
-                // List of Wdts to calculate the Ld of each doc
-                List<Double> Wdts = Collections.emptyList();
+				// List of Wdts to calculate the Ld of each doc
+				List<Double> Wdts = new ArrayList<Double>();
 
-                // Count number of tokens for each doc
-                int tokenCount = 0;
+                // Count frequency of tokens for each doc
+                int tokenFrequency = 0;
 
                 // Adds term to index along with Document ID
                 for (String token : stream.getTokens()) {    // Go through each token
                     // Increment token counter each time
-                    tokenCount++;
+                    tokenFrequency++;
                     // Add processed token
                     tdi.addTerm(processor.processToken(token), d.getId(), x);
                     //System.out.println(processor.processToken(token));
@@ -457,29 +457,29 @@ public class DiskPositionalIndexer {
                     x++;
                 }
 
-                // Save Token Count
-                tCount.put(d.getId(), terms.size());
+                // Save Token Frequency
+                tFrequency.put(d.getId(), terms.size());
 
-                // Save Average Token Count
+                // Save Average Token Frequency
                 double atSum = 0;
-                for (double s: terms.values()){
+                for (double s : terms.values()){
                     atSum += s;
                 }
                 double aveCalc = atSum / terms.size();
-                aveTCount.put(d.getId(), aveCalc);
+                aveTFrequency.put(d.getId(), aveCalc);
 
-
-                // Calculate Ld ========================================================
+				writeDisk.addAvgTFs(aveCalc);
+				writeDisk.addDocLength(atSum);
+                // Calculate Ld
                 if (formulaSelect == 0) { // Default
-                    double h = rankSelect.calculateLd(new DefaultRank(terms));
-                    writeDisk.addDocWeight(h);
-                }
+					writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
+				}
                 if (formulaSelect == 1) { // tf-idf
-                    writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank(terms)));
-                }
+					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank(terms)));
+				}
                 if (formulaSelect == 2) { // OkapiBM25
-                    writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
-                }
+					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
+				}
 
 
                 try {
@@ -487,19 +487,17 @@ public class DiskPositionalIndexer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                 */
 
             }    // End of Documents
-
-            if (formulaSelect == 3) { // Wacky
-                //List to get the byte size of each doc
-                System.out.print("Wacky byteSize Test: ");
-                List<Long> dBytes = getByteSizes();
-                for (Long s : dBytes) {
-                    double byteGet = (double) s;
-                    writeDisk.addDocWeight(Math.sqrt(byteGet));
-                }
-            }
+			//List to get the byte size of each doc
+			List<Long> dBytes = getByteSizes();
+			for (Long s : dBytes) {
+				double byteGet = (double) s;
+				if (formulaSelect == 3)
+					writeDisk.addDocWeight(Math.sqrt(byteGet));
+				writeDisk.addByteSize(byteGet);
+			}
 
             // Write to Disk
             writeDisk.WriteIndex(tdi, Paths.get(directory + "/index").toAbsolutePath());
@@ -515,7 +513,7 @@ public class DiskPositionalIndexer {
         return tdi;
     }
 
-
+	// Gets byte sizes for all documents
     public List<Long> getByteSizes() {
         List<Long> result = new ArrayList<Long>();
 

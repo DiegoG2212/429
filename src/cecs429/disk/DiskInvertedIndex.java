@@ -17,6 +17,7 @@ public class DiskInvertedIndex implements Index {
     private RandomAccessFile mVocabList;
     private RandomAccessFile mPostings;
     private RandomAccessFile mDocWeights;
+    private RandomAccessFile mDocLengthAvg;
     private long[] mVocabTable;
 
     // Opens a disk inverted index that was constructed in the given path.
@@ -26,6 +27,7 @@ public class DiskInvertedIndex implements Index {
             mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
             mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
             mDocWeights = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
+            mDocLengthAvg = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
             mVocabTable = readVocabTable(mPath);
             //mFileNames = readFileNames(path);
         }
@@ -310,23 +312,115 @@ public class DiskInvertedIndex implements Index {
     @Override
     public void addTerm(List<String> term, int docID, int pos) {}
 
+    // Gets all docWeight variables
     public List<Double> getLds() {
         try {
             List<Double> Lds = Collections.emptyList();
             byte[] buffer = new byte[8];
 
+            //Position for traversal
+            long pos = 0;
+            mDocWeights.seek(pos);
             for (int i = 0; i < mDocWeights.length(); i++) {
                 mDocWeights.read(buffer, 0, 8);
-
+                pos += 32;
                 double docLength = ByteBuffer.wrap(buffer).getDouble();
 
                 Lds.add(docLength);
+                mDocWeights.seek(pos);
             }
             return Lds;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Gets all docLength variables
+    public List<Double> getDocLengths() {
+        try {
+            List<Double> Lds = Collections.emptyList();
+            byte[] buffer = new byte[8];
+
+            //Position for traversal
+            long pos = 8;
+            mDocWeights.seek(pos);
+            for (int i = 0; i < mDocWeights.length(); i++) {
+                mDocWeights.read(buffer, 0, 8);
+                pos += 32;
+                double docLength = ByteBuffer.wrap(buffer).getDouble();
+
+                Lds.add(docLength);
+                mDocWeights.seek(pos);
+            }
+            return Lds;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Gets all byteSize variables
+    public List<Double> getByteSizes() {
+        try {
+            List<Double> Lds = Collections.emptyList();
+            byte[] buffer = new byte[8];
+
+            //Position for traversal
+            long pos = 16;
+            mDocWeights.seek(pos);
+            for (int i = 0; i < mDocWeights.length(); i++) {
+                mDocWeights.read(buffer, 0, 8);
+                pos += 32;
+                double docLength = ByteBuffer.wrap(buffer).getDouble();
+
+                Lds.add(docLength);
+                mDocWeights.seek(pos);
+            }
+            return Lds;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Gets all
+    public List<Double> getAvgTFtds() {
+        try {
+            List<Double> Lds = Collections.emptyList();
+            byte[] buffer = new byte[8];
+
+            //Position for traversal
+            long pos = 24;
+            mDocWeights.seek(pos);
+            for (int i = 0; i < mDocWeights.length(); i++) {
+                mDocWeights.read(buffer, 0, 8);
+                pos += 32;
+                double docLength = ByteBuffer.wrap(buffer).getDouble();
+
+                Lds.add(docLength);
+                mDocWeights.seek(pos);
+            }
+            return Lds;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public double getDocLengthAvg() {
+        try {
+            byte[] buffer = new byte[8];
+
+            mDocLengthAvg.read(buffer, 0, 8);
+
+            double docLengthAvg = ByteBuffer.wrap(buffer).getDouble();
+
+            return docLengthAvg;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

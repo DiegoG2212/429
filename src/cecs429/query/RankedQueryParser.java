@@ -1,13 +1,8 @@
 package cecs429.query;
 
 import cecs429.documents.DocumentCorpus;
-import cecs429.index.Index;
-import cecs429.index.Posting;
-import cecs429.rankings.RankFormula;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 public class RankedQueryParser {
     /**
