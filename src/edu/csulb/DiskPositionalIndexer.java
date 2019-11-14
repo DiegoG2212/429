@@ -299,6 +299,26 @@ public class DiskPositionalIndexer {
 					System.exit(-1);
 				}
 
+<<<<<<< HEAD
+				// Opening Dialog Box to select Mode
+				Object[] options2 = {"Default",	// 0
+						"tf-idf",				// 1
+						"OkapiBM25",			// 2
+						"Wacky"};				// 3
+				formulaSelect = JOptionPane.showOptionDialog(frame,
+						"What formula would you like to use?",
+						"Formula Selection",
+						JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						options2,
+						options2[3]);
+				// System.out.println(n);
+				if(formulaSelect == 0 || formulaSelect == 1 || formulaSelect == 2 || formulaSelect == 3) { }
+				else {
+					// End Program
+					System.exit(-1);
+=======
 				if(modeSelect == 1) {
 					// Opening Dialog Box to select Mode
 					Object[] options2 = {"Default",    // 0
@@ -319,6 +339,7 @@ public class DiskPositionalIndexer {
 						// End Program
 						System.exit(-1);
 					}
+>>>>>>> f4198b343b068328156a4cf8344a6543400da62a
 				}
 
 				// Panel Add
@@ -484,8 +505,11 @@ public class DiskPositionalIndexer {
             System.out.println("Index on Disk");
             tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
         }
-        //System.out.println(tdi.getVocabulary().toString());
-
+        List<Posting> p = tdi.getPostings("sea");
+		for (Posting i : p){
+			System.out.println("DocId: " + i.getDocumentId());
+			System.out.println("Positions" + i.getPos().toString());
+		}
         // Return Index
         return tdi;
     }
