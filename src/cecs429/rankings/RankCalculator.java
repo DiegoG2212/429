@@ -1,6 +1,9 @@
 package cecs429.rankings;
 
 public class RankCalculator {
+    public RankCalculator(){
+
+    }
 
     public double calculateWqt(RankFormula strategy){
         return strategy.getWqt();

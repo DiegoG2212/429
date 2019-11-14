@@ -15,15 +15,15 @@ import java.util.*;
 public class RankQuery implements QueryComponent{
 
     private int corpusSize;
-    private RankFormula rf;
+
     //private List<String> query;
     private Path path;
     String[] query = {};
-    RankCalculator rankC;
+    RankCalculator rankC = new RankCalculator();
     int formulaSelect = 0;
     DocumentCorpus corpus;
-    HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
-    HashMap<Integer, Double> ave = new HashMap<Integer, Double>();
+    HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>(); // <DocID, # of tokens>
+    HashMap<Integer, Double> ave = new HashMap<Integer, Double>(); // <DocID, Ave>
 
     public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
         corpusSize = c.getCorpusSize();
@@ -35,7 +35,8 @@ public class RankQuery implements QueryComponent{
 
     /* @Override */
     public List<Posting> getPostings(Index index) {
-        List<Posting> result = Collections.emptyList();
+        List<Posting> result = new ArrayList<Posting>();
+        // <DocID, Ad>
         HashMap<Integer, Double> acc = new HashMap<Integer, Double>();
 
         for(String s: query){
@@ -45,10 +46,10 @@ public class RankQuery implements QueryComponent{
                 dft ++;
             }
             double wqt = 0;
-            if(formulaSelect == 0) { // Default -
+            if(formulaSelect == 0) { // Default
                 wqt = rankC.calculateWqt(new DefaultRank(corpusSize, dft));
             }
-            if(formulaSelect == 1) { // tf-idf -
+            if(formulaSelect == 1) { // tf-idf
                 wqt = rankC.calculateWqt(new tfidfRank(corpusSize, dft));
             }
             if(formulaSelect == 2) { // OkapiBM25
@@ -88,41 +89,40 @@ public class RankQuery implements QueryComponent{
                             acc.put(p.getDocumentId(), hold);
                         }
             }
+        } // End of Query loop
 
+        // For each non-zero Ad, divide Ad by Ld ===============
 
+        // Sort and return Top 10 ==============================
+        // Create Binary Heap Priority Queue
+        PriorityQueue<Map.Entry<Integer, Double>> queue
+                = new PriorityQueue<>(Comparator.comparing(e -> e.getValue()));
 
-
-
-        }
-        // Divide Ad by Ld
-        /*
-        for (HashMap.Entry<Integer, Double> entry : acc.entrySet()) { // Go through HashMap
-            double newDiv = entry.getValue() / Ld;
-            acc.put(entry.getKey(), newDiv);
-        }
-         */
-
-        // Return Top 10
-        /*
-        List<Map.Entry<Integer, Double> > list =
-                new LinkedList<Map.Entry<Integer, Double> >(acc.entrySet());
-
-        Collections.sort(list, new Comparator<Map.Entry<Integer, Double> >() {
-            public int compare(Map.Entry<Integer, Double> o1,
-                               Map.Entry<Integer, Double> o2)
-            {
-                return (o1.getValue()).compareTo(o2.getValue());
+        // Get the top 10
+        int k = 10;
+        for (Map.Entry<Integer, Double> entry : acc.entrySet()) {
+            queue.offer(entry);
+            if (queue.size() > k) {
+                queue.poll();
             }
-        });
-
-        HashMap<Integer, Double> temp = new LinkedHashMap<Integer, Double>();
-        for (Map.Entry<Integer, Double> aa : list) {
-            temp.put(aa.getKey(), aa.getValue());
         }
-         */
+
+        // Scan
+        HashMap<Integer, Double> r = new HashMap<Integer,Double>();
+        while (queue.size() > 0) {
+            Integer h = queue.poll().getKey();
+            r.put(h, acc.get(h));
+        }
+        //System.out.println(r);
 
 
+        // For the Top 10 results
+        for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
+            Posting newP = new Posting(entry.getKey()); // Create new posting with DocID
+            result.add(newP);
+        }
 
-        return null;
+
+        return result;
     } // End of getPostings
 }

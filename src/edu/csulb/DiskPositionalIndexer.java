@@ -66,7 +66,7 @@ public class DiskPositionalIndexer {
     long indexTime = 0;
 
     //Ranking formula selection
-    RankCalculator rankSelect;
+    RankCalculator rankSelect = new RankCalculator();
 
     // Token Counter use
     HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>();
@@ -452,7 +452,8 @@ public class DiskPositionalIndexer {
 
                 // Calculate Ld
                 if (formulaSelect == 0) { // Default
-                    writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
+                    double h = rankSelect.calculateLd(new DefaultRank(terms));
+                    writeDisk.addDocWeight(h);
                 }
                 if (formulaSelect == 1) { // tf-idf
                     writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank(terms)));

@@ -104,13 +104,13 @@ public class DiskIndexWriter {
 	//List< HashMap<String, Integer> > holdTerms = new ArrayList< HashMap<String, Integer> >();
 
 	// docWeights
-	List<Double> holdLd = Collections.emptyList();
+	List<Double> holdLd = new ArrayList<Double>();
 	// docLength
-	List<Double> holdDocLengths = Collections.emptyList();
+	List<Double> holdDocLengths = new ArrayList<Double>();
 	// byteSize
-	List<Double> holdByteSizes = Collections.emptyList();
+	List<Double> holdByteSizes = new ArrayList<Double>();
 	//aveTFtd
-	List<Double> holdAvgTFtds = Collections.emptyList();
+	List<Double> holdAvgTFtds = new ArrayList<Double>();
 	// docWeights.bin
 	//public void addDocWeight(HashMap<String,Integer> terms) throws IOException {
 	public void addDocWeight(double add) throws IOException {
