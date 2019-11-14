@@ -16,6 +16,7 @@ public class DiskInvertedIndex implements Index {
     private String mPath;
     private RandomAccessFile mVocabList;
     private RandomAccessFile mPostings;
+    private RandomAccessFile mDocWeights;
     private long[] mVocabTable;
 
     // Opens a disk inverted index that was constructed in the given path.
@@ -24,6 +25,7 @@ public class DiskInvertedIndex implements Index {
             mPath = path.toString();
             mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
             mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
+            mDocWeights = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
             mVocabTable = readVocabTable(mPath);
             //mFileNames = readFileNames(path);
         }
@@ -83,28 +85,15 @@ public class DiskInvertedIndex implements Index {
     // Reads the file vocabTable.bin into memory.
     private static long[] readVocabTable(String indexName) {
         try {
-
-            long[] vocabTable;
+            System.out.println(indexName);
 
             RandomAccessFile tableFile = new RandomAccessFile(
                     new File(indexName, "vocabTable.bin"),
                     "r");
 
- /*
-            DataInputStream tableFile = new DataInputStream(
-                    new BufferedInputStream(
-                            new FileInputStream(indexName + "/vocabTable.bin")));
-
-  */
-
-
-            byte[] byteBuffer = new byte[4];
-          //  tableFile.read(byteBuffer, 0, byteBuffer.length);
-
             int tableIndex = 0;
-            //System.out.println(ByteBuffer.wrap(byteBuffer).getInt());
-            vocabTable = new long[(int) tableFile.length() / 16 * 2];
-            byteBuffer = new byte[8];
+            long[] vocabTable = new long[(int) tableFile.length() / 16 * 2];
+            byte[] byteBuffer = new byte[8];
 
 
 
@@ -134,9 +123,9 @@ public class DiskInvertedIndex implements Index {
 
 
 
-    public int getTermCount() {
-        return mVocabTable.length / 2;
-    }
+   public int getTermCount() {
+       return mVocabTable.length / 2;
+   }
 
 
     public List<Posting> getPostings(String term) {
@@ -219,7 +208,7 @@ public class DiskInvertedIndex implements Index {
             } else {
                 mPostings.seek(position);
 
-                mPostings.read(buffer, 0,4 ); //reading from first location of the term to end of the term
+                mPostings.read(buffer, 0, 8); //reading from first location of the term to end of the term
                 int numberOfDocs = ByteBuffer.wrap(buffer).getInt();
 
                 //position = position + 4; // to go to the next number
@@ -232,19 +221,19 @@ public class DiskInvertedIndex implements Index {
                     mPostings.read(buffer2, 0,4 ); //reading from first location of the term to end of the term
                     int DocId  = ByteBuffer.wrap(buffer2).getInt() + lastDocId;
                     lastDocId = DocId;
-
+                    
                     //position += 4;
                     //mPostings.seek(position);
                     mPostings.read(buffer2, 0,4 );
                     int termFreq = ByteBuffer.wrap(buffer2).getInt(); // getting number of positions of that term
 
-                    //  position += 4;
+                    //position += 4;
                     //mPostings.seek(position);
                     mPostings.read(buffer2, 0,4 );
                     int termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
 
                     Posting p = new Posting(DocId, termPos); // creates the posting so
-                    // i just add the locations in the for loop
+                                                             // i just add the locations in the for loop
                     for(int j = 0; j < termFreq - 1; j++){
                         mPostings.read(buffer2, 0,4 );
                         termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
@@ -274,8 +263,6 @@ public class DiskInvertedIndex implements Index {
     }
 
 
-
-
     public List<String> getVocabulary() {
         try {
 
@@ -294,7 +281,7 @@ public class DiskInvertedIndex implements Index {
                     termLength = mVocabTable[nextNum] - locHolder; // i is at the last term
 
                     i = mVocabTable.length ;
-                }else{                                // we are not at the last term read until the next term
+                } else {                                // we are not at the last term read until the next term
                     int nextNum = (2*i) + 2;
                     termLength  =  mVocabTable[nextNum] -  locHolder;
                     System.out.println(locHolder);
@@ -323,9 +310,26 @@ public class DiskInvertedIndex implements Index {
         return null;
     }
 
-    public void addTerm(List<String> term, int docID, int pos){
-        // never adding a single term to disk so we just use this to query
+    @Override
+    public void addTerm(List<String> term, int docID, int pos) {}
 
+    public List<Double> getLds() {
+        try {
+            List<Double> Lds = Collections.emptyList();
+            byte[] buffer = new byte[8];
+
+            for (int i = 0; i < mDocWeights.length(); i++) {
+                mDocWeights.read(buffer, 0, 8);
+
+                double docLength = ByteBuffer.wrap(buffer).getDouble();
+
+                Lds.add(docLength);
+            }
+            return Lds;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
