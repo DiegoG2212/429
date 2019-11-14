@@ -1,5 +1,6 @@
 package cecs429.query;
 
+import cecs429.disk.DiskInvertedIndex;
 import cecs429.documents.Document;
 import cecs429.documents.DocumentCorpus;
 import cecs429.index.Index;
@@ -26,6 +27,7 @@ public class RankQuery implements QueryComponent{
     HashMap<Integer, Double> ave = new HashMap<Integer, Double>(); // <DocID, Ave>
 
     public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
+        query = r;
         corpusSize = c.getCorpusSize();
         formulaSelect = formSel;
         corpus = c;
@@ -40,6 +42,7 @@ public class RankQuery implements QueryComponent{
         HashMap<Integer, Double> acc = new HashMap<Integer, Double>();
 
         for(String s: query){
+            System.out.println("Query part: " +s);
             // Calculate wqt
             int dft = 0;
             for( Posting p: index.getPostings(s) ){ // Calculate dft
@@ -92,6 +95,17 @@ public class RankQuery implements QueryComponent{
         } // End of Query loop
 
         // For each non-zero Ad, divide Ad by Ld ===============
+        List<Double> LdList = index.getLds();
+        int i = 0;
+        for (HashMap.Entry<Integer, Double> scan : acc.entrySet()) {
+            if (scan.getValue() != 0){
+                double calc = scan.getValue() / LdList.get(i);
+                i++;
+                acc.put(scan.getKey(),calc);
+            }
+        }
+
+
 
         // Sort and return Top 10 ==============================
         // Create Binary Heap Priority Queue
@@ -117,9 +131,13 @@ public class RankQuery implements QueryComponent{
 
 
         // For the Top 10 results
+        //int count = 1;
+
         for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
-            Posting newP = new Posting(entry.getKey()); // Create new posting with DocID
+            Posting newP = new Posting(entry.getKey(),entry.getValue()); // Create new posting with DocID
             result.add(newP);
+            //System.out.println("At: " +count);
+            //count++;
         }
 
 

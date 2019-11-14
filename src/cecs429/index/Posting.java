@@ -7,12 +7,16 @@ import java.util.List;
  * A Posting encapulates a document ID associated with a search query component.
  */
 public class Posting {
-	private int mDocumentId;
+	int mDocumentId;
 	private ArrayList <Integer> pos;
+	private double accumulator;
 
-	public Posting(int documentId){
+
+	public Posting(int documentId, double acc){
 		mDocumentId = documentId;
+		accumulator = acc;
 	}
+
 
 	public Posting(int documentId, int position) {
 		mDocumentId = documentId;
@@ -20,7 +24,10 @@ public class Posting {
 		pos.add(position);
 		
 	}
-	
+
+	public double getAccumulator(){ return accumulator;}
+
+
 	public void addPos (int position) {
 			pos.add(position);
 	}

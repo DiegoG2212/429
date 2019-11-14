@@ -78,4 +78,8 @@ public class DiskPositionalIndex implements Index {
 
     }
 
+    public List<Double> getLds(){
+	    return null;
+    }
+
 }
