@@ -453,8 +453,6 @@ public class DiskPositionalIndexer {
 				}
 
 
-
-
                 try {
                     stream.close();
                 } catch (IOException e) {
