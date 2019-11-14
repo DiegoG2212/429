@@ -66,4 +66,8 @@ public class PositionalInvertedIndex implements Index {
 		}
 	}
 
+	public List<Double> getLds(){
+		return null;
+	}
+
 }

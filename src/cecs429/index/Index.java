@@ -27,4 +27,12 @@ public interface Index {
 	 * Adds term into index
 	 */
 	void addTerm(List<String> term, int docID, int pos);
+
+	/**
+	 *
+	 *
+	 * Get Lds
+	 *
+	 */
+	public List<Double> getLds();
 }

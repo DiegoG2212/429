@@ -315,7 +315,7 @@ public class DiskInvertedIndex implements Index {
     // Gets all docWeight variables
     public List<Double> getLds() {
         try {
-            List<Double> Lds = Collections.emptyList();
+            List<Double> Lds = new ArrayList<Double>();
             byte[] buffer = new byte[8];
 
             //Position for traversal

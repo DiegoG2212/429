@@ -11,13 +11,12 @@ public class Posting {
 	private ArrayList <Integer> pos;
 	private double accumulator;
 
-	/*
+
 	public Posting(int documentId, double acc){
 		mDocumentId = documentId;
 		accumulator = acc;
 	}
 
-	 */
 
 	public Posting(int documentId, int position) {
 		mDocumentId = documentId;

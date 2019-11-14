@@ -265,7 +265,7 @@ public class DiskPositionalIndexer {
 
                             for (Posting p : q.getPostings(index)) {
 
-                                results.append("Document: " +corpus.getDocument(p.getDocumentId()).getTitle()+ "\n");
+                                results.append("Document: " +p.getDocumentId()+ "\n");
 
                                 if(modeSelect == 1){
                                     results.append("Accumulator: " +p.getAccumulator());
@@ -487,7 +487,6 @@ public class DiskPositionalIndexer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                 */
 
             }    // End of Documents
 			//List to get the byte size of each doc
@@ -508,6 +507,7 @@ public class DiskPositionalIndexer {
         // Switches to DiskInvertedIndex after building/ already existed
         System.out.println("Index on Disk");
         tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
+
 
         // Return Index
         return tdi;
