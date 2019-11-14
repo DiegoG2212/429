@@ -17,6 +17,7 @@ public class DiskInvertedIndex implements Index {
     private RandomAccessFile mVocabList;
     private RandomAccessFile mPostings;
     private RandomAccessFile mDocWeights;
+    private RandomAccessFile mDocLengthAvg;
     private long[] mVocabTable;
 
     // Opens a disk inverted index that was constructed in the given path.
@@ -26,6 +27,7 @@ public class DiskInvertedIndex implements Index {
             mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
             mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
             mDocWeights = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
+            mDocLengthAvg = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
             mVocabTable = readVocabTable(mPath);
             //mFileNames = readFileNames(path);
         }
@@ -330,6 +332,21 @@ public class DiskInvertedIndex implements Index {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public double getDocLengthAvg() {
+        try {
+            byte[] buffer = new byte[8];
+
+            mDocLengthAvg.read(buffer, 0, 8);
+
+            double docLengthAvg = ByteBuffer.wrap(buffer).getDouble();
+
+            return docLengthAvg;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }
