@@ -14,9 +14,15 @@ public class RankedQueryParser {
      * Given a boolean query, parses and returns a tree of QueryComponents representing the query.
      */
     public QueryComponent parseQuery(String query, DocumentCorpus c, int formulaSelect, HashMap<Integer,Integer> tCount, HashMap<Integer, Double> ave) {
-        String[] result = query.split("\\s+");
+        System.out.println("Inside Ranked Retrieval");
 
-        return new RankQuery(result, c, formulaSelect, tCount, ave);
+        System.out.println("Splitting string...");
+        String[] q = query.split("\\s+");
+        for(String s: q) {
+            System.out.println("String: " +s);
+        }
+
+        return new RankQuery(q, c, formulaSelect, tCount, ave);
     }
 
 }

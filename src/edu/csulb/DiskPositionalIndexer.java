@@ -241,19 +241,26 @@ public class DiskPositionalIndexer {
                                 }
                             }
                             System.out.println(combine);
+                            System.out.println("HELP");
 
                             int docCount = 0;
                             QueryComponent q = new BooleanQueryParser().parseQuery(query); // Default
                             if (modeSelect == 0) {
+                                System.out.println("Boolean Parse");
                                 q = new BooleanQueryParser().parseQuery(query);
                             }
                             if (modeSelect == 1) {
+                                System.out.println("Ranked Retrieval Parse");
                                 q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tCount, aveTCount);
                             }
 
                             for (Posting p : q.getPostings(index)) {
                                 results.append("Document: " + DiskPositionalIndexer.this.corpus
                                         .getDocument(p.getDocumentId()).getTitle() + "\n");
+                                if(modeSelect == 1){
+                                    results.append("Accumulator: " +p.getAccumulator());
+                                }
+
                                 if (modeSelect == 0) {
                                     results.append("Positions: " + p.getPos() + "\n");
                                 }

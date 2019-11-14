@@ -9,9 +9,11 @@ import java.util.List;
 public class Posting {
 	private int mDocumentId;
 	private ArrayList <Integer> pos;
+	private double accumulator;
 
-	public Posting(int documentId){
+	public Posting(int documentId, double acc){
 		mDocumentId = documentId;
+		accumulator = acc;
 	}
 
 	public Posting(int documentId, int position) {
@@ -20,7 +22,10 @@ public class Posting {
 		pos.add(position);
 		
 	}
-	
+
+	public double getAccumulator(){ return accumulator;}
+
+
 	public void addPos (int position) {
 			pos.add(position);
 	}

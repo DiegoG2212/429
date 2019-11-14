@@ -26,6 +26,7 @@ public class RankQuery implements QueryComponent{
     HashMap<Integer, Double> ave = new HashMap<Integer, Double>(); // <DocID, Ave>
 
     public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
+        query = r;
         corpusSize = c.getCorpusSize();
         formulaSelect = formSel;
         corpus = c;
@@ -40,6 +41,7 @@ public class RankQuery implements QueryComponent{
         HashMap<Integer, Double> acc = new HashMap<Integer, Double>();
 
         for(String s: query){
+            System.out.println("Query part: " +s);
             // Calculate wqt
             int dft = 0;
             for( Posting p: index.getPostings(s) ){ // Calculate dft
@@ -117,9 +119,12 @@ public class RankQuery implements QueryComponent{
 
 
         // For the Top 10 results
+        int count = 1;
         for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
-            Posting newP = new Posting(entry.getKey()); // Create new posting with DocID
+            Posting newP = new Posting(entry.getKey(),entry.getValue()); // Create new posting with DocID
             result.add(newP);
+            System.out.println("At: " +count);
+            count++;
         }
 
 
