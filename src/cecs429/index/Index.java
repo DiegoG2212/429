@@ -11,7 +11,12 @@ public interface Index {
 	 * Retrieves a list of Postings of documents that contain the given term.
 	 */
 	List<Posting> getPostings(String term);
-	
+
+	/**
+	 *  Retrieves postings with the positions of the term.
+	 */
+	List<Posting> getPositionalPostings(String term);
+
 	/**
 	 * A (sorted) list of all terms in the index vocabulary.
 	 */
@@ -21,5 +26,5 @@ public interface Index {
 	 * 
 	 * Adds term into index
 	 */
-	public void addTerm(List<String> term, int docID, int pos);
+	void addTerm(List<String> term, int docID, int pos);
 }

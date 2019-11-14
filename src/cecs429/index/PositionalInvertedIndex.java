@@ -39,6 +39,11 @@ public class PositionalInvertedIndex implements Index {
 		return val;
 	}
 
+
+	public List<Posting> getPositionalPostings(String term) {
+		return Collections.emptyList();
+	}
+
 	public void addTerm(List<String> term, int docID, int pos) {
 		for (String i : term) {
 			if (!map.containsKey(i)) { // If map doesn't contain term

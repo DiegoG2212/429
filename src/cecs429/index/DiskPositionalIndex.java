@@ -27,6 +27,10 @@ public class DiskPositionalIndex implements Index {
 		}
 	}
 
+    public List<Posting> getPositionalPostings(String term) {
+        return Collections.emptyList();
+    }
+
 	@Override
 	public List<String> getVocabulary() {
 		List<String> vocab = new ArrayList<String>();

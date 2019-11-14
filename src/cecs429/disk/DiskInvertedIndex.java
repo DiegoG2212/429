@@ -157,6 +157,71 @@ public class DiskInvertedIndex implements Index {
                 mPostings.read(buffer, 0,4 ); //reading from first location of the term to end of the term
                 int numberOfDocs = ByteBuffer.wrap(buffer).getInt();
 
+                position = position + 4; // to go to the next number
+
+                int i =0;
+                int lastDocId = 0;
+                while (i < numberOfDocs){
+                    //mPostings.seek(position);
+                    byte[] buffer2 = new byte[4]; // making  bytes
+                    mPostings.read(buffer2, 0,4 ); //reading from first location of the term to end of the term
+                    position = position + 4; // keeping track where i am
+                    int DocId  = ByteBuffer.wrap(buffer2).getInt() + lastDocId;
+                    lastDocId = DocId;
+
+                    //position += 4;
+                    //mPostings.seek(position);
+                    mPostings.read(buffer2, 0,4 );
+                    int termFreq = ByteBuffer.wrap(buffer2).getInt(); // getting number of positions of that term
+                    position = position + 4;
+                  //  position += 4;
+                    //mPostings.seek(position);
+                    mPostings.read(buffer2, 0,4 );
+                    int termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
+                    position = position + 4;
+
+                    Posting p = new Posting(DocId, termPos); // creates the posting so
+                                                             // i just add the locations in the for loop
+                    position += (long) (termFreq -1)*4;
+
+                    res.add(p); // adds posting to the list
+                    i++; // adds 1  to i;
+
+                    mPostings.seek(position);
+                }
+
+            }
+
+
+            return res;
+
+
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
+
+        return Collections.emptyList();
+    }
+
+    public List<Posting> getPositionalPostings(String term) {
+
+        List<Posting> res = new ArrayList<>();
+
+        try {
+
+            long position = binarySearchVocabulary(term);
+            System.out.println(position);
+
+            byte[] buffer = new byte[4]; // making  bytes
+
+            if (position < 0) {
+                return Collections.emptyList();
+            } else {
+                mPostings.seek(position);
+
+                mPostings.read(buffer, 0,4 ); //reading from first location of the term to end of the term
+                int numberOfDocs = ByteBuffer.wrap(buffer).getInt();
+
                 //position = position + 4; // to go to the next number
 
                 int i =0;
@@ -167,19 +232,19 @@ public class DiskInvertedIndex implements Index {
                     mPostings.read(buffer2, 0,4 ); //reading from first location of the term to end of the term
                     int DocId  = ByteBuffer.wrap(buffer2).getInt() + lastDocId;
                     lastDocId = DocId;
-                    
+
                     //position += 4;
                     //mPostings.seek(position);
                     mPostings.read(buffer2, 0,4 );
                     int termFreq = ByteBuffer.wrap(buffer2).getInt(); // getting number of positions of that term
 
-                  //  position += 4;
+                    //  position += 4;
                     //mPostings.seek(position);
                     mPostings.read(buffer2, 0,4 );
                     int termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
 
                     Posting p = new Posting(DocId, termPos); // creates the posting so
-                                                             // i just add the locations in the for loop
+                    // i just add the locations in the for loop
                     for(int j = 0; j < termFreq - 1; j++){
                         mPostings.read(buffer2, 0,4 );
                         termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
@@ -207,6 +272,8 @@ public class DiskInvertedIndex implements Index {
 
         return Collections.emptyList();
     }
+
+
 
 
     public List<String> getVocabulary() {
