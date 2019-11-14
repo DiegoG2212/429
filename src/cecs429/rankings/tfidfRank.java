@@ -19,7 +19,7 @@ public class tfidfRank implements RankFormula {
     }
 
     public tfidfRank(HashMap<String,Integer> x){
-        terms = x;
+       terms = x;
     }
 
     public tfidfRank(int t){
