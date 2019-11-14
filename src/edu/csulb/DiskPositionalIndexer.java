@@ -54,7 +54,7 @@ public class DiskPositionalIndexer {
     // File defStore = new File("src/DefaultDirectory.txt"); // Text file storing
     // Default Directory
     DocumentCorpus corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(directory).toAbsolutePath(), ".json");
-    //DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
+    // DocumentCorpus corpus = DirectoryCorpus.loadTextDirectory(Paths.get(directory).toAbsolutePath(), ".txt");
     String lastQuery = ""; // Saves last user query
     int queryCheck = 0;
 	Index index;
