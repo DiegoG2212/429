@@ -207,7 +207,7 @@ public class DiskInvertedIndex implements Index {
             } else {
                 mPostings.seek(position);
 
-                mPostings.read(buffer, 0, 8); //reading from first location of the term to end of the term
+                mPostings.read(buffer, 0, 4); //reading from first location of the term to end of the term
                 int numberOfDocs = ByteBuffer.wrap(buffer).getInt();
 
                 //position = position + 4; // to go to the next number

@@ -157,11 +157,13 @@ public class DiskIndexWriter {
 		List<Double> avgTFs = getAvgTFs();
 
 		for (int i = 0; i < holdLd.size(); i++) {
-			double Ld = Lds.get(i);
 
-			docWeightsOut.writeDouble(Ld);
+			docWeightsOut.writeDouble(Lds.get(i));
+//			docWeightsOut.writeDouble(docLengths.get(i));
+//			docWeightsOut.writeDouble(byteSizes.get(i));
+//			docWeightsOut.writeDouble(avgTFs.get(i));
 		}
-
+		//writeAverageDocLength(path, docLengths);
 		//docWeightsOut.writeDouble(Ld);
 		docWeightsOut.close();
 	}

@@ -81,16 +81,16 @@ public class PhraseLiteral implements QueryComponent {
 				while(i < mTerms.size()) {
 					if (i < 2) {
 						 
-						result = andPos(index.getPostings(mTerms.get(i)), index.getPostings(mTerms.get(i+1)));
+						result = andPos(index.getPositionalPostings(mTerms.get(i)), index.getPositionalPostings(mTerms.get(i+1)));
 						i = i + 2;
 						}else {
-							result = andPos(result, index.getPostings(mTerms.get(i)));
+							result = andPos(result, index.getPositionalPostings(mTerms.get(i)));
 							i++;
 						}
 				}
 				
 				
-			}else { result = index.getPostings(mTerms.get(0));}
+			}else { result = index.getPositionalPostings(mTerms.get(0));}
 			
 		}		
 		return result;

@@ -48,50 +48,57 @@ public class RankQuery implements QueryComponent{
             for( Posting p: index.getPostings(s) ){ // Calculate dft
                 dft ++;
             }
+            System.out.println("DFT Test:" +dft);
             double wqt = 0;
-            if(formulaSelect == 0) { // Default
-                wqt = rankC.calculateWqt(new DefaultRank(corpusSize, dft));
+            if(dft == 0){
+                System.out.println("uhoh");
             }
-            if(formulaSelect == 1) { // tf-idf
-                wqt = rankC.calculateWqt(new tfidfRank(corpusSize, dft));
-            }
-            if(formulaSelect == 2) { // OkapiBM25
-                wqt = rankC.calculateWqt(new OkapiRank(corpusSize, dft));
-            }
-            if(formulaSelect == 3) { // Wacky
-                wqt = rankC.calculateWqt(new WackyRank(corpusSize, dft));
+            else{
+                if(formulaSelect == 0) { // Default
+                    wqt = rankC.calculateWqt(new DefaultRank(corpusSize, dft));
+                }
+                if(formulaSelect == 1) { // tf-idf
+                    wqt = rankC.calculateWqt(new tfidfRank(corpusSize, dft));
+                }
+                if(formulaSelect == 2) { // OkapiBM25
+                    wqt = rankC.calculateWqt(new OkapiRank(corpusSize, dft));
+                }
+                if(formulaSelect == 3) { // Wacky
+                    wqt = rankC.calculateWqt(new WackyRank(corpusSize, dft));
+                }
+
+                // For each document d in t's posting list
+                for (Posting p : index.getPostings(s)) {
+                    // Calculate wdt
+                    int tftd = p.getPos().size();
+                    double wdt = 0;
+
+                    if(formulaSelect == 0) { // Default
+                        wdt = rankC.calculateWdt(new DefaultRank(tftd));
+                    }
+                    if(formulaSelect == 1) { // tf-idf
+                        wdt = rankC.calculateWdt(new tfidfRank(tftd));
+                    }
+                    if(formulaSelect == 2) { // OkapiBM25
+                        wdt = rankC.calculateWdt(new OkapiRank(tftd, tCount.get(p.getDocumentId()), tCount, corpusSize));
+                    }
+                    if(formulaSelect == 3) { // Wacky
+                        wdt = rankC.calculateWdt(new WackyRank(tftd, ave.get(p.getDocumentId()) ) );
+                    }
+
+                    // If accumulator exists for document
+                    if(acc.containsKey(p.getDocumentId()) ){
+                        double holdVal = acc.get(p.getDocumentId());
+                        holdVal += (wdt * wqt);
+                        acc.put(p.getDocumentId(), holdVal);
+                    }
+                    else{ // No accumulator yet
+                        double hold = (wdt * wqt);
+                        acc.put(p.getDocumentId(), hold);
+                    }
+                }
             }
 
-            // For each document d in t's posting list
-            for (Posting p : index.getPostings(s)) {
-                        // Calculate wdt
-                        int tftd = p.getPos().size();
-                        double wdt = 0;
-
-                        if(formulaSelect == 0) { // Default
-                            wdt = rankC.calculateWdt(new DefaultRank(tftd));
-                        }
-                        if(formulaSelect == 1) { // tf-idf
-                            wdt = rankC.calculateWdt(new tfidfRank(tftd));
-                        }
-                        if(formulaSelect == 2) { // OkapiBM25
-                           wdt = rankC.calculateWdt(new OkapiRank(tftd, tCount.get(p.getDocumentId()), tCount, corpusSize));
-                        }
-                        if(formulaSelect == 3) { // Wacky
-                            wdt = rankC.calculateWdt(new WackyRank(tftd, ave.get(p.getDocumentId()) ) );
-                        }
-
-                        // If accumulator exists for document
-                        if(acc.containsKey(p.getDocumentId()) ){
-                            double holdVal = acc.get(p.getDocumentId());
-                            holdVal += (wdt * wqt);
-                            acc.put(p.getDocumentId(), holdVal);
-                        }
-                        else{ // No accumulator yet
-                            double hold = (wdt * wqt);
-                            acc.put(p.getDocumentId(), hold);
-                        }
-            }
         } // End of Query loop
 
         // For each non-zero Ad, divide Ad by Ld ===============

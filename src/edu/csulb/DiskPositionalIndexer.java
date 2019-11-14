@@ -364,7 +364,7 @@ public class DiskPositionalIndexer {
 
     //
     public void updateDirectory(String dir) throws IOException { // Updates changes to corpus and index
-        DiskPositionalIndexer.this.corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),".json");
+        corpus = DirectoryCorpus.loadJsonDirectory(Paths.get(dir).toAbsolutePath(),".json");
         //DiskPositionalIndexer.this.corpus = DirectoryCorpus.loadTextDirectory(Paths.get(dir).toAbsolutePath(), ".txt");
 
         long startTime = System.nanoTime(); // Index Timer
@@ -505,6 +505,7 @@ public class DiskPositionalIndexer {
             //return tdi;
         }
         // Switches to DiskInvertedIndex after building/ already existed
+
         System.out.println("Index on Disk");
         tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
 
