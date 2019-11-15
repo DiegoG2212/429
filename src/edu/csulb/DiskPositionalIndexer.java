@@ -393,8 +393,8 @@ public class DiskPositionalIndexer {
             DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
 
 			// Lists for calculating each individual document's weightings
-			List<Double> docWeights = Collections.emptyList(); //Ld of each doc in Default & tfidf
-			List<Double> docLengths = Collections.emptyList();
+			List<Double> docWeights = new ArrayList<>(); //Ld of each doc in Default & tfidf
+			List<Double> docLengths = new ArrayList<>();
 			// List to get the average for term frequency of each term in the doc
 			List<Double> dAveTFtd = Collections.emptyList();
 
@@ -520,7 +520,7 @@ public class DiskPositionalIndexer {
         List<Long> result = new ArrayList<Long>();
 
         try (Stream<Path> walk = Files.walk(Paths.get(directory).toAbsolutePath(), 1)) {
-            result = walk.filter(f -> f.getFileName().toString().endsWith(".txt"))
+            result = walk.filter(f -> f.getFileName().toString().endsWith(".json"))
                     .map(p -> p.toFile().length())
                     .collect(Collectors.toList());
 

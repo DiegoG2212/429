@@ -12,11 +12,11 @@ import edu.csulb.PositionalInvertedIndexer;
 public class DiskIndexWriter {
 
 	public void WriteIndex(Index x, Path y) throws IOException {
-			writeVocabTable(y, x);
-			writeDocWeights(y, x);
+		writeVocabTable(y, x);
+		writeDocWeights(y, x);
 
 	}
-	
+
 	// postings.bin
 	private List<Long> writePostings(Path path, Index index) throws IOException {
 		System.out.println("Writing postings.bin ...");
@@ -24,8 +24,8 @@ public class DiskIndexWriter {
 
 		DataOutputStream postingsOut = new DataOutputStream(
 				new BufferedOutputStream(
-				new FileOutputStream(path + "/postings.bin")));	
-		
+						new FileOutputStream(path + "/postings.bin")));
+
 		List<String> t = index.getVocabulary();
 		long position = 0;
 
@@ -45,20 +45,20 @@ public class DiskIndexWriter {
 				for(int x: p.getPos()) {	// For every position
 					postingsOut.writeInt(x);	// Write position
 				}
-			}	
+			}
 		}
 		postingsOut.close();
 		return docPos;
 	}
-	
+
 	// vocab.bin encoded using UTF-8
 	private List<Long> writeVocab(Path path, Index index) throws IOException{
 		System.out.println("Writing vocab.bin ...");
 		List<Long> vocabPos = new ArrayList<>();
 		DataOutputStream vocabOut = new DataOutputStream(
 				new BufferedOutputStream(
-				new FileOutputStream(path + "/vocab.bin")));
-		
+						new FileOutputStream(path + "/vocab.bin")));
+
 		List<String> t = index.getVocabulary();	// Get vocab from index
 		long position = 0;
 
@@ -67,8 +67,8 @@ public class DiskIndexWriter {
 			vocabPos.add(position);
 			//System.out.println(position);
 			//System.out.println("Vocab: "+ i);
-            byte[] sbytes = i.getBytes("UTF-8");
-            vocabOut.write(sbytes);
+			byte[] sbytes = i.getBytes("UTF-8");
+			vocabOut.write(sbytes);
 		}
 		vocabOut.close();
 
@@ -95,7 +95,7 @@ public class DiskIndexWriter {
 
 			vtableOut.writeLong(vPos);
 			vtableOut.writeLong(dPos);
-			}
+		}
 
 		vtableOut.close();
 	}
@@ -155,13 +155,19 @@ public class DiskIndexWriter {
 		List<Double> docLengths = getDocLengths();
 		List<Double> byteSizes = getByteSizes();
 		List<Double> avgTFs = getAvgTFs();
+/*
+		System.out.println(Lds.size());
+		System.out.println(docLengths.size());
+		System.out.println(byteSizes.size());
+		System.out.println(avgTFs.size());
+
+ */
 
 		for (int i = 0; i < holdLd.size(); i++) {
-
 			docWeightsOut.writeDouble(Lds.get(i));
-//			docWeightsOut.writeDouble(docLengths.get(i));
-//			docWeightsOut.writeDouble(byteSizes.get(i));
-//			docWeightsOut.writeDouble(avgTFs.get(i));
+			docWeightsOut.writeDouble(docLengths.get(i));
+			docWeightsOut.writeDouble(byteSizes.get(i));
+			docWeightsOut.writeDouble(avgTFs.get(i));
 		}
 		//writeAverageDocLength(path, docLengths);
 		//docWeightsOut.writeDouble(Ld);
