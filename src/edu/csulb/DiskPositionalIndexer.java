@@ -251,7 +251,7 @@ public class DiskPositionalIndexer {
 
                             if (modeSelect == 1) {
                                 System.out.println("Ranked Retrieval Parse");
-                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect, tFrequency, aveTFrequency);
+                                q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect);
                             }
 
 
@@ -471,6 +471,7 @@ public class DiskPositionalIndexer {
 
 				writeDisk.addAvgTFs(aveCalc);
 				writeDisk.addDocLength(atSum);
+
                 // Calculate Ld
                 if (formulaSelect == 0) { // Default
 					writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
@@ -525,6 +526,7 @@ public class DiskPositionalIndexer {
                     .collect(Collectors.toList());
 
             for (Long l : result) {
+                System.out.println();
                 System.out.println(l);
             }
         } catch (IOException i) {

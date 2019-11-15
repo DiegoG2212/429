@@ -23,22 +23,18 @@ public class RankQuery implements QueryComponent{
     RankCalculator rankC = new RankCalculator();
     int formulaSelect = 0;
     DocumentCorpus corpus;
-    HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>(); // <DocID, # of tokens>
-    HashMap<Integer, Double> ave = new HashMap<Integer, Double>(); // <DocID, Ave>
+
     List<String> query = new ArrayList<>();
 
-    public RankQuery(List<String> phr, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
+    public RankQuery(List<String> phr, DocumentCorpus c, int formSel) {
         query = phr;
         corpusSize = c.getCorpusSize();
         formulaSelect = formSel;
         corpus = c;
-        tCount = tokCount;
-        ave = a;
     }
 
     /* @Override */
     public List<Posting> getPostings(Index index) {
-        List<Posting> result = new ArrayList<Posting>();
         // <DocID, Ad>
         HashMap<Integer, Double> acc = new HashMap<Integer, Double>();
 
@@ -49,10 +45,10 @@ public class RankQuery implements QueryComponent{
             for( Posting p: index.getPostings(s) ){ // Calculate dft
                 dft ++;
             }
-            System.out.println("DFT Test:" +dft);
+            //System.out.println("DFT Test:" +dft);
             double wqt = 0;
             if(dft == 0){
-                System.out.println("uhoh");
+                //System.out.println("uhoh");
             }
             else{
                 if(formulaSelect == 0) { // Default
@@ -81,10 +77,10 @@ public class RankQuery implements QueryComponent{
                         wdt = rankC.calculateWdt(new tfidfRank(tftd));
                     }
                     if(formulaSelect == 2) { // OkapiBM25
-                        wdt = rankC.calculateWdt(new OkapiRank(tftd, tCount.get(p.getDocumentId()), tCount, corpusSize));
+                        wdt = rankC.calculateWdt(new OkapiRank(tftd, index.getDocLengths().get(p.getDocumentId()), index.getDocLengthAvg() ));
                     }
                     if(formulaSelect == 3) { // Wacky
-                        wdt = rankC.calculateWdt(new WackyRank(tftd, ave.get(p.getDocumentId()) ) );
+                        wdt = rankC.calculateWdt(new WackyRank(tftd, index.getAvgTFtds().get(p.getDocumentId())  ));
                     }
 
                     // If accumulator exists for document
@@ -115,39 +111,63 @@ public class RankQuery implements QueryComponent{
 
 
 
-        // Sort and return Top 10 ==============================
-        // Create Binary Heap Priority Queue
+        // Sort and return Top 10 =========================================================
+
+
+
+//
+//        // Create Binary Heap Priority Queue
+//        PriorityQueue<Map.Entry<Integer, Double>> queue
+//                = new PriorityQueue<>(Comparator.comparing(e -> e.getValue()));
+//
+//        // Get the top 10
+//        int k = 10;
+//        for (Map.Entry<Integer, Double> entry : acc.entrySet()) {
+//            queue.offer(entry);
+//            if (queue.size() > k) {
+//                queue.poll();
+//            }
+//        }
+//
+//        // Scan
+//        HashMap<Integer, Double> r = new HashMap<Integer,Double>();
+//        while (queue.size() > 0) {
+//            Integer h = queue.poll().getKey();
+//            r.put(h, acc.get(h));
+//        }
+//        //System.out.println(r);
+//
+//
+//        // For the Top 10 results
+//        // int count = 1;
+//
+//        for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
+//            Posting newP = new Posting(entry.getKey(),entry.getValue()); // Create new posting with DocID
+//            result.add(newP);
+//            //System.out.println("At: " +count);
+//            //count++;
+//        }
+
+
+
+
         PriorityQueue<Map.Entry<Integer, Double>> queue
-                = new PriorityQueue<>(Comparator.comparing(e -> e.getValue()));
+                = new PriorityQueue<>(Comparator.comparing(e -> e.getValue(), Collections.reverseOrder()));
 
-        // Get the top 10
-        int k = 10;
+        // Add to Priority Queue
         for (Map.Entry<Integer, Double> entry : acc.entrySet()) {
-            queue.offer(entry);
-            if (queue.size() > k) {
-                queue.poll();
-            }
+            System.out.println("Offer check: "+queue.offer(entry));
         }
 
-        // Scan
-        HashMap<Integer, Double> r = new HashMap<Integer,Double>();
-        while (queue.size() > 0) {
-            Integer h = queue.poll().getKey();
-            r.put(h, acc.get(h));
-        }
-        //System.out.println(r);
-
-
-        // For the Top 10 results
-        //int count = 1;
-
-        for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
-            Posting newP = new Posting(entry.getKey(),entry.getValue()); // Create new posting with DocID
+        List<Posting> result = new ArrayList<Posting>();
+        int count = 0;
+        int qSize = queue.size();
+        while (count < 10 && count < qSize) {
+            Posting newP = new Posting(queue.peek().getKey(), queue.peek().getValue());
             result.add(newP);
-            //System.out.println("At: " +count);
-            //count++;
+            queue.remove();
+            count++;
         }
-
 
         return result;
     } // End of getPostings

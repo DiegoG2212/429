@@ -81,5 +81,9 @@ public class DiskPositionalIndex implements Index {
     public List<Double> getLds(){
 	    return null;
     }
+    public List<Double> getDocLengths(){return null;};
+    public List<Double> getByteSizes(){return null;};
+    public List<Double> getAvgTFtds(){return null;};
+    public double getDocLengthAvg(){return 0;};
 
 }

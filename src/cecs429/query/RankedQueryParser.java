@@ -11,7 +11,7 @@ public class RankedQueryParser {
     /**
      * Given a boolean query, parses and returns a tree of QueryComponents representing the query.
      */
-    public QueryComponent parseQuery(String query, DocumentCorpus c, int formulaSelect, HashMap<Integer,Integer> tCount, HashMap<Integer, Double> ave) {
+    public QueryComponent parseQuery(String query, DocumentCorpus c, int formulaSelect) {
         System.out.println("Inside Ranked Retrieval");
 
         BetterTokenProcessor proc = new BetterTokenProcessor();
@@ -19,7 +19,6 @@ public class RankedQueryParser {
         String[] q = query.split("\\s+");
         List<String> tem = new ArrayList<>();
         List<String> phr = new ArrayList<>();
-        int count = 0;
         for(String s: q) {
             System.out.println("String: " +s);
             tem = new BetterTokenProcessor().processToken(s);
@@ -29,7 +28,7 @@ public class RankedQueryParser {
             }
         }
 
-        return new RankQuery(phr, c, formulaSelect, tCount, ave);
+        return new RankQuery(phr, c, formulaSelect);
     }
 
 }

@@ -164,14 +164,20 @@ public class DiskIndexWriter {
  */
 
 		for (int i = 0; i < holdLd.size(); i++) {
+
+			System.out.println("LD Check: " +Lds.get(i));
 			docWeightsOut.writeDouble(Lds.get(i));
+			System.out.println("docLengthd Check: " +docLengths.get(i));
 			docWeightsOut.writeDouble(docLengths.get(i));
+			System.out.println("byteSize Check: " +byteSizes.get(i));
 			docWeightsOut.writeDouble(byteSizes.get(i));
+			System.out.println("ave(tftd) Check: " +avgTFs.get(i));
 			docWeightsOut.writeDouble(avgTFs.get(i));
 		}
-		//writeAverageDocLength(path, docLengths);
+
 		//docWeightsOut.writeDouble(Ld);
 		docWeightsOut.close();
+		writeAverageDocLength(path, docLengths);
 	}
 
 	private void writeAverageDocLength(Path path, List<Double> docLengths) throws IOException {
@@ -185,6 +191,7 @@ public class DiskIndexWriter {
 		}
 
 		avg /= docLengths.size();
+		System.out.println("DocLengthAvg Check: "+avg);
 		aveLength.writeDouble(avg);
 
 		aveLength.close();

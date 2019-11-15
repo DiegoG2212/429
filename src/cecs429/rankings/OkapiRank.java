@@ -15,14 +15,15 @@ public class OkapiRank implements RankFormula {
     }
 
     int tftd = 0;
-    int tokenCount = 0;
-    HashMap<Integer, Integer> tokenAll = new HashMap<Integer, Integer>();
-    public OkapiRank(int t, int tC, HashMap<Integer,Integer> tAll, int c){
-        corpusSize = c;
+    double docLengthd = 0;
+    double docLengthA = 0;
+    //HashMap<Integer, Integer> tokenAll = new HashMap<Integer, Integer>();
+    public OkapiRank(int t, double dld, double dla){
         tftd = t;
-        tokenCount = tC;
-        tokenAll = tAll;
+        docLengthd = dld;
+        docLengthA = dla;
     }
+
 
     @Override
     public double getWqt() {
@@ -32,13 +33,15 @@ public class OkapiRank implements RankFormula {
 
     @Override
     public double getWdt() {
+        /*
         double docLenA = 0;
         for(double s: tokenAll.values()){ // Add all doc token counts
             docLenA += s;
         }
         docLenA = docLenA/ tokenAll.size();
+         */
 
-        double calc = (2.2 * tftd) / ( 1.2 * ( 0.25 + 0.75 * (tokenCount/ docLenA) + tftd) );
+        double calc = (2.2 * tftd) / ( 1.2 * ( 0.25 + 0.75 * (docLengthd/ docLengthA) + tftd) );
         return calc;
     }
 

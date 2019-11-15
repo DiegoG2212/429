@@ -27,7 +27,7 @@ public class DiskInvertedIndex implements Index {
             mVocabList = new RandomAccessFile(new File(path.toString(), "vocab.bin"), "r");
             mPostings = new RandomAccessFile(new File(path.toString(), "postings.bin"), "r");
             mDocWeights = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
-            mDocLengthAvg = new RandomAccessFile(new File(path.toString(), "docWeights.bin"), "r");
+            mDocLengthAvg = new RandomAccessFile(new File(path.toString(), "avgLength.bin"), "r");
             mVocabTable = readVocabTable(mPath);
             //mFileNames = readFileNames(path);
         }
@@ -321,7 +321,7 @@ public class DiskInvertedIndex implements Index {
             //Position for traversal
             long pos = 0;
             mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length(); i++) {
+            for (int i = 0; i < mDocWeights.length()/32; i++) {
                 mDocWeights.read(buffer, 0, 8);
                 pos += 32;
                 double docLength = ByteBuffer.wrap(buffer).getDouble();
@@ -339,13 +339,13 @@ public class DiskInvertedIndex implements Index {
     // Gets all docLength variables
     public List<Double> getDocLengths() {
         try {
-            List<Double> Lds = Collections.emptyList();
+            List<Double> Lds = new ArrayList<>();
             byte[] buffer = new byte[8];
 
             //Position for traversal
             long pos = 8;
             mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length(); i++) {
+            for (int i = 0; i < mDocWeights.length()/32; i++) {
                 mDocWeights.read(buffer, 0, 8);
                 pos += 32;
                 double docLength = ByteBuffer.wrap(buffer).getDouble();
@@ -363,13 +363,13 @@ public class DiskInvertedIndex implements Index {
     //Gets all byteSize variables
     public List<Double> getByteSizes() {
         try {
-            List<Double> Lds = Collections.emptyList();
+            List<Double> Lds = new ArrayList<>();
             byte[] buffer = new byte[8];
 
             //Position for traversal
             long pos = 16;
             mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length(); i++) {
+            for (int i = 0; i < mDocWeights.length()/32; i++) {
                 mDocWeights.read(buffer, 0, 8);
                 pos += 32;
                 double docLength = ByteBuffer.wrap(buffer).getDouble();
@@ -387,13 +387,13 @@ public class DiskInvertedIndex implements Index {
     //Gets all
     public List<Double> getAvgTFtds() {
         try {
-            List<Double> Lds = Collections.emptyList();
+            List<Double> Lds = new ArrayList<>();
             byte[] buffer = new byte[8];
 
             //Position for traversal
             long pos = 24;
             mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length(); i++) {
+            for (int i = 0; i < mDocWeights.length()/32; i++) {
                 mDocWeights.read(buffer, 0, 8);
                 pos += 32;
                 double docLength = ByteBuffer.wrap(buffer).getDouble();
@@ -410,6 +410,8 @@ public class DiskInvertedIndex implements Index {
 
     public double getDocLengthAvg() {
         try {
+            long pos = 0;
+            mDocLengthAvg.seek(pos);
             byte[] buffer = new byte[8];
 
             mDocLengthAvg.read(buffer, 0, 8);
