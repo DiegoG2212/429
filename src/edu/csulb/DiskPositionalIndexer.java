@@ -241,7 +241,7 @@ public class DiskPositionalIndexer {
                                 }
                             }
                             System.out.println(combine);
-                            System.out.println("HELP");
+                            //System.out.println("HELP");
 
                             int docCount = 0;
                             if (modeSelect == 0) {
@@ -393,13 +393,14 @@ public class DiskPositionalIndexer {
             DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
 
 			// Lists for calculating each individual document's weightings
-			List<Double> docWeights = Collections.emptyList(); //Ld of each doc in Default & tfidf
-			List<Double> docLengths = Collections.emptyList();
+			List<Double> docWeights = new ArrayList<>(); //Ld of each doc in Default & tfidf
+			List<Double> docLengths = new ArrayList<>();
 			// List to get the average for term frequency of each term in the doc
 			List<Double> dAveTFtd = Collections.emptyList();
 
             // Loops through documents
             for (Document d : corpus.getDocuments()) {
+                System.out.println("At Document: " +d.getId());
                 int x = 0; // Reset counter for positions
                 // Creates tokens by splitting on whitespace
                 EnglishTokenStream stream = new EnglishTokenStream(d.getContent());
@@ -519,7 +520,7 @@ public class DiskPositionalIndexer {
         List<Long> result = new ArrayList<Long>();
 
         try (Stream<Path> walk = Files.walk(Paths.get(directory).toAbsolutePath(), 1)) {
-            result = walk.filter(f -> f.getFileName().toString().endsWith(".txt"))
+            result = walk.filter(f -> f.getFileName().toString().endsWith(".json"))
                     .map(p -> p.toFile().length())
                     .collect(Collectors.toList());
 

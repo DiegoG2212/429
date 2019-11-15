@@ -19,15 +19,16 @@ public class RankQuery implements QueryComponent{
 
     //private List<String> query;
     private Path path;
-    String[] query = {};
+    //String[] query = {};
     RankCalculator rankC = new RankCalculator();
     int formulaSelect = 0;
     DocumentCorpus corpus;
     HashMap<Integer, Integer> tCount = new HashMap<Integer, Integer>(); // <DocID, # of tokens>
     HashMap<Integer, Double> ave = new HashMap<Integer, Double>(); // <DocID, Ave>
+    List<String> query = new ArrayList<>();
 
-    public RankQuery(String[] r, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
-        query = r;
+    public RankQuery(List<String> phr, DocumentCorpus c, int formSel, HashMap<Integer,Integer> tokCount, HashMap<Integer,Double> a) {
+        query = phr;
         corpusSize = c.getCorpusSize();
         formulaSelect = formSel;
         corpus = c;
