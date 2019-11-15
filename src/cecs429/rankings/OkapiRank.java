@@ -41,8 +41,7 @@ public class OkapiRank implements RankFormula {
         docLenA = docLenA/ tokenAll.size();
          */
 
-        double calc = (2.2 * tftd) / ( 1.2 * ( 0.25 + 0.75 * (docLengthd/ docLengthA) + tftd) );
-        return calc;
+        return (2.2 * tftd) / ( 1.2 * ( 0.25 + 0.75 * (docLengthd/ docLengthA) + tftd) );
     }
 
     @Override

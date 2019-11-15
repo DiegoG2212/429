@@ -335,77 +335,84 @@ public class DiskInvertedIndex implements Index {
         }
         return null;
     }
+//
+//    // Gets all docLength variables
+//    public List<Double> getDocLengths() {
+//        try {
+//            List<Double> Lds = new ArrayList<>();
+//            byte[] buffer = new byte[8];
+//
+//            //Position for traversal
+//            long pos = 8;
+//            mDocWeights.seek(pos);
+//            for (int i = 0; i < mDocWeights.length()/32; i++) {
+//                mDocWeights.read(buffer, 0, 8);
+//                pos += 32;
+//                double docLength = ByteBuffer.wrap(buffer).getDouble();
+//
+//                Lds.add(docLength);
+//                mDocWeights.seek(pos);
+//            }
+//            return Lds;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     // Gets all docLength variables
-    public List<Double> getDocLengths() {
+    public double getDocLengths(int docID) {
         try {
-            List<Double> Lds = new ArrayList<>();
             byte[] buffer = new byte[8];
-
             //Position for traversal
             long pos = 8;
-            mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length()/32; i++) {
-                mDocWeights.read(buffer, 0, 8);
-                pos += 32;
-                double docLength = ByteBuffer.wrap(buffer).getDouble();
-
-                Lds.add(docLength);
-                mDocWeights.seek(pos);
-            }
-            return Lds;
+            mDocWeights.seek(pos + (docID * 32) );
+            mDocWeights.read(buffer, 0, 8);
+            double docLength = ByteBuffer.wrap(buffer).getDouble();
+            return docLength;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 
+
     //Gets all byteSize variables
-    public List<Double> getByteSizes() {
+    public double getByteSizes(int docID) {
         try {
-            List<Double> Lds = new ArrayList<>();
             byte[] buffer = new byte[8];
 
             //Position for traversal
             long pos = 16;
-            mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length()/32; i++) {
-                mDocWeights.read(buffer, 0, 8);
-                pos += 32;
-                double docLength = ByteBuffer.wrap(buffer).getDouble();
+            mDocWeights.seek(pos + (docID * 32) );
+            mDocWeights.read(buffer, 0, 8);
+            double byteSize = ByteBuffer.wrap(buffer).getDouble();
 
-                Lds.add(docLength);
-                mDocWeights.seek(pos);
-            }
-            return Lds;
+            return byteSize;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 
     //Gets all
-    public List<Double> getAvgTFtds() {
+    public double getAvgTFtds(int docID) {
         try {
-            List<Double> Lds = new ArrayList<>();
+
             byte[] buffer = new byte[8];
 
             //Position for traversal
             long pos = 24;
-            mDocWeights.seek(pos);
-            for (int i = 0; i < mDocWeights.length()/32; i++) {
-                mDocWeights.read(buffer, 0, 8);
-                pos += 32;
-                double docLength = ByteBuffer.wrap(buffer).getDouble();
+            mDocWeights.seek(pos + (docID * 32) );
+            mDocWeights.read(buffer, 0, 8);
+            double avgtftd = ByteBuffer.wrap(buffer).getDouble();
+            return avgtftd;
 
-                Lds.add(docLength);
-                mDocWeights.seek(pos);
-            }
-            return Lds;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 
     public double getDocLengthAvg() {

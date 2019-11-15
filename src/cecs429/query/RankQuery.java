@@ -48,9 +48,10 @@ public class RankQuery implements QueryComponent{
             //System.out.println("DFT Test:" +dft);
             double wqt = 0;
             if(dft == 0){
-                //System.out.println("uhoh");
+                System.out.println("No Postings for: "+s);
             }
             else{
+                System.out.println("Calculating wqt for: " +s);
                 if(formulaSelect == 0) { // Default
                     wqt = rankC.calculateWqt(new DefaultRank(corpusSize, dft));
                 }
@@ -66,10 +67,12 @@ public class RankQuery implements QueryComponent{
 
                 // For each document d in t's posting list
                 for (Posting p : index.getPostings(s)) {
+                    System.out.println("For postings: " +s);
                     // Calculate wdt
                     int tftd = p.getPos().size();
                     double wdt = 0;
 
+                    System.out.println("Calculating wdt for: " +s);
                     if(formulaSelect == 0) { // Default
                         wdt = rankC.calculateWdt(new DefaultRank(tftd));
                     }
@@ -77,19 +80,21 @@ public class RankQuery implements QueryComponent{
                         wdt = rankC.calculateWdt(new tfidfRank(tftd));
                     }
                     if(formulaSelect == 2) { // OkapiBM25
-                        wdt = rankC.calculateWdt(new OkapiRank(tftd, index.getDocLengths().get(p.getDocumentId()), index.getDocLengthAvg() ));
+                        wdt = rankC.calculateWdt(new OkapiRank(tftd, index.getDocLengths(p.getDocumentId()), index.getDocLengthAvg() ));
                     }
                     if(formulaSelect == 3) { // Wacky
-                        wdt = rankC.calculateWdt(new WackyRank(tftd, index.getAvgTFtds().get(p.getDocumentId())  ));
+                        wdt = rankC.calculateWdt(new WackyRank(tftd, index.getAvgTFtds(p.getDocumentId())));
                     }
 
                     // If accumulator exists for document
                     if(acc.containsKey(p.getDocumentId()) ){
+                        System.out.println("Accumulator exists for: " +p.getDocumentId());
                         double holdVal = acc.get(p.getDocumentId());
                         holdVal += (wdt * wqt);
                         acc.put(p.getDocumentId(), holdVal);
                     }
                     else{ // No accumulator yet
+                        System.out.println("No Accumulator yet for: " +p.getDocumentId());
                         double hold = (wdt * wqt);
                         acc.put(p.getDocumentId(), hold);
                     }
@@ -99,6 +104,7 @@ public class RankQuery implements QueryComponent{
         } // End of Query loop
 
         // For each non-zero Ad, divide Ad by Ld ===============
+        System.out.println("For each non-zero Ad, divided by Ld");
         List<Double> LdList = index.getLds();
         int i = 0;
         for (HashMap.Entry<Integer, Double> scan : acc.entrySet()) {
@@ -111,7 +117,7 @@ public class RankQuery implements QueryComponent{
                     calc = scan.getValue();
                 }
                 if(formulaSelect == 3){ // Wacky
-                    double bCalc = scan.getValue()/ rankC.calculateLd(new WackyRank( index.getByteSizes().get(scan.getKey()) ));
+                    double bCalc = scan.getValue()/ rankC.calculateLd(new WackyRank( index.getByteSizes(scan.getKey()) ));
                     calc = bCalc;
                 }
 
@@ -120,10 +126,11 @@ public class RankQuery implements QueryComponent{
             }
         }
 
-
+        System.out.println("Finished dividing Ld ...");
 
         // Sort and return Top 10 =========================================================
 
+        System.out.println("Sorting and returning Top 10 ...");
         PriorityQueue<Map.Entry<Integer, Double>> queue
                 = new PriorityQueue<>(Comparator.comparing(e -> e.getValue(), Collections.reverseOrder()));
 
@@ -142,7 +149,7 @@ public class RankQuery implements QueryComponent{
             queue.remove();
             count++;
         }
-
+        System.out.println("Finished sorting and returning Top 10...");
         return result;
     } // End of getPostings
 }

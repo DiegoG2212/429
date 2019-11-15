@@ -70,9 +70,9 @@ public class PositionalInvertedIndex implements Index {
 		return null;
 	}
 
-	public List<Double> getDocLengths(){return null;}
-	public List<Double> getByteSizes(){return null;}
-	public List<Double> getAvgTFtds(){return null;}
+	public double getDocLengths(int docID){return 0;}
+	public double getByteSizes(int docID){return 0;}
+	public double getAvgTFtds(int docID){return 0;}
 	public double getDocLengthAvg(){return 0;}
 
 }

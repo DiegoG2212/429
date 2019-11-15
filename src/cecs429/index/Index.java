@@ -35,8 +35,8 @@ public interface Index {
 	 *
 	 */
 	public List<Double> getLds();
-	public List<Double> getDocLengths();
-	public List<Double> getByteSizes();
-	public List<Double> getAvgTFtds();
+	public double getDocLengths(int docID);
+	public double getByteSizes(int docID);
+	public double getAvgTFtds(int docID);
 	public double getDocLengthAvg();
 }
