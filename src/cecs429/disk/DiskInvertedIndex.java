@@ -163,14 +163,11 @@ public class DiskInvertedIndex implements Index {
                     int termFreq = ByteBuffer.wrap(buffer2).getInt(); // getting number of positions of that term
                     position = position + 4;
                   //  position += 4;
-                    //mPostings.seek(position);
-                    mPostings.read(buffer2, 0,4 );
-                    int termPos = ByteBuffer.wrap(buffer2).getInt(); // getting the locations of the term in the doc.
-                    position = position + 4;
+                    //mPostings.seek(position)
 
-                    Posting p = new Posting(DocId, termPos); // creates the posting so
+                    Posting p = new Posting(DocId, termFreq); // creates the posting so
                                                              // i just add the locations in the for loop
-                    position += (long) (termFreq -1)*4;
+                    position += (long) (termFreq)*4;
 
                     res.add(p); // adds posting to the list
                     i++; // adds 1  to i;

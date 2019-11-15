@@ -32,13 +32,14 @@ public class DefaultRank implements RankFormula {
     @Override
     public double getWqt() {
         //return Math.log(1 + (double)(corpusSize / i.getPostings(term).size()));
-        double calc1 = corpusSize/ documentFreq;
+        double calc1 = (double)corpusSize/ documentFreq;
         return Math.log(1 + calc1);
     }
 
     @Override
     public double getWdt() {
-        return (1 + Math.log(tftd)) ;
+        double s = tftd;
+        return (1 + Math.log(s)) ;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class RankQuery implements QueryComponent{
             for( Posting p: index.getPostings(s) ){ // Calculate dft
                 dft ++;
             }
-            //System.out.println("DFT Test:" +dft);
+            System.out.println("DFT Count:" +dft);
             double wqt = 0;
             if(dft == 0){
                 System.out.println("No Postings for: "+s);
@@ -65,11 +65,14 @@ public class RankQuery implements QueryComponent{
                     wqt = rankC.calculateWqt(new WackyRank(corpusSize, dft));
                 }
 
+                System.out.println("Wqt Check: "+wqt);
+
                 // For each document d in t's posting list
-                for (Posting p : index.getPostings(s)) {
+                for (Posting p : index.getPositionalPostings(s)) {
                     System.out.println("For postings: " +s);
                     // Calculate wdt
                     int tftd = p.getPos().size();
+                    System.out.println("tftd for Wdt Calc Check: "+tftd);
                     double wdt = 0;
 
                     System.out.println("Calculating wdt for: " +s);
@@ -85,6 +88,7 @@ public class RankQuery implements QueryComponent{
                     if(formulaSelect == 3) { // Wacky
                         wdt = rankC.calculateWdt(new WackyRank(tftd, index.getAvgTFtds(p.getDocumentId())));
                     }
+                    System.out.println("Wdt Check: "+wdt);
 
                     // If accumulator exists for document
                     if(acc.containsKey(p.getDocumentId()) ){

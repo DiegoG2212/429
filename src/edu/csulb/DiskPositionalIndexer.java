@@ -428,7 +428,7 @@ public class DiskPositionalIndexer {
                         token3.add(temp);
                         tdi.addTerm(token3, d.getId(), x);
                         // Doc Weight Work ===================================================
-                        for (String b : token3) {
+                        /*for (String b : token3) {
                             if (terms.containsKey(b)) {
                                 int valHold = terms.get(b); // Take value
                                 valHold++; // Increment counter by 1
@@ -436,7 +436,7 @@ public class DiskPositionalIndexer {
                             } else { // Term doesn't currently exist
                                 terms.put(b, 1); // Give count of 1
                             }
-                        }
+                        }*/
                         // ====================================================================
                         token2.remove(0);
                     }
