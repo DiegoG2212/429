@@ -265,7 +265,7 @@ public class DiskPositionalIndexer {
 
                             for (Posting p : q.getPostings(index)) {
 
-                                results.append("Document: " +p.getDocumentId()+ "\n");
+                                results.append("Document: " +corpus.getDocument(p.getDocumentId()).getTitle()+ "\n");
 
                                 if(modeSelect == 1){
                                     results.append("Accumulator: " +p.getAccumulator());
@@ -505,6 +505,9 @@ public class DiskPositionalIndexer {
 
             // Return Index
             //return tdi;
+        }
+        else{
+            corpus.getDocuments();
         }
         // Switches to DiskInvertedIndex after building/ already existed
 
