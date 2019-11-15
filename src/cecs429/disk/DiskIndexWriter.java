@@ -159,9 +159,9 @@ public class DiskIndexWriter {
 		for (int i = 0; i < holdLd.size(); i++) {
 
 			docWeightsOut.writeDouble(Lds.get(i));
-//			docWeightsOut.writeDouble(docLengths.get(i));
-//			docWeightsOut.writeDouble(byteSizes.get(i));
-//			docWeightsOut.writeDouble(avgTFs.get(i));
+			docWeightsOut.writeDouble(docLengths.get(i));
+			docWeightsOut.writeDouble(byteSizes.get(i));
+			docWeightsOut.writeDouble(avgTFs.get(i));
 		}
 		//writeAverageDocLength(path, docLengths);
 		//docWeightsOut.writeDouble(Ld);
