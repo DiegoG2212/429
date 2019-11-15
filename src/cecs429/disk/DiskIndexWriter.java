@@ -155,17 +155,18 @@ public class DiskIndexWriter {
 		List<Double> docLengths = getDocLengths();
 		List<Double> byteSizes = getByteSizes();
 		List<Double> avgTFs = getAvgTFs();
-/*
+
+		System.out.println("Size Check: ");
 		System.out.println(Lds.size());
 		System.out.println(docLengths.size());
 		System.out.println(byteSizes.size());
 		System.out.println(avgTFs.size());
+		System.out.println("End Size Check =============");
 
- */
 
 		for (int i = 0; i < holdLd.size(); i++) {
 
-			System.out.println("LD Check: " +Lds.get(i));
+			System.out.println("docWeightsd Check: " +Lds.get(i));
 			docWeightsOut.writeDouble(Lds.get(i));
 			System.out.println("docLengthd Check: " +docLengths.get(i));
 			docWeightsOut.writeDouble(docLengths.get(i));

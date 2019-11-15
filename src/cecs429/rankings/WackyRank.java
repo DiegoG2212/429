@@ -20,6 +20,11 @@ public class WackyRank implements RankFormula {
         ave = a;
     }
 
+    double byteSize = 0;
+    public WackyRank(double bSize){
+        byteSize = bSize;
+    }
+
 
     @Override
     public double getWqt() {
@@ -35,6 +40,6 @@ public class WackyRank implements RankFormula {
 
     @Override
     public double getLd() {
-        return 0;
+        return Math.sqrt(byteSize);
     }
 }

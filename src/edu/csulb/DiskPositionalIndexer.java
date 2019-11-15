@@ -68,11 +68,6 @@ public class DiskPositionalIndexer {
 	//Ranking formula selection
     RankCalculator rankSelect = new RankCalculator();
 
-    // Token Counter use
-    HashMap<Integer, Integer> tFrequency = new HashMap<Integer, Integer>();
-
-    // Average Token Counter use
-    HashMap<Integer, Double> aveTFrequency = new HashMap<Integer, Double>();
 
     public DiskPositionalIndexer() throws Exception {
         query();
@@ -386,17 +381,11 @@ public class DiskPositionalIndexer {
 
     private Index indexCorpus(DocumentCorpus corpus) throws IOException {
         BetterTokenProcessor processor = new BetterTokenProcessor();
+        DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
         Index tdi;
         if (Files.exists(Paths.get(directory + "/index/vocabTable.bin").toAbsolutePath()) == false) { // If index folder doesn't exist
             System.out.println("Writing Index to Disk...");
             tdi = new PositionalInvertedIndex();
-            DiskIndexWriter writeDisk = new DiskIndexWriter(); // Writes index to disk
-
-			// Lists for calculating each individual document's weightings
-			List<Double> docWeights = new ArrayList<>(); //Ld of each doc in Default & tfidf
-			List<Double> docLengths = new ArrayList<>();
-			// List to get the average for term frequency of each term in the doc
-			List<Double> dAveTFtd = Collections.emptyList();
 
             // Loops through documents
             for (Document d : corpus.getDocuments()) {
@@ -412,13 +401,9 @@ public class DiskPositionalIndexer {
 				// List of Wdts to calculate the Ld of each doc
 				List<Double> Wdts = new ArrayList<Double>();
 
-                // Count frequency of tokens for each doc
-                int tokenFrequency = 0;
-
                 // Adds term to index along with Document ID
                 for (String token : stream.getTokens()) {    // Go through each token
                     // Increment token counter each time
-                    tokenFrequency++;
                     // Add processed token
                     tdi.addTerm(processor.processToken(token), d.getId(), x);
                     //System.out.println(processor.processToken(token));
@@ -458,8 +443,7 @@ public class DiskPositionalIndexer {
                     x++;
                 }
 
-                // Save Token Frequency
-                tFrequency.put(d.getId(), terms.size());
+
 
                 // Save Average Token Frequency
                 double atSum = 0;
@@ -467,22 +451,21 @@ public class DiskPositionalIndexer {
                     atSum += s;
                 }
                 double aveCalc = atSum / terms.size();
-                aveTFrequency.put(d.getId(), aveCalc);
+
 
 				writeDisk.addAvgTFs(aveCalc);
 				writeDisk.addDocLength(atSum);
 
-                // Calculate Ld
-                if (formulaSelect == 0) { // Default
-					writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
-				}
-                if (formulaSelect == 1) { // tf-idf
-					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank(terms)));
-				}
-                if (formulaSelect == 2) { // OkapiBM25
-					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
-				}
+                // Calculate docWeightsd
 
+                writeDisk.addDocWeight(rankSelect.calculateLd(new DefaultRank(terms)));
+
+//                if (formulaSelect == 1) { // tf-idf
+//					writeDisk.addDocWeight(rankSelect.calculateLd(new tfidfRank(terms)));
+//				}
+//                if (formulaSelect == 2) { // OkapiBM25
+//					writeDisk.addDocWeight(rankSelect.calculateLd(new OkapiRank()));
+//				}
 
                 try {
                     stream.close();
@@ -495,8 +478,6 @@ public class DiskPositionalIndexer {
 			List<Long> dBytes = getByteSizes();
 			for (Long s : dBytes) {
 				double byteGet = (double) s;
-				if (formulaSelect == 3)
-					writeDisk.addDocWeight(Math.sqrt(byteGet));
 				writeDisk.addByteSize(byteGet);
 			}
 
@@ -509,8 +490,9 @@ public class DiskPositionalIndexer {
         else{
             corpus.getDocuments();
         }
-        // Switches to DiskInvertedIndex after building/ already existed
 
+
+        // Switches to DiskInvertedIndex after building/ already existed
         System.out.println("Index on Disk");
         tdi = new DiskInvertedIndex(Paths.get(directory + "/index").toAbsolutePath());
 

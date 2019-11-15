@@ -103,7 +103,18 @@ public class RankQuery implements QueryComponent{
         int i = 0;
         for (HashMap.Entry<Integer, Double> scan : acc.entrySet()) {
             if (scan.getValue() != 0){
-                double calc = scan.getValue() / LdList.get(i);
+                double calc = 0;
+                if(formulaSelect == 0 || formulaSelect == 1) { // Default / tf-idf
+                    calc = scan.getValue() / LdList.get(scan.getKey());
+                }
+                if(formulaSelect == 2){ // OkapiBM25
+                    calc = scan.getValue();
+                }
+                if(formulaSelect == 3){ // Wacky
+                    double bCalc = scan.getValue()/ rankC.calculateLd(new WackyRank( index.getByteSizes().get(scan.getKey()) ));
+                    calc = bCalc;
+                }
+
                 i++;
                 acc.put(scan.getKey(),calc);
             }
@@ -113,50 +124,13 @@ public class RankQuery implements QueryComponent{
 
         // Sort and return Top 10 =========================================================
 
-
-
-//
-//        // Create Binary Heap Priority Queue
-//        PriorityQueue<Map.Entry<Integer, Double>> queue
-//                = new PriorityQueue<>(Comparator.comparing(e -> e.getValue()));
-//
-//        // Get the top 10
-//        int k = 10;
-//        for (Map.Entry<Integer, Double> entry : acc.entrySet()) {
-//            queue.offer(entry);
-//            if (queue.size() > k) {
-//                queue.poll();
-//            }
-//        }
-//
-//        // Scan
-//        HashMap<Integer, Double> r = new HashMap<Integer,Double>();
-//        while (queue.size() > 0) {
-//            Integer h = queue.poll().getKey();
-//            r.put(h, acc.get(h));
-//        }
-//        //System.out.println(r);
-//
-//
-//        // For the Top 10 results
-//        // int count = 1;
-//
-//        for (HashMap.Entry<Integer, Double> entry : r.entrySet()) {
-//            Posting newP = new Posting(entry.getKey(),entry.getValue()); // Create new posting with DocID
-//            result.add(newP);
-//            //System.out.println("At: " +count);
-//            //count++;
-//        }
-
-
-
-
         PriorityQueue<Map.Entry<Integer, Double>> queue
                 = new PriorityQueue<>(Comparator.comparing(e -> e.getValue(), Collections.reverseOrder()));
 
         // Add to Priority Queue
         for (Map.Entry<Integer, Double> entry : acc.entrySet()) {
-            System.out.println("Offer check: "+queue.offer(entry));
+            //System.out.println("Offer check: "+queue.offer(entry));
+            queue.offer(entry);
         }
 
         List<Posting> result = new ArrayList<Posting>();
