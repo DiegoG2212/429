@@ -23,9 +23,7 @@ import cecs429.text.EnglishTokenStream;
 import org.tartarus.snowball.ext.englishStemmer;
 
 // General Imports
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,7 +71,7 @@ public class DiskPositionalIndexer {
         query();
     }
 
-    public void query() throws Exception {
+    public void query() throws IOException {
         // Load Default Directory (Last selected folder)
         // Disabled for now :(
         // BufferedReader br = new BufferedReader(new
@@ -119,28 +117,32 @@ public class DiskPositionalIndexer {
 
                         int returnVal = j.showOpenDialog(null); // Select File
                         File file = j.getSelectedFile();
-                        String fullPath = file.getAbsolutePath();
-                        System.out.println(fullPath);
-                        directory = fullPath;    // Update directory
+                        //System.out.println(returnVal);
+                        if(returnVal == 0) {
+                            String fullPath = file.getAbsolutePath();
+                            System.out.println(fullPath);
+                            directory = fullPath;    // Update directory
 
-                        /*
-                         * // Stores last chosen directory BufferedWriter writer; writer = new
-                         * BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
-                         * writer.write(fullPath); writer.close();
-                         */
+                            /*
+                             * // Stores last chosen directory BufferedWriter writer; writer = new
+                             * BufferedWriter(new FileWriter(PositionalInvertedIndexer.this.defStore));
+                             * writer.write(fullPath); writer.close();
+                             */
 
-                        // Update chosen directory
-                        try {
-                            updateDirectory(fullPath);
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
+                            // Update chosen directory
+                            try {
+                                updateDirectory(fullPath);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                            results.setText(""); // Clear previous
+                            results.append("" + indexTime + " milliseconds to index the corpus\n");
+
+                            /*
+                             * catch (IOException e1) { e1.printStackTrace(); }
+                             */
                         }
-                        results.setText(""); // Clear previous
-                        results.append("" + indexTime + " milliseconds to index the corpus\n");
-
-                        /*
-                         * catch (IOException e1) { e1.printStackTrace(); }
-                         */
+                        else{ System.out.println("Cancelled Directory");} 
                     }
                 });
                 // Search Button Action Listener
@@ -220,7 +222,19 @@ public class DiskPositionalIndexer {
                             } else {
                                 results.append("You must search a query first \n");
                             }
-                        } else {
+                        }
+
+                        // Special Query for MAP
+                        else if (special[0].equals(":MAP")) {
+                            try {
+                                MAP(); // Calls MAP function
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+
+
+                        else {
                             results.setText("");
                             String combine = "";
                             int counter = 0;
@@ -532,6 +546,25 @@ public class DiskPositionalIndexer {
         }
         return Math.sqrt(docWeight);
     }
+
+
+
+    // Milestone 3 Method ==========================
+    public void MAP () throws IOException {
+         BufferedReader br = new BufferedReader(new
+                 FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries.txt"));
+        BufferedReader br1 = new BufferedReader(new
+                FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/qrel.txt"));
+         //Reads text file into String
+         String st;
+         while ((st = br.readLine()) != null) {
+             System.out.println(st);
+         }
+
+
+    }
+
+
 
     public static void main(String[] args) throws Exception {
         new DiskPositionalIndexer(); // Calls program
