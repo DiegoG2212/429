@@ -147,13 +147,13 @@ public class RankQuery implements QueryComponent{
         List<Posting> result = new ArrayList<Posting>();
         int count = 0;
         int qSize = queue.size();
-        while (count < 10 && count < qSize) {
+        while (count < 50 && count < qSize) {
             Posting newP = new Posting(queue.peek().getKey(), queue.peek().getValue());
             result.add(newP);
             queue.remove();
             count++;
         }
-        System.out.println("Finished sorting and returning Top 10...");
+        System.out.println("Finished sorting and returning Top 50...");
         return result;
     } // End of getPostings
 }
