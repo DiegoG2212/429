@@ -615,7 +615,7 @@ public class DiskPositionalIndexer {
                     String check[] = qRel.get(queryCount).split("\\s+");
                     for(String s: check){ // For every "int" in corresponding qRel line
                         int iCheck = Integer.parseInt(s); // Parse Int
-                        if(fID == iCheck){ // If Postings ID matches with qRel ID
+                        if(fID == iCheck){ // (+) If Postings ID matches with qRel ID
 
                         }
                     }
