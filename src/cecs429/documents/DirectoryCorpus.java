@@ -105,6 +105,7 @@ public class DirectoryCorpus implements DocumentCorpus {
 		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		return "." + extension;
 	}
+
 	
 	@Override
 	public Iterable<Document> getDocuments() {

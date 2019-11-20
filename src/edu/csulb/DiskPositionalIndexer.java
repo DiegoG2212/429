@@ -142,7 +142,7 @@ public class DiskPositionalIndexer {
                              * catch (IOException e1) { e1.printStackTrace(); }
                              */
                         }
-                        else{ System.out.println("Cancelled Directory");} 
+                        else{ System.out.println("Cancelled Directory");}
                     }
                 });
                 // Search Button Action Listener
@@ -551,17 +551,89 @@ public class DiskPositionalIndexer {
 
     // Milestone 3 Method ==========================
     public void MAP () throws IOException {
-         BufferedReader br = new BufferedReader(new
-                 FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries.txt"));
+        BufferedReader br = new BufferedReader(new
+                 FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries"));
         BufferedReader br1 = new BufferedReader(new
-                FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/qrel.txt"));
-         //Reads text file into String
-         String st;
-         while ((st = br.readLine()) != null) {
-             System.out.println(st);
-         }
+                FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/qrel"));
+
+        //         //Reads text file into String
+//         String st;
+//         // Print queries
+//         while ((st = br.readLine()) != null) {
+//             System.out.println(st);
+//         }
+
+//        // Print query rel
+//         while ((st = br1.readLine()) != null) {
+//             System.out.println(st);
+//         }
+
+        int storeSelFormula = formulaSelect; // Stores user selected formula
+
+        // Store Query Rel
+        String query = "";
+        String st = "";
+        List<String> qRel = new ArrayList<String>();
+
+        // Create List of Query Rels
+        while ((st = br1.readLine()) != null) {
+            qRel.add(st);
+        }
+
+        // Cycle through formulas
+        for(formulaSelect = 0; formulaSelect < 4; formulaSelect++ ){
+            // AVG precision of all Queries
+            int avgPrec = 0;
+
+            //
+
+            int docIndexRelHit = 0;
+
+            // While loop for for all queries
+            int queryCount = 0;
+            while ((query = br.readLine()) != null) {
+                // Uses selected formula on query
+                QueryComponent q = new RankedQueryParser().parseQuery(query, corpus, formulaSelect);
+
+                // Get postings for query
+                int docIndex = 0;
+                for (Posting p : q.getPostings(index)) {
+                    // Get FileName of Document
+                    String fName = corpus.getDocument(p.getDocumentId()).getFileName();
+
+                    // Strip off extension and parse as int to get rid of padding
+                    int fID = Integer.parseInt(fName.substring(0, fName.indexOf(".")));
+
+                    // Print ID from Filename
+                    System.out.println("Doc Name: " + fID);
+
+                    // Print actual ID (Not used for checking relativity)
+                    System.out.println("ID: " + p.getDocumentId());
+
+                    // Compare found ID with qRel list
+                    // Split qRel line to get individual integers
+                    String check[] = qRel.get(queryCount).split("\\s+");
+                    for(String s: check){ // For every "int" in corresponding qRel line
+                        int iCheck = Integer.parseInt(s); // Parse Int
+                        if(fID == iCheck){ // If Postings ID matches with qRel ID
+
+                        }
+                    }
+
+                    System.out.println("");
+                }
+                queryCount++;
+            } // End of Query Loop
+
+            // Write AVG Precision to File
+
+            // File MAP to File
+
+        } // End of Formula Loop
 
 
+        // Restore user selected formula
+        formulaSelect = storeSelFormula;
     }
 
 

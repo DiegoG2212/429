@@ -78,6 +78,11 @@ public class JsonFileDocument implements FileDocument {
 		return "";
 	}
 
+
+	public String getFileName() {
+		return mFilePath.getFileName().toString();
+	}
+
 	@Override
 	public String getTitle() {
 		// return mFilePath.getFileName().toString();
@@ -121,4 +126,6 @@ class Article {
 	public String getURL() {
 		return this.url;
 	}
+
+
 }

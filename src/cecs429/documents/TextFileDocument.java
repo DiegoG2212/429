@@ -46,6 +46,11 @@ public class TextFileDocument implements FileDocument {
 	public String getTitle() {
 		return mFilePath.getFileName().toString();
 	}
+
+	@Override
+	public String getFileName() {
+		return mFilePath.getFileName().toString();
+	}
 	
 	public static FileDocument loadTextFileDocument(Path absolutePath, int documentId) {
 		return new TextFileDocument(documentId, absolutePath);
