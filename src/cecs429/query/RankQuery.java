@@ -134,7 +134,7 @@ public class RankQuery implements QueryComponent{
 
         // Sort and return Top 10 =========================================================
 
-        System.out.println("Sorting and returning Top 10 ...");
+        System.out.println("Sorting and returning Top 50 ...");
         PriorityQueue<Map.Entry<Integer, Double>> queue
                 = new PriorityQueue<>(Comparator.comparing(e -> e.getValue(), Collections.reverseOrder()));
 
