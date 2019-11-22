@@ -774,10 +774,10 @@ public class DiskPositionalIndexer {
 
         // Cycle through formulas
         for (int i = 0; i < 4; i++) {
-            System.out.println("Running Formula: " + 0 + "=========================================");
+            System.out.println("Running Formula: " + i + "=========================================");
 
             // Uses selected formula on query
-            QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, 0);
+            QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, i);
 
             // Get postings for query
             int precTrack = 0;
