@@ -24,6 +24,7 @@ import org.tartarus.snowball.ext.englishStemmer;
 
 // General Imports
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -898,8 +899,30 @@ public class DiskPositionalIndexer {
             OkapiWriter.close();
             WackyWriter.close();
 
+//            InputStream stdout = p.getInputStream();
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(stdout, StandardCharsets.UTF_8));
+//            String line;
+//            try{
+//                while((line = reader.readLine()) != null){
+//                    System.out.println("stdout: "+ line);
+//                }
+//            }catch(IOException e){
+//                System.out.println("Exception in reading output"+ e.toString());
+//            }
+            System.out.println("Graphed the results");
             System.out.println("================================================");
         } // End of Formula Loop
+
+        System.out.println("Running graphRankings.py...");
+        String command = "cmd /c start python " + directory + "/relevance/graphRankings.py";
+//            Process p = null;
+        try {
+            System.out.println("Running python script...");
+            Process temp = Runtime.getRuntime().exec(command);
+//                p = temp;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
