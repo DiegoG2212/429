@@ -39,43 +39,47 @@ public class RankQuery implements QueryComponent{
         HashMap<Integer, Double> acc = new HashMap<Integer, Double>();
 
         for(String s: query){
-            System.out.println("Query part: " +s);
+            //System.out.println("Query part: " +s);
             // Calculate wqt
             int dft = 0;
             for( Posting p: index.getPostings(s) ){ // Calculate dft
                 dft ++;
             }
-            System.out.println("DFT Count:" +dft);
+            //System.out.println("DFT Count:" +dft);
             double wqt = 0;
             if(dft == 0){
-                System.out.println("No Postings for: "+s);
+                //System.out.println("No Postings for: "+s);
             }
             else{
-                System.out.println("Calculating wqt for: " +s);
+                //System.out.println("Calculating wqt for: " +s);
                 if(formulaSelect == 0) { // Default
+                    //System.out.println("Default Formula WQT");
                     wqt = rankC.calculateWqt(new DefaultRank(corpusSize, dft));
                 }
                 if(formulaSelect == 1) { // tf-idf
+                    //System.out.println("tf-idf Formula WQT");
                     wqt = rankC.calculateWqt(new tfidfRank(corpusSize, dft));
                 }
                 if(formulaSelect == 2) { // OkapiBM25
+                    //System.out.println("OkapiBM25 Formula WQT");
                     wqt = rankC.calculateWqt(new OkapiRank(corpusSize, dft));
                 }
                 if(formulaSelect == 3) { // Wacky
+                    //System.out.println("Wacky Formula WQT");
                     wqt = rankC.calculateWqt(new WackyRank(corpusSize, dft));
                 }
 
-                System.out.println("Wqt Check: "+wqt);
+                //System.out.println("Wqt Check: "+wqt);
 
                 // For each document d in t's posting list
                 for (Posting p : index.getPositionalPostings(s)) {
-                    System.out.println("For postings: " +s);
+                    //System.out.println("For postings: " +s);
                     // Calculate wdt
                     int tftd = p.getPos().size();
-                    System.out.println("tftd for Wdt Calc Check: "+tftd);
+                    //System.out.println("tftd for Wdt Calc Check: "+tftd);
                     double wdt = 0;
 
-                    System.out.println("Calculating wdt for: " +s);
+                    //System.out.println("Calculating wdt for: " +s);
                     if(formulaSelect == 0) { // Default
                         wdt = rankC.calculateWdt(new DefaultRank(tftd));
                     }
@@ -88,17 +92,17 @@ public class RankQuery implements QueryComponent{
                     if(formulaSelect == 3) { // Wacky
                         wdt = rankC.calculateWdt(new WackyRank(tftd, index.getAvgTFtds(p.getDocumentId())));
                     }
-                    System.out.println("Wdt Check: "+wdt);
+                    //System.out.println("Wdt Check: "+wdt);
 
                     // If accumulator exists for document
                     if(acc.containsKey(p.getDocumentId()) ){
-                        System.out.println("Accumulator exists for: " +p.getDocumentId());
+                        //System.out.println("Accumulator exists for: " +p.getDocumentId());
                         double holdVal = acc.get(p.getDocumentId());
                         holdVal += (wdt * wqt);
                         acc.put(p.getDocumentId(), holdVal);
                     }
                     else{ // No accumulator yet
-                        System.out.println("No Accumulator yet for: " +p.getDocumentId());
+                        //System.out.println("No Accumulator yet for: " +p.getDocumentId());
                         double hold = (wdt * wqt);
                         acc.put(p.getDocumentId(), hold);
                     }
@@ -108,7 +112,7 @@ public class RankQuery implements QueryComponent{
         } // End of Query loop
 
         // For each non-zero Ad, divide Ad by Ld ===============
-        System.out.println("For each non-zero Ad, divided by Ld");
+        //System.out.println("For each non-zero Ad, divided by Ld");
         List<Double> LdList = index.getLds();
         int i = 0;
         for (HashMap.Entry<Integer, Double> scan : acc.entrySet()) {
@@ -130,11 +134,11 @@ public class RankQuery implements QueryComponent{
             }
         }
 
-        System.out.println("Finished dividing Ld ...");
+        //System.out.println("Finished dividing Ld ...");
 
         // Sort and return Top 10 =========================================================
 
-        System.out.println("Sorting and returning Top 50 ...");
+        //System.out.println("Sorting and returning Top 50 ...");
         PriorityQueue<Map.Entry<Integer, Double>> queue
                 = new PriorityQueue<>(Comparator.comparing(e -> e.getValue(), Collections.reverseOrder()));
 

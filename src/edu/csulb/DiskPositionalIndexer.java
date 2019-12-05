@@ -253,6 +253,20 @@ public class DiskPositionalIndexer {
                             } catch (IOException ex) {
                                 ex.printStackTrace();
                             }
+                        }
+                        else if (special[0].equals(":TMRT")) {
+                            try {
+                                TMRT(); // Calls MAP function
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                        else if (special[0].equals(":TMAP")) {
+                            try {
+                                TMAP(); // Calls MAP function
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
                         } else {
                             results.setText("");
                             String combine = "";
@@ -567,17 +581,15 @@ public class DiskPositionalIndexer {
 
     // Milestone 3 Methods ==========================
 
+
     public void MAP() throws IOException { // MAP ================================================
         // Scan for Queries + Query Rels
         BufferedReader br = new BufferedReader(new
                 FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries"));
         BufferedReader br1 = new BufferedReader(new
                 FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/qrel"));
-
-
         List<String> queries = new ArrayList<>(); // Store Queries
         List<String> qRel = new ArrayList<String>(); // Store  Queries Rels
-
 
         // Create List of Queries
         String query = "";
@@ -595,14 +607,12 @@ public class DiskPositionalIndexer {
 
         // Cycle through formulas
         for (int i = 0; i < 4; i++) {
-            //System.out.println("Running Formula " +i);
+            System.out.println("Running Formula " +i);
             // List of all query AVG Precisions
             double avgTotal = 0;
-
             int queryCount = 0;
+
             for (String s : queries) { // Query Loop ===============================================
-
-
                 // Uses selected formula on query
                 QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, i);
 
@@ -611,6 +621,8 @@ public class DiskPositionalIndexer {
                 int qRelCounter = 0;
                 double precisionStore = 0;
                 int docCount = 0;
+                String check[] = qRel.get(queryCount).split("\\s+");
+
                 for (Posting p : q.getPostings(index)) {
                     docCount++;
                     // Get FileName of Document
@@ -619,17 +631,9 @@ public class DiskPositionalIndexer {
                     // Strip off extension and parse as int to get rid of padding
                     int fID = Integer.parseInt(fName.substring(0, fName.indexOf(".")));
 
-                    // Print ID from Filename
-                    System.out.println("Doc Name: " + fID);
 
-                    // Print actual ID (Not used for checking relativity)
-                    //System.out.println("ID: " + p.getDocumentId());
-
-                    // Compare found ID with qRel list
-                    // Split qRel line to get individual integers
-                    String check[] = qRel.get(queryCount).split("\\s+");
                     for (String c : check) { // For every "int" in corresponding qRel line
-                        qRelCounter++;
+
                         int iCheck = Integer.parseInt(c); // Parse Int
                         if (fID == iCheck) { // (+) If Postings ID matches with qRel ID
                             precTrack++;
@@ -645,18 +649,15 @@ public class DiskPositionalIndexer {
                 } // End of Postings Loop
 
                 // Calc Avg Precision for Query
-                double avgPrecCalc = (precisionStore / qRelCounter);
+                double avgPrecCalc = (precisionStore / check.length);
 
                 // Add to Total list of Avg Precisions
                 avgTotal += avgPrecCalc;
 
                 queryCount++;
             } // End of Query Loop ========================================
-
-
             // Calc MAP
             double mapCalc = (avgTotal / queryCount);
-            System.out.println("MAP CALC: " + mapCalc);
 
             // Store Values
             formulaMAPs.add(mapCalc);
@@ -680,9 +681,8 @@ public class DiskPositionalIndexer {
                 FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries"));
 
         List<String> queries = new ArrayList<>(); // Store Queries
-
         List<Float> allMRT = new ArrayList<Float>();
-        float MRTSum = 0;
+
 
         // Create List of Queries
         String query = "";
@@ -692,6 +692,8 @@ public class DiskPositionalIndexer {
 
         // Cycle through formulas
         for (int i = 0; i < 4; i++) {
+            float MRTSum = 0;
+
             //System.out.println("Running Formula " +i);
             int queryCount = 0;
             for (String s : queries) { // Query Loop ===============================================
@@ -701,9 +703,7 @@ public class DiskPositionalIndexer {
                 QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, i);
 
                 // Get postings for query using formula
-                for (Posting p : q.getPostings(index)) {
-                    //System.out.println("Posting: " +corpus.getDocument(p.getDocumentId()).getTitle() );
-                } // End of Postings Loop
+                q.getPostings(index);
 
                 // End Timer
                 long endTime = System.currentTimeMillis();
@@ -749,6 +749,7 @@ public class DiskPositionalIndexer {
     }
 
 
+
     public void PrecisionRecall() throws IOException { // Precision Recall Curve ================================================
         // Scan for Queries + Query Rels
         BufferedReader br = new BufferedReader(new
@@ -765,9 +766,7 @@ public class DiskPositionalIndexer {
         String st = br1.readLine();
         System.out.println("qRel: " + st);
 
-        // Lists
-        List<Double> precision = new ArrayList<Double>();
-        List<Double> recall = new ArrayList<Double>();
+
 
         // Split qRel line to get individual integers
         String check[] = st.split("\\s+");
@@ -776,6 +775,9 @@ public class DiskPositionalIndexer {
         // Cycle through formulas
         for (int i = 0; i < 4; i++) {
             System.out.println("Running Formula: " + i + "=========================================");
+            // Lists
+            List<Double> precision = new ArrayList<Double>();
+            List<Double> recall = new ArrayList<Double>();
 
             // Uses selected formula on query
             QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, i);
@@ -784,7 +786,6 @@ public class DiskPositionalIndexer {
             int precTrack = 0;
             int docCount = 0;
             for (Posting p : q.getPostings(index)) { // Doc Loop ======================
-
                 docCount++;
                 // Get FileName of Document
                 String fName = corpus.getDocument(p.getDocumentId()).getFileName();
@@ -802,11 +803,11 @@ public class DiskPositionalIndexer {
                 int hit = 0;
                 for (String c : check) { // For every "int" in corresponding qRel line
                     int iCheck = Integer.parseInt(c); // Parse Int
-                    System.out.println("Check iCheck: " + iCheck);
+                    //System.out.println("Check iCheck: " + iCheck);
 
                     if (fID == iCheck) { // (+) If Postings ID matches with qRel ID
                         hit = 1;
-                        System.out.println("Hit");
+                        //System.out.println("Hit");
                         precTrack++;
                         double pCalc = ((double) (precTrack)) / (double) docCount;
 
@@ -822,7 +823,7 @@ public class DiskPositionalIndexer {
 
                 if (hit == 0) {
 
-                    System.out.println("Miss");
+                    //System.out.println("Miss");
                     double pCalc = ((double) (precTrack)) / (double) docCount;
 
                     // Recall
@@ -837,68 +838,156 @@ public class DiskPositionalIndexer {
                 System.out.println("");
             } // End of Postings Loop
 
-
-//            DataOutputStream DefaultWriter = new DataOutputStream(new FileOutputStream(Paths.get(directory).toAbsolutePath() + "/relevance/DefaultPlot.txt"));
-//            DataOutputStream tfidfWriter = new DataOutputStream(new FileOutputStream(Paths.get(directory).toAbsolutePath() + "/relevance/tfidfPlot.txt"));
-//            DataOutputStream OkapiWriter = new DataOutputStream(new FileOutputStream(Paths.get(directory).toAbsolutePath() + "/relevance/OkapiPlot.txt"));
-//            DataOutputStream WackyWriter = new DataOutputStream(new FileOutputStream(Paths.get(directory).toAbsolutePath() + "/relevance/WackyPlot.txt"));
-
-
-            // Stores last chosen directory
-            BufferedWriter DefaultWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/DefaultPlot.txt"));
-            BufferedWriter tfidfWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/tfidfPlot.txt"));
-            BufferedWriter OkapiWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/OkapiPlot.txt"));
-            BufferedWriter WackyWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/WackyPlot.txt"));
-
-//            writer.write(fullPath);
-//            writer.close();
-//
-
-
-            for (int b = 0; b < 4; b++) {
-                for (int x = 0; x < docCount; x++) {
-                    System.out.print("Precision: " + precision.get(x));
-                    System.out.println(", Recall: " + recall.get(x));
-
-                    if (b == 0) {
-                        DefaultWriter.write(precision.get(x).toString());
-                        DefaultWriter.write(",");
-                        DefaultWriter.write(recall.get(x).toString());
-                        DefaultWriter.write("\n");
-
-                    }
-                    if (b == 1) {
-                        tfidfWriter.write(precision.get(x).toString());
-                        tfidfWriter.write(",");
-                        tfidfWriter.write(recall.get(x).toString());
-                        tfidfWriter.write("\n");
-
-
-                    }
-                    if (b == 2) {
-                        OkapiWriter.write(precision.get(x).toString());
-                        OkapiWriter.write(",");
-                        OkapiWriter.write(recall.get(x).toString());
-                        OkapiWriter.write("\n");
-
-
-                    }
-                    if (b == 3) {
-                        WackyWriter.write(precision.get(x).toString());
-                        WackyWriter.write(",");
-                        WackyWriter.write(recall.get(x).toString());
-                        WackyWriter.write("\n");
-
-
-                    }
-                }
+            if(i == 0){
+                BufferedWriter DefaultWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/DefaultPlot.txt"));
+                precRecWrite(DefaultWriter, precision, recall, i, docCount);
+            }
+            if(i == 1){
+                BufferedWriter tfidfWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/tfidfPlot.txt"));
+                precRecWrite(tfidfWriter, precision, recall, i, docCount);
+            }
+            if(i == 2){
+                BufferedWriter OkapiWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/OkapiPlot.txt"));
+                precRecWrite(OkapiWriter, precision, recall, i, docCount);
+            }
+            if(i == 3){
+                BufferedWriter WackyWriter = new BufferedWriter(new FileWriter(Paths.get(directory).toAbsolutePath() + "/relevance/WackyPlot.txt"));
+                precRecWrite(WackyWriter, precision, recall, i, docCount);
             }
 
-            DefaultWriter.close();
-            tfidfWriter.close();
-            OkapiWriter.close();
-            WackyWriter.close();
 
+
+            System.out.println("================================================");
+        } // End of Formula Loop
+    }
+
+
+    public void precRecWrite(BufferedWriter writer, List<Double> p, List<Double> r, int i, int docCount) throws IOException{
+        List<Double> precision = p;
+        List<Double> recall = r;
+
+
+        for (int x = 0; x < docCount; x++) {
+            System.out.print("Precision: " + precision.get(x));
+            System.out.println(", Recall: " + recall.get(x));
+
+            if (i == 0) {
+                writer.write(precision.get(x).toString());
+                writer.write(",");
+                writer.write(recall.get(x).toString());
+                writer.write("\n");
+
+            }
+            if (i == 1) {
+
+                writer.write(precision.get(x).toString());
+                writer.write(",");
+                writer.write(recall.get(x).toString());
+                writer.write("\n");
+
+
+            }
+            if (i == 2) {
+                writer.write(precision.get(x).toString());
+                writer.write(",");
+                writer.write(recall.get(x).toString());
+                writer.write("\n");
+            }
+            if (i == 3) {
+                writer.write(precision.get(x).toString());
+                writer.write(",");
+                writer.write(recall.get(x).toString());
+                writer.write("\n");
+            }
+        } // End of for loop
+
+        writer.close();
+    }
+
+
+
+
+
+
+
+
+
+
+
+    // Methods for Turn In Section =============================================================================
+    public void TMAP() throws IOException { // MAP ================================================
+        results.setText(""); // Clear Output
+
+        // Scan for Queries + Query Rels
+        BufferedReader br = new BufferedReader(new
+                FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries"));
+        BufferedReader br1 = new BufferedReader(new
+                FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/qrel"));
+
+
+        List<String> queries = new ArrayList<>(); // Store Queries
+        List<String> qRel = new ArrayList<String>(); // Store  Queries Rels
+
+        // Create List of Queries
+        String query = "";
+        while ((query = br.readLine()) != null) {
+            queries.add(query);
+        }
+
+        // Create List of Query Rels
+        String st = "";
+        while ((st = br1.readLine()) != null) {
+            qRel.add(st);
+        }
+
+        List<Double> formulaMAPs = new ArrayList<Double>(); // Store MAP results for each formula
+
+        String s = queries.get(0); // Get First Query
+        int i = 0; // Formula
+        results.append("Query: " +s +"\n");
+
+        // Uses selected formula on query
+        QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, i);
+
+        // Get postings for query
+        int precTrack = 0;
+        int qRelCounter = 0;
+        double precisionStore = 0;
+        int docCount = 0;
+        String check[] = qRel.get(0).split("\\s+"); //qRel of First Query
+
+        for (Posting p : q.getPostings(index)) {
+            docCount++;
+            // Get FileName of Document
+            String fName = corpus.getDocument(p.getDocumentId()).getFileName();
+
+            // Strip off extension and parse as int to get rid of padding
+            int fID = Integer.parseInt(fName.substring(0, fName.indexOf(".")));
+
+            // Print ID from Filename
+            System.out.println("Doc Name: " + fID);
+            results.append("Document: " +fID +"\n");
+
+            // Compare found ID with qRel list
+            // Split qRel line to get individual integers
+
+            for (String c : check) { // For every "int" in corresponding qRel line
+                int iCheck = Integer.parseInt(c); // Parse Int
+                if (fID == iCheck) { // (+) If Postings ID matches with qRel ID
+                    results.append("Is a Relevant Document \n");
+
+                    precTrack++;
+                    double calc = ((double) (precTrack)) / (double) docCount;
+                    // Store Precision
+                    precisionStore += calc;
+                }
+            }
+            results.append("\n");
+
+            System.out.println("");
+        } // End of Postings Loop
+
+<<<<<<< Updated upstream
 //            InputStream stdout = p.getInputStream();
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(stdout, StandardCharsets.UTF_8));
 //            String line;
@@ -923,8 +1012,69 @@ public class DiskPositionalIndexer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+=======
+        // Calc Avg Precision for Query
+        double avgPrecCalc = (precisionStore / check.length);
+
+
+        // Print Results
+        // results.setText("");
+        results.append("AVG Precision: " +avgPrecCalc + "\n");
     }
 
+
+    public void TMRT() throws IOException { // MRT ===================================================
+        // Scan for Queries
+        BufferedReader br = new BufferedReader(new
+                FileReader(Paths.get(directory).toAbsolutePath() + "/relevance/queries"));
+
+        List<String> queries = new ArrayList<>(); // Store Queries
+
+        // Create List of Queries
+        String query = "";
+        while ((query = br.readLine()) != null) {
+            queries.add(query);
+        }
+
+
+        int i = 2; // Formula
+        String s = queries.get(0); // First Query
+        float tList = 0;
+
+        for(int h = 0; h < 30; h++) { // Start 30 Loop
+            long startTime = System.currentTimeMillis(); // Start Timer
+
+            // Uses selected formula on query
+            QueryComponent q = new RankedQueryParser().parseQuery(s, corpus, i);
+
+            // Get Postings
+            q.getPostings(index);
+
+            // End Timer
+            long endTime = System.currentTimeMillis();
+
+            // Calc Total Time for Query
+            float totalTime = (endTime - startTime) / 1000F;
+            tList += totalTime; // Add Time to Total
+
+
+        } // End of 30 Loop
+
+        float MRTCalc = tList/30; // Calculate Formula MRT
+        // Calc Throughput
+        float dThrough = 1 / MRTCalc;
+
+
+        // Print Throughput
+        results.setText(""); // Clear output
+        //results.append("Okapi Formula \n");
+        results.append("Query: " +s +"\n");
+        results.append("First Query, 30 Iterations Avg Throughput: " +dThrough +" queries/second \n");
+        results.append("\n");
+>>>>>>> Stashed changes
+    }
+
+    // ===============================================================================================
 
     public static void main(String[] args) throws Exception {
         new DiskPositionalIndexer(); // Calls program
